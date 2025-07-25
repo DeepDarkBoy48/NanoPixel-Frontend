@@ -11,6 +11,7 @@ const isRegister = ref(false)
         <el-col :span="6" :offset="3" class="form">
             <!-- 注册表单 -->
             <!-- v-if:是否显示注册或者登陆 -->
+             
             <el-form ref="form" size="large" autocomplete="off" v-if="isRegister">
                 <el-form-item>
                     <h1>注册</h1>
