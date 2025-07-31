@@ -5,17 +5,25 @@ import axios from "axios";
 //定义一个变量,记录公共的前缀  ,  baseURL
 const baseURL = "/api";
 const instance = axios.create({ baseURL });
+import { ElMessage } from "element-plus";
 
 //添加响应拦截器
 //axios通过参数的位置来决定，第一个参数是成功的回调，第二个参数是失败的回调
+//添加响应拦截器
 instance.interceptors.response.use(
   (result) => {
-    return result.data;
+    //如果业务状态码为0，代表本次操作成功
+    if (result.data.code == 0) {
+      ElMessage.success(result.data.message || "操作成功");
+      return result.data;
+    }
+    //代码走到这里，代表业务状态码不是0，本次操作失败
+    ElMessage.error(result.data.message || "操作失败");
+    return Promise.reject(result.data); //异步的状态转化成失败的状态
   },
   (err) => {
-    alert("服务异常");
+    ElMessage.error("服务异常");
     return Promise.reject(err); //异步的状态转化成失败的状态
   }
 );
 export default instance;
-

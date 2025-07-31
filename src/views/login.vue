@@ -1,6 +1,8 @@
 <script setup>
 import { User, Lock } from "@element-plus/icons-vue";
 import { ref } from "vue";
+//引入element-plus的消息提示组件
+import { ElMessage } from 'element-plus'
 //控制注册与登录表单的显示， 默认显示注册
 const isRegister = ref(false);
 
@@ -40,18 +42,18 @@ import { userRegisterService } from "@/api/user";
 const register = async () => {
   //校验表单数据
   if (!registerData.value.username || !registerData.value.password || !registerData.value.rePassword) {
-    alert("请输入完整信息");
+    ElMessage.error('请输入完整信息');
     return;
   } else if (registerData.value.password !== registerData.value.rePassword) {
-    alert("两次输入密码不一致");
+    ElMessage.error('两次输入密码不一致');
     return;
   }
   let result = await userRegisterService(registerData.value);
-  if (result.code === "0") {
-    alert("注册成功");
-  } else {
-    alert(result.message);
-  }
+  // if (result.code === "0") {
+  //   alert("注册成功");
+  // } else {
+  //   alert(result.message);
+  // }
 };
 
 //调用后台接口，完成登录
@@ -59,17 +61,18 @@ import { userLoginService } from "@/api/user";
 const login = async () => {
   //校验表单数据
   if (!registerData.value.username || !registerData.value.password) {
-    alert("请输入完整信息");
+    ElMessage.error('请输入完整信息');
     return;
   }
   let result = await userLoginService(registerData.value);
-  if (result.code === "0") {
-    alert("登录成功");
-  } else {
-    alert(result.message);
-  }
+  // if (result.code === "0") {
+  //   alert("登录成功");
+  // } else {
+  //   alert(result.message);
+  // }
 };
 
+// 清空注册数据
 const clearRegisterData = () => {
   registerData.value.username = "";
   registerData.value.password = "";
