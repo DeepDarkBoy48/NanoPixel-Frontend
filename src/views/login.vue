@@ -58,6 +58,9 @@ const register = async () => {
 
 //调用后台接口，完成登录
 import { userLoginService } from "@/api/user";
+//引入路由模块
+import { useRouter } from 'vue-router'
+const router = useRouter();
 const login = async () => {
   //校验表单数据
   if (!registerData.value.username || !registerData.value.password) {
@@ -67,6 +70,8 @@ const login = async () => {
   let result = await userLoginService(registerData.value);
   // if (result.code === "0") {
   //   alert("登录成功");
+  //登录成功，跳转到首页
+  router.push({ path: '/' });
   // } else {
   //   alert(result.message);
   // }
