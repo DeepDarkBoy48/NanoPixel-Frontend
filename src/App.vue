@@ -1,6 +1,5 @@
 <script setup>
-import loginVue from './views/login.vue'
-import layout from './views/layout.vue';  
+
 </script>
 
 <template>

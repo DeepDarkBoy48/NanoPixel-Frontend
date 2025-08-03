@@ -56,6 +56,8 @@ const register = async () => {
   // }
 };
 
+import { useTokenStore } from "@/store/token";
+const tokenStore = useTokenStore();
 //调用后台接口，完成登录
 import { userLoginService } from "@/api/user";
 //引入路由模块
@@ -68,6 +70,7 @@ const login = async () => {
     return;
   }
   let result = await userLoginService(registerData.value);
+  tokenStore.token = result.data;
   // if (result.code === "0") {
   //   alert("登录成功");
   //登录成功，跳转到首页
@@ -83,6 +86,8 @@ const clearRegisterData = () => {
   registerData.value.password = "";
   registerData.value.rePassword = "";
 }
+
+
 </script>
 
 <template>
