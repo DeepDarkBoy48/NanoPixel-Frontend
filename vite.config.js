@@ -6,6 +6,7 @@ import vueDevTools from "vite-plugin-vue-devtools";
 
 // https://vite.dev/config/
 export default defineConfig({
+  // vueDevTools()是开发工具，在开发时使用，生产时不需要使用
   plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {

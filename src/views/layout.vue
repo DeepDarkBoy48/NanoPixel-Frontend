@@ -10,12 +10,67 @@ import {
     CaretBottom
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
+import { userInfoService } from '@/api/user.js'
+import useUserInfoStore from '@/store/userInfo.js'
+import { useTokenStore } from '@/store/token.js'
+const tokenStore = useTokenStore();
+const userInfoStore = useUserInfoStore();
+//调用函数,获取用户详细信息
+const getUserInfo = async () => {
+    //调用接口
+    let result = await userInfoService();
+    //数据存储到pinia中
+    userInfoStore.setInfo(result.data);
+}
+getUserInfo();
+
+import { useRouter } from 'vue-router'
+const router = useRouter();
+import { ElMessage, ElMessageBox } from 'element-plus'
+const handleCommand = (command) => {
+    //判断指令
+    if (command === 'logout') {
+        //退出登录
+        ElMessageBox.confirm(
+            '您确认要退出吗?',
+            '温馨提示',
+            {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }
+        )
+            .then(async () => {
+                //退出登录
+                //1.清空pinia中存储的token以及个人信息
+                tokenStore.removeToken()
+                userInfoStore.removeInfo()
+
+                //2.跳转到登录页面
+                router.push('/login')
+                ElMessage({
+                    type: 'success',
+                    message: '退出登录成功',
+                })
+
+            })
+            .catch(() => {
+                ElMessage({
+                    type: 'info',
+                    message: '用户取消了退出登录',
+                })
+            })
+    } else {
+        //路由
+        router.push('/user/' + command)
+    }
+}
 </script>
 <template>
     <!-- el-container 容器 -->
     <el-container class="layout-container">
         <!-- 左侧菜单 -->
-        <el-aside width="500px">
+        <el-aside width="200px">
             <div class="el-aside__logo"></div>
             <!-- 菜单 -->
             <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router>
@@ -69,11 +124,12 @@ import avatar from '@/assets/default.png'
         <el-container>
             <!-- 头部区域 -->
             <el-header>
-                <div>黑马程序员：<strong>东哥</strong></div>
-
-                <el-dropdown placement="bottom-end">
+                <div>黑马程序员：<strong>{{ userInfoStore.info.nickname }}</strong></div>
+                <!-- 下拉菜单 -->
+                <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
+                <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
-                        <el-avatar :src="avatar" />
+                        <el-avatar :src="userInfoStore.info.userPic ? userInfoStore.info.userPic : avatar" />
                         <el-icon>
                             <CaretBottom />
                         </el-icon>
@@ -81,13 +137,13 @@ import avatar from '@/assets/default.png'
 
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <el-dropdown-item command="profile" :icon="User">
+                            <el-dropdown-item command="info" :icon="User">
                                 基本资料
                             </el-dropdown-item>
                             <el-dropdown-item command="avatar" :icon="Crop">
                                 更换头像
                             </el-dropdown-item>
-                            <el-dropdown-item command="password" :icon="EditPen">
+                            <el-dropdown-item command="resetPassword" :icon="EditPen">
                                 重置密码
                             </el-dropdown-item>
                             <el-dropdown-item command="logout" :icon="SwitchButton">
@@ -100,7 +156,7 @@ import avatar from '@/assets/default.png'
 
             <!-- 中间区域 -->
             <el-main>
-                <div style="width: 1290px; height: 570px; border: 1px solid red;">
+                <div style="width: 100%; height: 100%; border: 1px solid red;">
                     <RouterView />
                 </div>
             </el-main>

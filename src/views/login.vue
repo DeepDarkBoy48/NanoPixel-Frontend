@@ -70,7 +70,7 @@ const login = async () => {
     return;
   }
   let result = await userLoginService(registerData.value);
-  tokenStore.token = result.data;
+  tokenStore.setToken(result.data);
   // if (result.code === "0") {
   //   alert("登录成功");
   //登录成功，跳转到首页
