@@ -1,5 +1,5 @@
 # 构建阶段 (builder stage)
-FROM node:18 AS builder
+FROM node:20 AS builder
 
 # 设置工作目录
 WORKDIR /vue
