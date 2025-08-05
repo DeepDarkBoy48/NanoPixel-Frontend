@@ -42,7 +42,7 @@ instance.interceptors.response.use(
       // console.log(allData);
       return result.data;
     }
-   
+
     //代码走到这里，代表业务状态码不是0，本次操作失败
     ElMessage.error(result.data.message || "操作失败");
     return Promise.reject(result.data); //异步的状态转化成失败的状态
@@ -50,12 +50,12 @@ instance.interceptors.response.use(
   (err) => {
     //如果响应状态码是401，代表token失效
     if (err.response && err.response.status === 401) {
-        ElMessage.error("登录状态已过期，请重新登录");
-        const tokenStore = useTokenStore();
-        tokenStore.removeToken();
-        router.push('/login');
+      ElMessage.error("登录状态已过期，请重新登录");
+      const tokenStore = useTokenStore();
+      tokenStore.removeToken();
+      router.push('/login');
     } else {
-        ElMessage.error("服务异常");
+      ElMessage.error("服务异常");
     }
     return Promise.reject(err); //异步的状态转化成失败的状态
   }
