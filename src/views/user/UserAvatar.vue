@@ -14,7 +14,7 @@ const imgUrl = ref(userInfoStore.info.userPic)
 
 //图片上传成功的回调函数
 const uploadSuccess = (result) => {
-    imgUrl.value = result.data;
+    imgUrl.value = result.data.fileUrl;
 }
 
 
@@ -89,7 +89,6 @@ const updateAvatar = async () => {
             width: 278px;
             height: 278px;
             text-align: center;
-        }
-    }
+        }}
 }
 </style>
