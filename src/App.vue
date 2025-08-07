@@ -4,7 +4,8 @@
 
 <template>
     <!-- <loginVue />
-    <layout /> -->
+    <layout /> 111-->
+    <!-- 这里很重要 -->
     <router-view></router-view>
 </template>
 
