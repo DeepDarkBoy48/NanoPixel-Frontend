@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue'
 import {
     Management,
     Promotion,
@@ -7,7 +8,10 @@ import {
     Crop,
     EditPen,
     SwitchButton,
-    CaretBottom
+    CaretBottom,
+    ChatLineRound,
+    Fold,
+    Expand
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 import { userInfoService } from '@/api/user.js'
@@ -15,6 +19,7 @@ import useUserInfoStore from '@/store/userInfo.js'
 import { useTokenStore } from '@/store/token.js'
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
+const isCollapse = ref(false)
 //调用函数,获取用户详细信息
 const getUserInfo = async () => {
     //调用接口
@@ -70,10 +75,11 @@ const handleCommand = (command) => {
     <!-- el-container 容器 -->
     <el-container class="layout-container">
         <!-- 左侧菜单 -->
-        <el-aside width="200px">
+        <el-aside :width="isCollapse ? '64px' : '200px'">
             <div class="el-aside__logo"></div>
             <!-- 菜单 -->
-            <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router>
+            <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router
+                :collapse="isCollapse" :collapse-transition="false">
                 <el-menu-item index="/article/category">
                     <el-icon>
                         <Management />
@@ -86,6 +92,13 @@ const handleCommand = (command) => {
                         <Promotion />
                     </el-icon>
                     <span>文章管理</span>
+                </el-menu-item>
+
+                <el-menu-item index="/user/chatRoom">
+                    <el-icon>
+                        <ChatLineRound />
+                    </el-icon>
+                    <span>聊天室</span>
                 </el-menu-item>
 
                 <el-sub-menu index="/user">
@@ -124,7 +137,12 @@ const handleCommand = (command) => {
         <el-container>
             <!-- 头部区域 -->
             <el-header>
-                <div>黑马程序员：<strong>{{ userInfoStore.info.nickname }}</strong></div>
+                <div>
+                    <el-icon @click="isCollapse = !isCollapse" class="header-icon">
+                        <component :is="isCollapse ? Expand : Fold" />
+                    </el-icon>
+                    <span>黑马程序员：</span><strong>{{ userInfoStore.info.nickname }}</strong>
+                </div>
                 <!-- 下拉菜单 -->
                 <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
                 <el-dropdown placement="bottom-end" @command="handleCommand">
@@ -156,9 +174,7 @@ const handleCommand = (command) => {
 
             <!-- 中间区域 -->
             <el-main>
-                <div style="width: 100%; height: 100%; border: 1px solid red;">
-                    <RouterView />
-                </div>
+                <RouterView />
             </el-main>
 
             <!-- 底部区域 -->
@@ -185,11 +201,47 @@ const handleCommand = (command) => {
         }
     }
 
+    .el-main {
+        flex: 1;
+        /* 让 el-main 充满剩余空间 */
+        display: flex;
+        /* 内部也使用 flex 布局 */
+        flex-direction: column;
+        /* 纵向排列 */
+        min-height: 0;
+        /* 关键：允许 flex item 收缩 */
+        padding: 0;
+
+        /* 让 RouterView 充满 el-main */
+        :deep(> .el-card),
+        :deep(> div) {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
     .el-header {
-        background-color: #fff;
         display: flex;
         align-items: center;
         justify-content: space-between;
+
+        div {
+            display: flex;
+            align-items: center;
+
+            .header-icon {
+                font-size: 24px;
+                margin-right: 12px;
+                cursor: pointer;
+                color: #555;
+                transition: color 0.3s;
+
+                &:hover {
+                    color: var(--el-color-primary);
+                }
+            }
+        }
 
         .el-dropdown__box {
             display: flex;

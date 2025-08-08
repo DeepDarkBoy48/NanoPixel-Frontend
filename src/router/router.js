@@ -7,7 +7,7 @@ import ArticleManageVue from "@/views/article/ArticleManage.vue";
 import UserInfoVue from "@/views/user/UserInfo.vue";
 import UserAvatarVUe from "@/views/user/UserAvatar.vue";
 import UserResetPasswordVue from "@/views/user/UserResetPassword.vue";
-
+import UserChatRoomVue from "@/views/user/UserChatRoom.vue";
 //定义路由关系
 const routes = [
   { path: "/login", component: LoginVue },
@@ -23,6 +23,7 @@ const routes = [
       { path: "/user/info", component: UserInfoVue },
       { path: "/user/avatar", component: UserAvatarVUe },
       { path: "/user/resetPassword", component: UserResetPasswordVue },
+      { path: "/user/chatRoom", component: UserChatRoomVue },
     ],
   },
 ];
