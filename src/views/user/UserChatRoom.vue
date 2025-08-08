@@ -27,7 +27,10 @@ const getMessageType = (from) => {
 
 //连接WebSocket
 const connectWs = () => {
-    ws = new WebSocket('ws://discordbot:8081/chat/' + userInfo.info.id);
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = window.location.host;
+    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    ws = new WebSocket(wsUrl);
     ws.onopen = () => {
         console.log('连接成功');
     }
