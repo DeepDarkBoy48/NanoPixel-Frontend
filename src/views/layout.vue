@@ -242,9 +242,7 @@ const handleMenuClick = () => {
                         <el-icon>
                             <CaretBottom />
                         </el-icon>
-                    </span>
-
-                    <template #dropdown>
+                    </span> <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item command="info" :icon="User">
                                 基本资料

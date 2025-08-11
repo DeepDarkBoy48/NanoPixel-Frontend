@@ -366,6 +366,13 @@ const sendMessage = () => {
 
 .msg-input {
     flex: 1;
+
+    // 解决移动端输入框点击自动放大的问题
+    @media (max-width: 768px) {
+        :deep(textarea) {
+            font-size: 16px;
+        }
+    }
 }
 
 .input-actions {
