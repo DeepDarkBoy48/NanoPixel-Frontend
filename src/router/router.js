@@ -8,6 +8,7 @@ import UserInfoVue from "@/views/user/UserInfo.vue";
 import UserAvatarVUe from "@/views/user/UserAvatar.vue";
 import UserResetPasswordVue from "@/views/user/UserResetPassword.vue";
 import UserChatRoomVue from "@/views/user/UserChatRoom.vue";
+import BlogVue from "@/views/blog/blog.vue";
 //定义路由关系
 const routes = [
   { path: "/login", component: LoginVue },
@@ -26,6 +27,7 @@ const routes = [
       { path: "/user/chatRoom", component: UserChatRoomVue },
     ],
   },
+  { path: "/blog", component: BlogVue },
 ];
 
 //创建路由器
