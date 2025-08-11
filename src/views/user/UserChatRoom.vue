@@ -18,8 +18,8 @@ const userInfo = useUserInfoStore();
 let ws = null;
 // 心跳定时器
 let heartbeatInterval = null;
-// 纯原生滚动容器引用
-const scrollContainerRef = ref(null)
+// El-scrollbar 组件引用
+const scrollbarRef = ref(null)
 
 // 获取当前用户昵称，用于判断消息归属
 const currentUserName = computed(() => userInfo?.info?.nickname || '我')
@@ -64,12 +64,12 @@ const connectWs = () => {
     if (ws) return; // 防止重复连接
 
     // 本地开发环境，直接连接后端
-    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
-    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    // const host = window.location.host;
-    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = window.location.host;
+    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -89,9 +89,11 @@ const connectWs = () => {
             messageList.value.push(message)
             // 新消息后滚动到底部
             nextTick(() => {
-                const el = scrollContainerRef.value
-                if (el) {
-                    el.scrollTop = el.scrollHeight
+                if (scrollbarRef.value) {
+                    const scrollContainer = scrollbarRef.value.wrapRef
+                    if (scrollContainer) {
+                        scrollContainer.scrollTop = scrollContainer.scrollHeight
+                    }
                 }
             })
         } catch (error) {
@@ -171,7 +173,7 @@ const sendMessage = () => {
                             <div class="meta">
                                 <span class="name">{{ msg.from === 'server' ? '系统' : msg.from }}</span>
                             </div>
-                            <div class="content" v-html="msg.message"></div>
+                            <div class="content" v-html="renderMessageHtml(msg)"></div>
                         </div>
                     </template>
 
@@ -181,7 +183,7 @@ const sendMessage = () => {
                             <div class="meta">
                                 <span class="name">{{ msg.from }}</span>
                             </div>
-                            <div class="content">{{ msg.message }}</div>
+                            <div class="content" v-html="renderMessageHtml(msg)"></div>
                         </div>
                         <el-avatar class="avatar" size="default" :src="userInfo.info.userPic">
                             {{ msg.from.charAt(0) }}

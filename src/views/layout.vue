@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import {
     Management,
     Promotion,
@@ -11,7 +11,8 @@ import {
     CaretBottom,
     ChatLineRound,
     Fold,
-    Expand
+    Expand,
+    Menu
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 import { userInfoService } from '@/api/user.js'
@@ -20,6 +21,29 @@ import { useTokenStore } from '@/store/token.js'
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
 const isCollapse = ref(false)
+const isMobile = ref(false)
+const drawerVisible = ref(false)
+
+const checkIsMobile = () => {
+    isMobile.value = window.innerWidth < 768
+}
+
+onMounted(() => {
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', checkIsMobile)
+})
+
+// 监听 isMobile 变化，如果从移动端切换到桌面端，确保抽屉关闭
+watch(isMobile, (newVal) => {
+    if (!newVal) {
+        drawerVisible.value = false
+    }
+})
+
 //调用函数,获取用户详细信息
 const getUserInfo = async () => {
     //调用接口
@@ -70,12 +94,20 @@ const handleCommand = (command) => {
         router.push('/user/' + command)
     }
 }
+
+const handleMenuClick = () => {
+    if (isMobile.value) {
+        drawerVisible.value = !drawerVisible.value
+    } else {
+        isCollapse.value = !isCollapse.value
+    }
+}
 </script>
 <template>
     <!-- el-container 容器 -->
     <el-container class="layout-container">
-        <!-- 左侧菜单 -->
-        <el-aside :width="isCollapse ? '64px' : '200px'">
+        <!-- 左侧菜单 (桌面端) -->
+        <el-aside v-if="!isMobile" :width="isCollapse ? '64px' : '200px'">
             <div class="el-aside__logo"></div>
             <!-- 菜单 -->
             <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router
@@ -133,15 +165,74 @@ const handleCommand = (command) => {
             </el-menu>
         </el-aside>
 
+        <!-- 抽屉菜单 (移动端) -->
+        <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="200px" :with-header="false"
+            class="mobile-drawer">
+            <div class="el-aside__logo"></div>
+            <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router
+                @select="drawerVisible = false">
+                <el-menu-item index="/article/category">
+                    <el-icon>
+                        <Management />
+                    </el-icon>
+                    <span>文章分类</span>
+                </el-menu-item>
+
+                <el-menu-item index="/article/manage">
+                    <el-icon>
+                        <Promotion />
+                    </el-icon>
+                    <span>文章管理</span>
+                </el-menu-item>
+
+                <el-menu-item index="/user/chatRoom">
+                    <el-icon>
+                        <ChatLineRound />
+                    </el-icon>
+                    <span>聊天室</span>
+                </el-menu-item>
+
+                <el-sub-menu index="/user">
+                    <template #title>
+                        <el-icon>
+                            <UserFilled />
+                        </el-icon>
+                        <span>个人中心</span>
+                    </template>
+
+                    <el-menu-item index="/user/info">
+                        <el-icon>
+                            <User />
+                        </el-icon>
+                        <span>基本资料</span>
+                    </el-menu-item>
+
+                    <el-menu-item index="/user/avatar">
+                        <el-icon>
+                            <Crop />
+                        </el-icon>
+                        <span>更换头像</span>
+                    </el-menu-item>
+
+                    <el-menu-item index="/user/resetPassword">
+                        <el-icon>
+                            <EditPen />
+                        </el-icon>
+                        <span>重置密码</span>
+                    </el-menu-item>
+                </el-sub-menu>
+            </el-menu>
+        </el-drawer>
+
         <!-- 右侧主区域 -->
         <el-container>
             <!-- 头部区域 -->
             <el-header>
                 <div>
-                    <el-icon @click="isCollapse = !isCollapse" class="header-icon">
-                        <component :is="isCollapse ? Expand : Fold" />
+                    <el-icon @click="handleMenuClick" class="header-icon">
+                        <component :is="isMobile ? Menu : (isCollapse ? Expand : Fold)" />
                     </el-icon>
-                    <span>黑马程序员：</span><strong>{{ userInfoStore.info.nickname }}</strong>
+                    <span class="header-title">黑马程序员：</span><strong>{{ userInfoStore.info.nickname }}</strong>
                 </div>
                 <!-- 下拉菜单 -->
                 <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
@@ -190,6 +281,7 @@ const handleCommand = (command) => {
 
     .el-aside {
         background-color: #232323;
+        transition: width 0.3s;
 
         &__logo {
             height: 120px;
@@ -252,10 +344,23 @@ const handleCommand = (command) => {
     }
 }
 
-// .el-footer {
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     font-size: 14px;
-//     color: #666;
-// }</style>
+:deep(.mobile-drawer) {
+    .el-drawer__body {
+        padding: 0;
+        background-color: #232323;
+    }
+
+    .el-menu {
+        border-right: none;
+    }
+}
+
+
+@media (max-width: 767px) {
+    .el-header {
+        .header-title {
+            display: none;
+        }
+    }
+}
+</style>
