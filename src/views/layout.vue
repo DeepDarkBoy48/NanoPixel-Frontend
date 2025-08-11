@@ -232,7 +232,7 @@ const handleMenuClick = () => {
                     <el-icon @click="handleMenuClick" class="header-icon">
                         <component :is="isMobile ? Menu : (isCollapse ? Expand : Fold)" />
                     </el-icon>
-                    <span class="header-title">黑马程序员：</span><strong>{{ userInfoStore.info.nickname }}</strong>
+                    <span class="header-title"></span><strong>{{ userInfoStore.info.nickname }}</strong>
                 </div>
                 <!-- 下拉菜单 -->
                 <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
