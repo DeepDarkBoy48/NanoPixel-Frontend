@@ -301,6 +301,12 @@ const handleMenuClick = () => {
         min-height: 0;
         /* 关键：允许 flex item 收缩 */
         padding: 12px;
+        height: 100%;
+        box-sizing: border-box;
+
+        @media (max-width: 768px) {
+            padding: 0;
+        }
     }
 
     .el-header {

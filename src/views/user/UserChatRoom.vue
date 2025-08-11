@@ -379,4 +379,48 @@ const sendMessage = () => {
     display: flex;
     gap: 8px;
 }
+
+@media (max-width: 768px) {
+    .chat-room {
+        padding: 0;
+    }
+
+    .chat-card {
+        border: none;
+        border-radius: 0;
+
+        :deep(.el-card__header) {
+            display: none;
+        }
+    }
+
+    .message-list-scrollbar {
+        :deep(.el-scrollbar__view) {
+            padding: 12px 8px;
+        }
+    }
+
+    .message-row {
+        flex-direction: column;
+
+        .bubble {
+            max-width: 95%;
+        }
+
+        .avatar {
+            margin: 0 0 8px 0;
+        }
+
+        &.message-self {
+            flex-direction: column-reverse;
+            align-items: flex-end;
+        }
+
+        &.message-other,
+        &.message-system,
+        &.message-ai {
+            align-items: flex-start;
+        }
+    }
+}
 </style>
