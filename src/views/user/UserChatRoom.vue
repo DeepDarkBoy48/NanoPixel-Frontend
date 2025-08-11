@@ -2,6 +2,10 @@
 import { ChatDotRound } from '@element-plus/icons-vue'
 
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import MarkdownIt from 'markdown-it'
+import DOMPurify from 'dompurify'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
 // 导入用户信息存储
 import useUserInfoStore from '@/store/userInfo'
 //用于储存消息列表
@@ -12,8 +16,10 @@ const currentMessage = ref('')
 const userInfo = useUserInfoStore();
 //用于储存WebSocket连接
 let ws = null;
+// 心跳定时器
+let heartbeatInterval = null;
 // 纯原生滚动容器引用
-const scrollbarRef = ref(null)
+const scrollContainerRef = ref(null)
 
 // 获取当前用户昵称，用于判断消息归属
 const currentUserName = computed(() => userInfo?.info?.nickname || '我')
@@ -25,14 +31,57 @@ const getMessageType = (from) => {
     return 'other'
 }
 
+// Markdown 渲染器，配置 highlight.js
+const markdown = new MarkdownIt({
+    html: false,
+    linkify: true,
+    breaks: true,
+    highlight: function (str, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+            try {
+                return '<pre class="hljs"><code>' +
+                    hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+                    '</code></pre>';
+            } catch (__) { }
+        }
+
+        return '<pre class="hljs"><code>' + markdown.utils.escapeHtml(str) + '</code></pre>';
+    }
+})
+
+const renderMessageHtml = (msg) => {
+    const text = typeof msg?.message === 'string' ? msg.message : ''
+    if (getMessageType(msg.from) === 'system' || msg.from === 'AI') {
+        // 系统消息按 Markdown 渲染，并做 XSS 清洗
+        return DOMPurify.sanitize(markdown.render(text))
+    }
+    // 其他消息如果本身包含 HTML，仅做清洗；保持现有行为
+    return DOMPurify.sanitize(text)
+}
+
 //连接WebSocket
 const connectWs = () => {
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = window.location.host;
-    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    if (ws) return; // 防止重复连接
+
+    // 本地开发环境，直接连接后端
+    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+
+    // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
+    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    // const host = window.location.host;
+    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+
     ws = new WebSocket(wsUrl);
+
     ws.onopen = () => {
         console.log('连接成功');
+        // 连接成功后，启动心跳机制
+        heartbeatInterval = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                // 发送一个心跳包到服务器
+                ws.send(JSON.stringify({ type: "ping" }));
+            }
+        }, 30000); // 每30秒发送一次
     }
     ws.onmessage = (event) => {
         try {
@@ -40,10 +89,9 @@ const connectWs = () => {
             messageList.value.push(message)
             // 新消息后滚动到底部
             nextTick(() => {
-                if (scrollbarRef.value) {
-                    const wrap = scrollbarRef.value.wrapRef
-                    const scrollHeight = wrap.scrollHeight
-                    scrollbarRef.value.setScrollTop(scrollHeight)
+                const el = scrollContainerRef.value
+                if (el) {
+                    el.scrollTop = el.scrollHeight
                 }
             })
         } catch (error) {
@@ -52,6 +100,8 @@ const connectWs = () => {
     }
     ws.onclose = () => {
         console.log('连接关闭');
+        // 连接关闭时，清除心跳
+        clearInterval(heartbeatInterval);
     }
     ws.onerror = (error) => {
         console.log(error);
@@ -71,6 +121,8 @@ onBeforeUnmount(() => {
         ws.close()
         ws = null
     }
+    // 确保定时器被清除
+    clearInterval(heartbeatInterval);
 })
 
 const sendMessage = () => {
@@ -152,7 +204,6 @@ const sendMessage = () => {
             </div>
         </el-card>
     </div>
-
 </template>
 
 
@@ -203,6 +254,8 @@ const sendMessage = () => {
 
 .message-list-scrollbar {
     flex: 1;
+    overflow: auto;
+    /* 新增：允许内容溢出时滚动 */
 
     :deep(.el-scrollbar__view) {
         padding: 16px;

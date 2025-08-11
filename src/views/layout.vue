@@ -177,10 +177,10 @@ const handleCommand = (command) => {
                 <RouterView />
             </el-main>
 
-            <!-- 底部区域 -->
+            <!-- 底部区域
             <el-footer>
                 大事件 ©2023 Created by 黑马程序员
-            </el-footer>
+            </el-footer> -->
         </el-container>
     </el-container>
 </template>
@@ -210,15 +210,7 @@ const handleCommand = (command) => {
         /* 纵向排列 */
         min-height: 0;
         /* 关键：允许 flex item 收缩 */
-        padding: 0;
-
-        /* 让 RouterView 充满 el-main */
-        :deep(> .el-card),
-        :deep(> div) {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+        padding: 12px;
     }
 
     .el-header {
@@ -258,13 +250,12 @@ const handleCommand = (command) => {
             }
         }
     }
-
-    .el-footer {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        color: #666;
-    }
 }
-</style>
+
+// .el-footer {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     font-size: 14px;
+//     color: #666;
+// }</style>
