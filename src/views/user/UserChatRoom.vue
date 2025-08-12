@@ -64,12 +64,12 @@ const connectWs = () => {
     if (ws) return; // 防止重复连接
 
     // 本地开发环境，直接连接后端
-    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const host = window.location.host;
-    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -201,7 +201,7 @@ const sendMessage = () => {
                 <el-input v-model="currentMessage" class="msg-input" type="textarea" placeholder="输入消息，支持 @指令 ……"
                     :autosize="{ minRows: 2, maxRows: 6 }" />
                 <div class="input-actions">
-                    <el-button type="primary" @click="sendMessage">发送</el-button>
+                    <el-button type="primary" @click="sendMessage" @keyup.enter="sendMessage">发送</el-button>
                 </div>
             </div>
         </el-card>
