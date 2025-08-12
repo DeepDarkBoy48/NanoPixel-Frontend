@@ -305,7 +305,7 @@ const handleMenuClick = () => {
         box-sizing: border-box;
 
         @media (max-width: 768px) {
-            padding: 0;
+            padding: 8px;
         }
     }
 
@@ -365,6 +365,24 @@ const handleMenuClick = () => {
         .header-title {
             display: none;
         }
+    }
+}
+
+/* 移动端：固定整体布局并让头部粘在顶部 */
+@media (max-width: 768px) {
+    .layout-container {
+        position: fixed;
+        inset: 0;
+        height: 100dvh;
+        width: 100%;
+        background: var(--el-bg-color, #fff);
+    }
+
+    .layout-container .el-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--el-bg-color, #fff);
     }
 }
 </style>
