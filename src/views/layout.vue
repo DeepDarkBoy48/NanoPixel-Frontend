@@ -376,11 +376,17 @@ const handleMenuClick = () => {
         height: 100dvh;
         width: 100%;
         background: var(--el-bg-color, #fff);
+        /* 适配 iOS 安全区域 */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        box-sizing: border-box;
     }
 
     .layout-container .el-header {
         position: sticky;
-        top: 0;
+        top: env(safe-area-inset-top);
         z-index: 100;
         background: var(--el-bg-color, #fff);
     }
