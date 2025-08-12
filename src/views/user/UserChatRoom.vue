@@ -64,12 +64,12 @@ const connectWs = () => {
     if (ws) return; // 防止重复连接
 
     // 本地开发环境，直接连接后端
-    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const host = window.location.host;
-    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -257,11 +257,12 @@ const sendMessage = () => {
 .message-list-scrollbar {
     flex: 1;
     overflow: auto;
-    /* 新增：允许内容溢出时滚动 */
+    max-width: 100%;
 
     :deep(.el-scrollbar__view) {
         padding: 16px;
         box-sizing: border-box;
+        max-width: 100%;
     }
 }
 
@@ -269,6 +270,7 @@ const sendMessage = () => {
     display: flex;
     align-items: flex-end;
     margin-bottom: 14px;
+    width: 100%;
 
     .avatar {
         margin: 0 10px;
@@ -308,6 +310,7 @@ const sendMessage = () => {
     border-radius: 12px;
     padding: 10px 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    word-break: break-word;
 
     .meta {
         display: flex;
@@ -383,6 +386,7 @@ const sendMessage = () => {
 @media (max-width: 768px) {
     .chat-room {
         padding: 0;
+        overflow-x: hidden;
     }
 
     .chat-card {
@@ -395,6 +399,10 @@ const sendMessage = () => {
     }
 
     .message-list-scrollbar {
+        :deep(.el-scrollbar__wrap) {
+            overflow-x: hidden !important;
+        }
+
         :deep(.el-scrollbar__view) {
             padding: 12px 8px;
         }
@@ -402,9 +410,10 @@ const sendMessage = () => {
 
     .message-row {
         flex-direction: column;
+        width: 100%;
 
         .bubble {
-            max-width: 95%;
+            max-width: 100%;
         }
 
         .avatar {

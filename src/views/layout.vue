@@ -276,6 +276,7 @@ const handleMenuClick = () => {
 <style lang="scss" scoped>
 .layout-container {
     height: 100vh;
+    overflow-x: hidden;
 
     .el-aside {
         background-color: #232323;
@@ -302,6 +303,7 @@ const handleMenuClick = () => {
         /* 关键：允许 flex item 收缩 */
         padding: 12px;
         overflow-y: auto;
+        overflow-x: hidden;
         box-sizing: border-box;
 
         @media (max-width: 768px) {
@@ -375,6 +377,8 @@ const handleMenuClick = () => {
         inset: 0;
         height: 100dvh;
         width: 100%;
+        overflow: hidden;
+        /* 禁止整体横向滚动 */
         background: var(--el-bg-color, #fff);
         /* 适配 iOS 安全区域 */
         padding-top: env(safe-area-inset-top);
