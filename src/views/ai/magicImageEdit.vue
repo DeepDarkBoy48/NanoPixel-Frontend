@@ -12,59 +12,118 @@
 
             <div class="content">
                 <div class="left">
-                    <el-form label-width="84px" class="form">
-                        <el-form-item label="提示词">
-                            <div class="preset-toolbar">
-                                <div class="row">
-                                    <el-select v-model="selectedPreset" placeholder="快速模版（可选）" clearable filterable size="large"
-                                        class="preset-select" @change="onPresetChange">
-                                        <el-option v-for="item in presetOptions" :key="item.value" :label="item.label"
-                                            :value="item.value" />
-                                    </el-select>
-                                    <el-button @click="randomPreset" :disabled="submitting" plain>随机模版</el-button>
-                                    <el-button @click="copyPrompt" :disabled="!prompt.trim()" plain>复制提示词</el-button>
+                    <div class="template-area form">
+                        <el-form>
+                            <el-form-item>
+                                <div class="preset-toolbar">
+                                    <div class="subcard">
+                                        <div class="subcard-header">快速模版</div>
+                                        <div class="row">
+                                            <el-select v-model="selectedPreset" placeholder="快速模版（可选）" clearable
+                                                filterable size="large" class="preset-select" @change="onPresetChange">
+                                                <el-option v-for="item in presetOptions" :key="item.value"
+                                                    :label="item.label" :value="item.value" />
+                                            </el-select>
+                                            <el-button @click="randomPreset" :disabled="submitting"
+                                                plain>随机模版</el-button>
+                                            <el-button @click="copyPrompt" :disabled="!prompt.trim()" plain>复制提示词
+                                            </el-button>
+                                        </div>
+                                    </div>
+                                    <div class="subcard">
+                                        <div class="subcard-header subcard-header--top">
+                                            <span>下拉组合模版</span>
+                                            <div class="carousel-controls">
+                                                <el-button :icon="ArrowLeft" circle size="small" @click="shiftPage(-1)"
+                                                    :disabled="submitting" />
+                                                <el-button :icon="ArrowRight" circle size="small" @click="shiftPage(1)"
+                                                    :disabled="submitting" />
+                                            </div>
+                                        </div>
+                                        <div class="carousel-container">
+                                            <div class="card-viewport">
+                                                <div class="subcard-header">{{ currentPageTitle }}</div>
+                                                <transition name="fade" mode="out-in">
+                                                    <div class="carousel-page" v-if="currentPage === 0" key="page0">
+                                                        <div class="row carousel-row">
+                                                            <el-select v-model="selectedSubject" placeholder="选择主体类型"
+                                                                clearable size="large" class="subject-select">
+                                                                <el-option v-for="item in subjectOptions"
+                                                                    :key="item.value" :label="item.label"
+                                                                    :value="item.value" />
+                                                            </el-select>
+                                                            <el-select v-model="selectedScene" placeholder="选择场景"
+                                                                clearable size="large" class="era-select">
+                                                                <el-option v-for="item in sceneOptions"
+                                                                    :key="item.value" :label="item.label"
+                                                                    :value="item.value" />
+                                                            </el-select>
+                                                        </div>
+                                                        <div class="row carousel-row">
+                                                            <el-select v-model="selectedArtStyle" placeholder="选择艺术风格"
+                                                                clearable size="large" class="style-select">
+                                                                <el-option v-for="item in artStyleOptions"
+                                                                    :key="item.value" :label="item.label"
+                                                                    :value="item.value" />
+                                                            </el-select>
+                                                            <el-button @click="smartCombo" :disabled="submitting"
+                                                                plain>智能组合</el-button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row carousel-row" v-else-if="currentPage === 1"
+                                                        key="page1">
+                                                        <el-select v-model="selectedEra" placeholder="年代风格模版" clearable
+                                                            size="large">
+                                                            <el-option v-for="item in eraOptions" :key="item.value"
+                                                                :label="item.label" :value="item.value" />
+                                                        </el-select>
+                                                    </div>
+                                                    <div class="row carousel-row" v-else key="page2">
+                                                        <el-select v-model="selectedCelebrity" placeholder="名人站在你身边模版"
+                                                            clearable size="large">
+                                                            <el-option v-for="item in celebrityOptions"
+                                                                :key="item.value" :label="item.label"
+                                                                :value="item.value" />
+                                                        </el-select>
+                                                        <el-select v-model="selectedPose" placeholder="名人和你的姿势模版"
+                                                            clearable size="large">
+                                                            <el-option v-for="item in poseOptions" :key="item.value"
+                                                                :label="item.label" :value="item.value" />
+                                                        </el-select>
+                                                    </div>
+                                                </transition>
+                                            </div>
+                                        </div>
+                                        <div class="hint">可选择「快速模版」或自由组合三个下拉菜单；不做约束，随心搭配。</div>
+                                    </div>
                                 </div>
-                                <div class="row">
-                                    <el-select v-model="selectedSubject" placeholder="选择主体类型" clearable size="large"
-                                        class="subject-select">
-                                        <el-option v-for="item in subjectOptions" :key="item.value" :label="item.label"
-                                            :value="item.value" />
-                                    </el-select>
-                                    <el-select v-model="selectedScene" placeholder="选择场景" clearable size="large"
-                                        class="era-select">
-                                        <el-option v-for="item in sceneOptionsShown" :key="item.value" :label="item.label"
-                                            :value="item.value" />
-                                    </el-select>
-                                    <el-select v-model="selectedArtStyle" placeholder="选择艺术风格" clearable size="large"
-                                        class="style-select">
-                                        <el-option v-for="item in artStyleOptionsShown" :key="item.value" :label="item.label"
-                                            :value="item.value" />
-                                    </el-select>
-                                    <el-button @click="smartCombo" :disabled="submitting" plain>智能组合</el-button>
-                                </div>
-                                <div class="hint">可选择「快速模版」或自由组合三个下拉菜单；系统会智能约束，保证语义合理、不乱搭配。</div>
-                            </div>
-                            <el-input v-model="prompt" type="textarea" :rows="7" placeholder="请选择上方模版/预设，或直接在此处输入提示词"
-                                clearable />
-                        </el-form-item>
+                            </el-form-item>
+                        </el-form>
+                    </div>
 
-                        <el-form-item label="上传图片">
-                            <el-upload class="uploader" :auto-upload="false" :limit="1" :show-file-list="true"
-                                :on-change="handleFileChange" :on-remove="handleFileRemove" :file-list="fileList"
-                                accept="image/*">
-                                <el-button type="primary">选择图片</el-button>
-                                <template #tip>
-                                    <div class="el-upload__tip">仅支持单张图片，建议不超过 10MB</div>
-                                </template>
-                            </el-upload>
-                        </el-form-item>
-
-                        <el-form-item>
-                            <el-button type="primary" size="large" :disabled="!canSubmit || submitting"
-                                :loading="submitting" @click="onSubmit">提交</el-button>
-                            <el-button @click="onReset" :disabled="submitting">重置</el-button>
-                        </el-form-item>
-                    </el-form>
+                    <div class="input-area form">
+                        <el-form>
+                            <el-form-item>
+                                <el-input v-model="prompt" type="textarea" :rows="7"
+                                    placeholder="请选择上方模版/预设，或直接在此处输入提示词" clearable />
+                            </el-form-item>
+                            <el-form-item>
+                                <el-upload class="uploader" :auto-upload="false" :limit="1" :show-file-list="true"
+                                    :on-change="handleFileChange" :on-remove="handleFileRemove" :file-list="fileList"
+                                    accept="image/*">
+                                    <el-button type="primary">选择图片</el-button>
+                                    <template #tip>
+                                        <div class="el-upload__tip">仅支持单张图片，建议不超过 10MB</div>
+                                    </template>
+                                </el-upload>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" size="large" :disabled="!canSubmit || submitting"
+                                    :loading="submitting" @click="onSubmit">提交</el-button>
+                                <el-button @click="onReset" :disabled="submitting">重置</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
                 </div>
 
                 <div class="right">
@@ -96,6 +155,7 @@
 import { ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { imageEditService } from '@/api/ai'
+import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 
 const prompt = ref('')
 
@@ -120,6 +180,12 @@ const presetOptions = [
 ]
 
 // 组合选择
+const TOTAL_PAGES = 3
+const currentPage = ref(0)
+const pageTitles = ['核心三元素', '时空之旅', '名人合影']
+const currentPageTitle = computed(() => pageTitles[currentPage.value])
+
+// Card 0 State
 const selectedSubject = ref('')
 const subjectOptions = [
     {
@@ -169,41 +235,84 @@ const artStyleOptions = [
     { value: 'isometric', label: '等距视角立体', description: '等距视角的微缩场景呈现，几何秩序与立体构成，画面整洁。' },
 ]
 
+// 第二页：新增三个下拉
+const selectedEra = ref('')
+const selectedCelebrity = ref('')
+const selectedPose = ref('')
+
+const eraOptions = [
+    { value: '1980s', label: '80年代复古胶片' },
+    { value: '1990s', label: '90年代嘻哈街头' },
+    { value: '2000s', label: '千禧年Y2K美学' },
+    { value: 'victorian', label: '维多利亚时代' },
+    { value: 'future_tech', label: '未来科技感' },
+]
+
+const celebrityOptions = [
+    { value: 'taylor_swift', label: '泰勒·斯威夫特' },
+    { value: 'tom_cruise', label: '汤姆·克鲁斯' },
+    { value: 'emma_watson', label: '艾玛·沃森' },
+    { value: 'dwayne_johnson', label: '道恩·强森' },
+    { value: 'scarlett_johansson', label: '斯嘉丽·约翰逊' },
+]
+
+const poseOptions = [
+    { value: 'side_by_side', label: '并肩站立' },
+    { value: 'back_to_back', label: '背靠背合照' },
+    { value: 'selfie', label: '一起温馨自拍' },
+    { value: 'cheers', label: '碰杯庆祝' },
+    { value: 'high_five', label: '击掌瞬间' },
+]
+
 // 直接覆盖生成的提示词（不追加）
 function applyText(text) {
     prompt.value = text
 }
 
 function updatePromptFromSelections() {
-    // Handle special template
     const subjectSelection = subjectOptions.find(opt => opt.value === selectedSubject.value)
-    if (subjectSelection?.template) {
-        applyText(subjectSelection.template)
-        return
+
+    // Page 0 构文
+    const buildPage0 = () => {
+        if (subjectSelection?.template) return subjectSelection.template
+        if (!selectedSubject.value && !selectedScene.value && !selectedArtStyle.value) return ''
+        const parts = []
+        let base = `请为本图进行再创作`
+        const sceneSelection = sceneOptions.find(opt => opt.value === selectedScene.value)
+        if (sceneSelection) base += `，${sceneSelection.description}`
+        if (subjectSelection) parts.push(`主体需要${subjectSelection.description}`)
+        const styleSelection = artStyleOptions.find(opt => opt.value === selectedArtStyle.value)
+        if (styleSelection) parts.push(styleSelection.description)
+        return base + ' ' + parts.join('，') + '。'
     }
 
-    // Handle combinations
-    if (!selectedSubject.value && !selectedScene.value && !selectedArtStyle.value) {
-        prompt.value = ''
-        return
+    // Page 1 构文
+    const buildPage1 = () => {
+        if (!selectedEra.value) return ''
+        const era = eraOptions.find(o => o.value === selectedEra.value)
+        return era ? `整体画面呈现${era.label}的风格。` : ''
     }
 
-    const parts = []
-    let base = `请为本图进行再创作`
+    // Page 2 构文
+    const buildPage2 = () => {
+        if (!selectedCelebrity.value && !selectedPose.value) return ''
+        const parts = []
+        const celeb = celebrityOptions.find(o => o.value === selectedCelebrity.value)
+        const pose = poseOptions.find(o => o.value === selectedPose.value)
+        if (celeb && pose) {
+            parts.push(`画面中需要出现名人${celeb.label}，并与你一起摆出${pose.label}的姿势`)
+        } else if (celeb) {
+            parts.push(`画面中需要出现名人${celeb.label}`)
+        }
+        return parts.join('，') + '。'
+    }
 
-    const sceneSelection = sceneOptions.find(opt => opt.value === selectedScene.value)
-    if (sceneSelection) base += `，${sceneSelection.description}`
-
-    if (subjectSelection) parts.push(`主体需要${subjectSelection.description}`)
-
-    const styleSelection = artStyleOptions.find(opt => opt.value === selectedArtStyle.value)
-    if (styleSelection) parts.push(styleSelection.description)
-
-    const text = base + ' ' + parts.join('，') + '。要求画面富有想象力，细节精致，充满故事感。'
-    applyText(text)
+    const chunks = [buildPage0(), buildPage1(), buildPage2()].filter(Boolean)
+    const finalText = chunks.join(' ') + (chunks.length ? '要求画面富有想象力，细节精致，充满故事感。' : '')
+    applyText(finalText)
 }
 
-watch([selectedSubject, selectedScene, selectedArtStyle], updatePromptFromSelections)
+watch([selectedSubject, selectedScene, selectedArtStyle, selectedEra, selectedCelebrity, selectedPose], updatePromptFromSelections)
 
 const fileList = ref([])
 const selectedFile = ref(null)
@@ -236,6 +345,13 @@ const handleFileRemove = () => {
 const onReset = () => {
     prompt.value = ''
     selectedPreset.value = ''
+    selectedSubject.value = ''
+    selectedScene.value = ''
+    selectedArtStyle.value = ''
+    selectedEra.value = ''
+    selectedCelebrity.value = ''
+    selectedPose.value = ''
+    currentPage.value = 0
     handleFileRemove()
     resultUrl.value = ''
 }
@@ -260,6 +376,10 @@ watch(() => selectedFile.value, (_, __, onCleanup) => {
     onCleanup(() => revokePreview())
 })
 
+function shiftPage(direction) {
+    currentPage.value = (currentPage.value + direction + TOTAL_PAGES) % TOTAL_PAGES
+}
+
 // 交互：快速模版与工具
 function onPresetChange(val) {
     const tpl = presetOptions.find(i => i.value === val)?.template
@@ -273,76 +393,7 @@ function randomPreset() {
     onPresetChange(selectedPreset.value)
 }
 
-// 兼容性与智能组合
-const compatibility = {
-    subjectToScenes: {
-        mech_pilot: ['cyberpunk_city', 'steampunk_sky_city', 'moon_base'],
-        gothic_vampire: ['victorian_manor', 'enchanted_forest'],
-        rock_star: ['concert_stage', 'retro_arcade', 'cyberpunk_city'],
-        astronaut: ['moon_base', 'cyberpunk_city', 'floating_islands'],
-        samurai: ['floating_islands', 'enchanted_forest', 'victorian_manor'],
-        wizard: ['enchanted_forest', 'floating_islands'],
-        street_dancer: ['retro_arcade', 'cyberpunk_city'],
-        chef: ['magazine_studio'],
-        '8_bit_hero': ['retro_arcade'],
-        time_magazine_cover: ['magazine_studio']
-    },
-    subjectToStyles: {
-        mech_pilot: ['glitch_art', 'retro_futurism', 'low_poly'],
-        gothic_vampire: ['film_noir', 'oil_paint', 'van_gogh'],
-        rock_star: ['glitch_art', 'retro_futurism', 'meme_style'],
-        astronaut: ['retro_futurism', 'film_noir', 'low_poly'],
-        samurai: ['ukiyo_e', 'van_gogh', 'oil_paint'],
-        wizard: ['van_gogh', 'studio_ghibli', 'oil_paint'],
-        street_dancer: ['glitch_art', 'pixel_art', 'meme_style'],
-        chef: ['film_noir', 'oil_paint'],
-        '8_bit_hero': ['pixel_art'],
-        time_magazine_cover: ['film_noir', 'retro_futurism']
-    },
-    sceneToStyles: {
-        cyberpunk_city: ['glitch_art', 'retro_futurism', 'pixel_art'],
-        steampunk_sky_city: ['retro_futurism', 'oil_paint', 'van_gogh'],
-        moon_base: ['retro_futurism', 'film_noir', 'low_poly'],
-        enchanted_forest: ['van_gogh', 'studio_ghibli', 'oil_paint', 'papercraft'],
-        victorian_manor: ['film_noir', 'oil_paint', 'van_gogh'],
-        magazine_studio: ['film_noir', 'oil_paint'],
-        retro_arcade: ['pixel_art', 'glitch_art', 'meme_style'],
-        floating_islands: ['studio_ghibli', 'van_gogh', 'isometric'],
-        concert_stage: ['glitch_art', 'retro_futurism', 'meme_style']
-    }
-}
-
-const sceneOptionsShown = computed(() => {
-    const sub = selectedSubject.value
-    const allow = compatibility.subjectToScenes[sub]
-    return allow ? sceneOptions.filter(o => allow.includes(o.value)) : sceneOptions
-})
-
-const artStyleOptionsShown = computed(() => {
-    const sub = selectedSubject.value
-    const sc = selectedScene.value
-    const allowBySub = compatibility.subjectToStyles[sub]
-    const allowByScene = compatibility.sceneToStyles[sc]
-    return artStyleOptions.filter(o => (!allowBySub || allowBySub.includes(o.value)) && (!allowByScene || allowByScene.includes(o.value)))
-})
-
-watch(selectedSubject, () => {
-    if (selectedScene.value) {
-        const ok = sceneOptionsShown.value.some(o => o.value === selectedScene.value)
-        if (!ok) selectedScene.value = ''
-    }
-    if (selectedArtStyle.value) {
-        const ok = artStyleOptionsShown.value.some(o => o.value === selectedArtStyle.value)
-        if (!ok) selectedArtStyle.value = ''
-    }
-})
-
-watch(selectedScene, () => {
-    if (selectedArtStyle.value) {
-        const ok = artStyleOptionsShown.value.some(o => o.value === selectedArtStyle.value)
-        if (!ok) selectedArtStyle.value = ''
-    }
-})
+// 已放开互斥约束：三个下拉可自由组合，无需兼容过滤
 
 const curatedCombos = [
     { subject: 'mech_pilot', scene: 'cyberpunk_city', style: 'glitch_art' },
@@ -359,37 +410,14 @@ const curatedCombos = [
 
 function smartCombo() {
     const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
-    // 如果都没选，给一个预置的高质量组合
-    if (!selectedSubject.value && !selectedScene.value && !selectedArtStyle.value) {
-        const combo = pick(curatedCombos)
-        selectedSubject.value = combo.subject
-        selectedScene.value = combo.scene
-        selectedArtStyle.value = combo.style
-        updatePromptFromSelections()
-        return
-    }
-    // 填充缺失项，且保证兼容
-    if (!selectedSubject.value) {
-        // 反查与当前 scene/style 兼容的主体
-        const candidates = subjectOptions.filter(su => {
-            const allowScenes = compatibility.subjectToScenes[su.value]
-            const allowStyles = compatibility.subjectToStyles[su.value]
-            const sceneOk = selectedScene.value ? allowScenes?.includes(selectedScene.value) : true
-            const styleOk = selectedArtStyle.value ? allowStyles?.includes(selectedArtStyle.value) : true
-            return sceneOk && styleOk
-        })
-        selectedSubject.value = (pick(candidates) || {}).value || ''
-    }
-    if (!selectedScene.value) {
-        const allowScenes = compatibility.subjectToScenes[selectedSubject.value] || sceneOptions.map(o => o.value)
-        selectedScene.value = pick(sceneOptions.filter(o => allowScenes.includes(o.value)))?.value || ''
-    }
-    if (!selectedArtStyle.value) {
-        const allowBySub = compatibility.subjectToStyles[selectedSubject.value] || artStyleOptions.map(o => o.value)
-        const allowByScene = compatibility.sceneToStyles[selectedScene.value] || artStyleOptions.map(o => o.value)
-        const intersection = artStyleOptions.filter(o => allowBySub.includes(o.value) && allowByScene.includes(o.value))
-        selectedArtStyle.value = pick(intersection.length ? intersection : artStyleOptions)?.value || ''
-    }
+    // 当前选择的组合键，用于避免重复
+    const currentKey = `${selectedSubject.value}|${selectedScene.value}|${selectedArtStyle.value}`
+    // 从预置高质量组合中过滤掉当前组合，保证每次点击都会“变换”
+    const pool = curatedCombos.filter(c => `${c.subject}|${c.scene}|${c.style}` !== currentKey)
+    const combo = pick(pool.length ? pool : curatedCombos)
+    selectedSubject.value = combo.subject
+    selectedScene.value = combo.scene
+    selectedArtStyle.value = combo.style
     updatePromptFromSelections()
 }
 
@@ -454,6 +482,12 @@ async function copyPrompt() {
     display: grid;
     grid-template-columns: 420px 1fr;
     gap: 20px;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .form {
@@ -523,11 +557,105 @@ async function copyPrompt() {
     align-items: center;
 }
 
-.preset-toolbar .row.minor { /* removed minor row in simplified UI */ }
+.subcard {
+    background: #fafafa;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) inset;
+}
+
+.subcard-header {
+    font-weight: 600;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--el-border-color);
+}
+
 
 .preset-select :deep(.el-select__wrapper) {
     --el-select-border-color: #626aef;
     --el-select-placeholder-color: #626aef;
+}
+
+.subcard {
+    background: #fff;
+    border: 1px solid var(--el-border-color);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.subcard-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.subcard-header--top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+}
+
+.carousel-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.carousel-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-viewport {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    min-width: 0;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.carousel-row {
+    width: 100%;
+}
+
+.carousel-row .el-select {
+    flex: 1;
+    min-width: 160px;
+}
+
+.carousel-page {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.carousel-page .row {
+    display: flex;
+    gap: 8px;
+}
+
+.carousel-page .row .el-select {
+    flex: 1;
+    min-width: 150px;
+    /* Increased min-width for selects */
+    flex-basis: 150px;
+    /* Added flex-basis for better control */
+}
+
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 
 .hint {
