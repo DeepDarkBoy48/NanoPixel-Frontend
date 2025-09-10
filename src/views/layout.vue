@@ -112,26 +112,60 @@ const handleMenuClick = () => {
             <!-- 菜单 -->
             <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router
                 :collapse="isCollapse" :collapse-transition="false">
-                <el-menu-item index="/article/category">
-                    <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>文章分类</span>
-                </el-menu-item>
 
-                <el-menu-item index="/article/manage">
-                    <el-icon>
-                        <Promotion />
-                    </el-icon>
-                    <span>文章管理</span>
-                </el-menu-item>
 
-                <el-menu-item index="/user/chatRoom">
-                    <el-icon>
-                        <ChatLineRound />
-                    </el-icon>
-                    <span>聊天室</span>
-                </el-menu-item>
+
+
+                <el-sub-menu index="/ai">
+                    <template #title>
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>AI创作</span>
+                    </template>
+                    <el-menu-item index="/ai/chatRoom">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>聊天室</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/magicImageEdit">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>魔法修图</span>
+                    </el-menu-item>
+
+                    <el-menu-item index="/ai/library">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>图片库</span>
+                    </el-menu-item>
+                </el-sub-menu>
+
+                <el-sub-menu index="/article">
+                    <template #title>
+                        <el-icon>
+                            <UserFilled />
+                        </el-icon>
+                        <span>文章中心</span>
+                    </template>
+                    <el-menu-item index="/article/category">
+                        <el-icon>
+                            <Management />
+                        </el-icon>
+                        <span>文章分类</span>
+                    </el-menu-item>
+
+                    <el-menu-item index="/article/manage">
+                        <el-icon>
+                            <Promotion />
+                        </el-icon>
+                        <span>文章管理</span>
+                    </el-menu-item>
+                </el-sub-menu>
+
 
                 <el-sub-menu index="/user">
                     <template #title>
@@ -185,11 +219,18 @@ const handleMenuClick = () => {
                     <span>文章管理</span>
                 </el-menu-item>
 
-                <el-menu-item index="/user/chatRoom">
+                <el-menu-item index="/ai/chatRoom">
                     <el-icon>
                         <ChatLineRound />
                     </el-icon>
                     <span>聊天室</span>
+                </el-menu-item>
+
+                <el-menu-item index="/ai/magicImageEdit">
+                    <el-icon>
+                        <ChatLineRound />
+                    </el-icon>
+                    <span>魔法修图</span>
                 </el-menu-item>
 
                 <el-sub-menu index="/user">
@@ -220,6 +261,8 @@ const handleMenuClick = () => {
                         </el-icon>
                         <span>重置密码</span>
                     </el-menu-item>
+
+
                 </el-sub-menu>
             </el-menu>
         </el-drawer>

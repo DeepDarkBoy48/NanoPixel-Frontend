@@ -4,8 +4,6 @@ import { ChatDotRound } from '@element-plus/icons-vue'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import MarkdownIt from 'markdown-it'
 import DOMPurify from 'dompurify'
-import hljs from 'highlight.js'
-import 'highlight.js/styles/github-dark.css'
 // 导入用户信息存储
 import useUserInfoStore from '@/store/userInfo'
 //用于储存消息列表
@@ -31,22 +29,11 @@ const getMessageType = (from) => {
     return 'other'
 }
 
-// Markdown 渲染器，配置 highlight.js
+// Markdown 渲染器
 const markdown = new MarkdownIt({
     html: false,
     linkify: true,
-    breaks: true,
-    highlight: function (str, lang) {
-        if (lang && hljs.getLanguage(lang)) {
-            try {
-                return '<pre class="hljs"><code>' +
-                    hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-                    '</code></pre>';
-            } catch (__) { }
-        }
-
-        return '<pre class="hljs"><code>' + markdown.utils.escapeHtml(str) + '</code></pre>';
-    }
+    breaks: true
 })
 
 const renderMessageHtml = (msg) => {

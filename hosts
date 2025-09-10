@@ -1,0 +1,19 @@
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting.  Do not change this entry.
+##
+127.0.0.1 localhost
+255.255.255.255 broadcasthost
+::1          localhost
+127.0.0.1 api.lemonsqueezy.com
+47.79.149.222 git.tianji.com
+47.79.149.222 jenkins.tianji.com
+47.79.149.222 mq.tianji.com
+47.79.149.222 nacos.tianji.com
+47.79.149.222 xxljob.tianji.com
+47.79.149.222 es.tianji.com
+47.79.149.222 api.tianji.com
+47.79.149.222 www.tianji.com
+47.79.149.222 manage.tianji.com
