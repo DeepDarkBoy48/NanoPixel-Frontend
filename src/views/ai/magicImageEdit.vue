@@ -133,7 +133,7 @@
                             <div class="preview-body">
                                 <el-empty v-if="!previewUrl" description="请先选择图片" />
                                 <el-image v-else :src="previewUrl" fit="contain" class="preview-image"
-                                    :preview-src-list="[previewUrl]" preview-teleported />
+                                    :preview-src-list="[previewUrl]" preview-teleported hide-on-click-modal />
                             </div>
                         </div>
                         <div class="preview-card">
@@ -141,7 +141,7 @@
                             <div class="preview-body">
                                 <el-empty v-if="!resultUrl" description="提交后查看生成结果" />
                                 <el-image v-else :src="resultUrl" fit="contain" class="preview-image"
-                                    :preview-src-list="[resultUrl]" preview-teleported />
+                                    :preview-src-list="[resultUrl]" preview-teleported hide-on-click-modal />
                             </div>
                         </div>
                     </div>

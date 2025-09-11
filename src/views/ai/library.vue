@@ -33,7 +33,7 @@
                         <video v-if="isVideo(item.mediaurl)" :src="item.mediaurl" autoplay loop muted playsinline
                             class="media"></video>
                         <el-image v-else :src="item.mediaurl" fit="cover" class="media"
-                            :preview-src-list="[item.mediaurl]" preview-teleported lazy />
+                            :preview-src-list="[item.mediaurl]" preview-teleported lazy hide-on-click-modal />
                         <div class="media-actions">
                             <el-button :icon="Download" circle @click="downloadMedia(item.mediaurl)"
                                 class="download-btn" />
