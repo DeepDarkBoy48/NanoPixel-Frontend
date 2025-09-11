@@ -27,7 +27,7 @@
 
         <template v-else>
             <div class="waterfall-container">
-                <div class="card" v-for="item in mediaList" :key="item.createtime">
+                <div class="card" v-for="item in mediaList" :key="item.id ?? item.createtime">
                     <div class="card-media">
                         <span v-if="isVideo(item.mediaurl)" class="badge">视频</span>
                         <video v-if="isVideo(item.mediaurl)" :src="item.mediaurl" autoplay loop muted playsinline
@@ -46,7 +46,10 @@
                                 @click="copyPrompt(item.prompt)">复制</el-button>
                         </div>
                         <div class="meta">
-                            <span class="username">{{ item.userName }}</span>
+                            <div class="meta-left">
+                                <span class="username">{{ item.userName }}</span>
+                                <span v-if="item.id" class="media-id">#{{ item.id }}</span>
+                            </div>
                             <span class="create-time">{{ formatTime(item.createtime) }}</span>
                         </div>
                     </div>
@@ -74,7 +77,7 @@ const skeletonCount = 10;
 
 // 分页
 const pageNum = ref(1);
-const pageSize = ref(20);
+const pageSize = ref(15);
 const total = ref(0);
 
 const refresh = () => {
@@ -278,6 +281,17 @@ onMounted(() => {
     margin-top: 8px;
     font-size: 12px;
     color: #909399;
+}
+
+.meta-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.media-id {
+    color: #a6a9ad;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /* Remove original colorful border */

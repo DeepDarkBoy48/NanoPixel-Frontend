@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import {
     Management,
     Promotion,
@@ -53,8 +53,15 @@ const getUserInfo = async () => {
 }
 getUserInfo();
 
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 const router = useRouter();
+const route = useRoute();
+
+// 顶部模块导航（核心）：
+// 根据当前路由前缀选择要渲染的“模块导航组件”，
+// 这样不同模块可以在同一布局头部呈现不同的二级导航。
+import NavMagicImageEdit from '@/components/navbars/NavMagicImageEdit.vue'
+import NavLibrary from '@/components/navbars/NavLibrary.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 const handleCommand = (command) => {
     //判断指令
@@ -102,6 +109,26 @@ const handleMenuClick = () => {
         isCollapse.value = !isCollapse.value
     }
 }
+
+// 当前显示的模块导航组件（核心）：
+// 通过路由前缀匹配来确定头部中部区域展示哪个导航组件。
+// 注意：按需扩展时只需要在下面增加一个分支并导入组件即可。
+const currentHeaderNav = computed(() => {
+    const path = route.path || ''
+    if (path.startsWith('/ai/magicImageEdit')) return NavMagicImageEdit
+    if (path.startsWith('/ai/library')) return NavLibrary
+    return null
+})
+
+// 侧边菜单高亮同步（核心）：
+// 当处于模块内的子路由时，让左侧菜单仍高亮该模块的“入口路径”。
+// 这样点击模块导航切换子页时，左侧不会跳到其它高亮。
+const activeMenu = computed(() => {
+    const path = route.path || ''
+    if (path.startsWith('/ai/magicImageEdit')) return '/ai/magicImageEdit'
+    if (path.startsWith('/ai/library')) return '/ai/library'
+    return path
+})
 </script>
 <template>
     <!-- el-container 容器 -->
@@ -110,8 +137,8 @@ const handleMenuClick = () => {
         <el-aside v-if="!isMobile" :width="isCollapse ? '64px' : '200px'">
             <div class="el-aside__logo"></div>
             <!-- 菜单 -->
-            <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router
-                :collapse="isCollapse" :collapse-transition="false">
+            <el-menu :default-active="activeMenu" active-text-color="#ffd04b" background-color="#232323"
+                text-color="#fff" router :collapse="isCollapse" :collapse-transition="false">
 
 
 
@@ -123,12 +150,7 @@ const handleMenuClick = () => {
                         </el-icon>
                         <span>AI创作</span>
                     </template>
-                    <el-menu-item index="/ai/chatRoom">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span>聊天室</span>
-                    </el-menu-item>
+
                     <el-menu-item index="/ai/magicImageEdit">
                         <el-icon>
                             <ChatLineRound />
@@ -141,6 +163,12 @@ const handleMenuClick = () => {
                             <ChatLineRound />
                         </el-icon>
                         <span>图片库</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/chatRoom">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>聊天室</span>
                     </el-menu-item>
                 </el-sub-menu>
 
@@ -203,35 +231,55 @@ const handleMenuClick = () => {
         <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="200px" :with-header="false"
             class="mobile-drawer">
             <div class="el-aside__logo"></div>
-            <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff" router
-                @select="drawerVisible = false">
-                <el-menu-item index="/article/category">
-                    <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>文章分类</span>
-                </el-menu-item>
+            <el-menu :default-active="activeMenu" active-text-color="#ffd04b" background-color="#232323"
+                text-color="#fff" router @select="drawerVisible = false">
+                <el-sub-menu index="/ai">
+                    <template #title>
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>AI创作</span>
+                    </template>
+                    <el-menu-item index="/ai/chatRoom">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>聊天室</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/magicImageEdit">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>魔法修图</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/library">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>图片库</span>
+                    </el-menu-item>
+                </el-sub-menu>
 
-                <el-menu-item index="/article/manage">
-                    <el-icon>
-                        <Promotion />
-                    </el-icon>
-                    <span>文章管理</span>
-                </el-menu-item>
-
-                <el-menu-item index="/ai/chatRoom">
-                    <el-icon>
-                        <ChatLineRound />
-                    </el-icon>
-                    <span>聊天室</span>
-                </el-menu-item>
-
-                <el-menu-item index="/ai/magicImageEdit">
-                    <el-icon>
-                        <ChatLineRound />
-                    </el-icon>
-                    <span>魔法修图</span>
-                </el-menu-item>
+                <el-sub-menu index="/article">
+                    <template #title>
+                        <el-icon>
+                            <UserFilled />
+                        </el-icon>
+                        <span>文章中心</span>
+                    </template>
+                    <el-menu-item index="/article/category">
+                        <el-icon>
+                            <Management />
+                        </el-icon>
+                        <span>文章分类</span>
+                    </el-menu-item>
+                    <el-menu-item index="/article/manage">
+                        <el-icon>
+                            <Promotion />
+                        </el-icon>
+                        <span>文章管理</span>
+                    </el-menu-item>
+                </el-sub-menu>
 
                 <el-sub-menu index="/user">
                     <template #title>
@@ -271,11 +319,14 @@ const handleMenuClick = () => {
         <el-container>
             <!-- 头部区域 -->
             <el-header>
-                <div>
+                <div class="header-left">
                     <el-icon @click="handleMenuClick" class="header-icon">
                         <component :is="isMobile ? Menu : (isCollapse ? Expand : Fold)" />
                     </el-icon>
                     <span class="header-title"></span><strong>{{ userInfoStore.info.nickname }}</strong>
+                </div>
+                <div class="header-center">
+                    <component v-if="currentHeaderNav" :is="currentHeaderNav" />
                 </div>
                 <!-- 下拉菜单 -->
                 <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
@@ -359,6 +410,21 @@ const handleMenuClick = () => {
         align-items: center;
         justify-content: space-between;
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+            min-width: 0;
+        }
+
         div {
             display: flex;
             align-items: center;
@@ -409,6 +475,11 @@ const handleMenuClick = () => {
     .el-header {
         .header-title {
             display: none;
+        }
+
+        .header-center {
+            display: none;
+            /* 移动端隐藏模块导航，避免拥挤 */
         }
     }
 }

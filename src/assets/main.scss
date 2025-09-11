@@ -11,6 +11,17 @@ body {
   background-color: #f5f5f5;
 }
 
+/* 全局消息位置：下移到头部导航下方 */
+:root{
+  --app-message-offset: 72px; /* 桌面端头部高度约 60px + 间距 */
+}
+@media (max-width: 768px){
+  :root{
+    /* 移动端顶部有安全区，适当增大 */
+    --app-message-offset: calc(56px + env(safe-area-inset-top) + 8px);
+  }
+}
+
 /* fade-slide */
 .fade-slide-leave-active,
 .fade-slide-enter-active {
@@ -25,4 +36,13 @@ body {
 .fade-slide-leave-to {
   transform: translateX(30px);
   opacity: 0;
+}
+
+/* 避免消息挡住交互，并统一下移 */
+.el-message {
+  pointer-events: none; /* 非可关闭消息可穿透点击 */
+  top: var(--app-message-offset) !important;
+}
+.el-message.is-closable {
+  pointer-events: auto; /* 可关闭的消息仍可点击 */
 }
