@@ -93,119 +93,237 @@ const goBlog = () => {
 </script>
 
 <template>
-
-  <el-row>
-    <el-col :span="24">
-      <div class="login-container">
-        <el-form ref="form" size="large" autocomplete="off" v-if="isRegister" :model="registerData" :rules="rules">
-          <el-form-item>
-            <h1>注册</h1>
-          </el-form-item>
-          <!-- prop="username"加入规则字段标签 -->
-          <el-form-item prop="username">
-
-            <!-- v-model="registerData.username" 绑定数据模型 -->
-            <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码"
-              v-model="registerData.password"></el-input>
-          </el-form-item>
-          <el-form-item prop="rePassword">
-            <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码"
-              v-model="registerData.rePassword"></el-input>
-          </el-form-item>
-          <!-- 注册按钮 -->
-          <el-form-item>
-            <el-button class="button" type="primary" auto-insert-space @click="register">
-              注册
-            </el-button>
-          </el-form-item>
-          <el-form-item class="flex">
-            <el-link type="info" :underline="false" @click="isRegister = false; clearRegisterData()">
-              ← 返回
-            </el-link>
-          </el-form-item>
-        </el-form>
-        <!-- 登录表单 -->
-        <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="rules">
-          <el-form-item>
-            <h1>登录</h1>
-          </el-form-item>
-          <el-form-item prop="username">
-            <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码"
-              v-model="registerData.password"></el-input>
-          </el-form-item>
-          <!-- <el-form-item class="flex">
-            <div class="flex">
-              <el-checkbox>记住我</el-checkbox>
-              <el-link type="primary" :underline="false">忘记密码？</el-link>
-            </div>
-          </el-form-item> -->
-          <!-- 登录按钮 -->
-          <el-form-item>
-            <el-button class="button" type="primary" auto-insert-space @click="login">登录</el-button>
-            <el-button class="button" type="primary" auto-insert-space @click="goBlog">博客</el-button>
-          </el-form-item>
-          <el-form-item class="flex">
-            <el-link type="info" :underline="false" @click="isRegister = true; clearRegisterData()">
-              注册 →
-            </el-link>
-          </el-form-item>
-        </el-form>
-      </div>
-    </el-col>
-  </el-row>
-  <!-- 注册表单 -->
-  <!-- v-if:是否显示注册或者登陆 -->
-  <!-- :rules="rules" 加入规则校验 -->
-  <!-- :model="registerData" 绑定数据模型 -->
-
-
+  <div class="login-page">
+    <div class="background-animation"></div>
+    <el-row>
+      <el-col :span="24">
+        <div class="login-container">
+          <div class="site-info">
+            <img src="@/assets/logo.png" alt="Nano Pixel Logo" class="site-logo" />
+            <h1 class="site-title">Nano Pixel</h1>
+            <p class="site-description">探索纳米像素的无限可能，让创意在这里绽放</p>
+          </div>
+          <el-form ref="form" size="large" autocomplete="off" v-if="isRegister" :model="registerData" :rules="rules">
+            <el-form-item>
+              <h1 class="form-title">注册</h1>
+            </el-form-item>
+            <!-- prop="username"加入规则字段标签 -->
+            <el-form-item prop="username">
+              <!-- v-model="registerData.username" 绑定数据模型 -->
+              <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
+            </el-form-item>
+            <el-form-item prop="password">
+              <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码"
+                v-model="registerData.password"></el-input>
+            </el-form-item>
+            <el-form-item prop="rePassword">
+              <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码"
+                v-model="registerData.rePassword"></el-input>
+            </el-form-item>
+            <!-- 注册按钮 -->
+            <el-form-item>
+              <el-button class="button" type="primary" auto-insert-space @click="register">
+                注册
+              </el-button>
+            </el-form-item>
+            <el-form-item class="flex">
+              <el-link type="info" :underline="false" @click="isRegister = false; clearRegisterData()">
+                ← 返回
+              </el-link>
+            </el-form-item>
+          </el-form>
+          <!-- 登录表单 -->
+          <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="rules">
+            <el-form-item>
+              <h1 class="form-title">登录</h1>
+            </el-form-item>
+            <el-form-item prop="username">
+              <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
+            </el-form-item>
+            <el-form-item prop="password">
+              <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码"
+                v-model="registerData.password"></el-input>
+            </el-form-item>
+            <!-- 登录按钮 -->
+            <el-form-item>
+              <el-button class="button" type="primary" auto-insert-space @click="login">登录</el-button>
+            </el-form-item>
+            <el-form-item class="blog-button-container">
+              <el-button class="blog-button" text @click="goBlog">前往博客</el-button>
+            </el-form-item>
+            <el-form-item class="flex">
+              <el-link type="info" :underline="false" @click="isRegister = true; clearRegisterData()">
+                注册 →
+              </el-link>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-/* 样式 */
+.login-page {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.background-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460, #533483, #e94560);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  z-index: 0;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .login-container {
-  margin: 180px auto;
-  width: 500px;
+  position: relative;
+  z-index: 1;
+  width: 420px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.5);
+  }
+}
+
+.site-info {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.site-logo {
+  width: 200px;
+  height: auto;
+  margin-bottom: 30px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.site-title {
+  font-size: 2.5rem;
+  color: #fff;
+  margin: 10px 0;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+.site-description {
+  color: #e0e0e0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.form-title {
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+:deep(.el-input__inner) {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  &::placeholder {
+    color: #ccc;
+  }
+}
+
+:deep(.el-input__prefix-inner) {
+  color: #fff;
+}
+
+.button-group {
+  .el-button {
+    width: 100%;
+    &:first-child {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.blog-button-container {
+  text-align: center;
+  margin-top: -10px;
+}
+
+.blog-button {
+  color: #eee;
+  &:hover {
+    color: #fff;
+  }
+}
+
+.button {
+  width: 100%;
+  background: linear-gradient(45deg, #e94560, #533483);
+  border: none;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(45deg, #533483, #e94560);
+  }
+}
+
+.flex {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  
+  .el-link {
+    color: #eee;
+    &:hover {
+      color: #fff;
+    }
+  }
 }
 
 @media (max-width: 768px) {
   .login-container {
-    margin: 20px auto;
     width: 90%;
-  }
-}
-
-// .bg {
-//   background: url("@/assets/logo.png") no-repeat 60% center / 240px auto,
-//     url("@/assets/login_bg.jpg") no-repeat center / cover;
-//   border-radius: 0 20px 20px 0;
-// }
-
-.form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  user-select: none;
-
-
-  .title {
-    margin: 0 auto;
-  }
-
-  .button {
-    width: 100%;
-  }
-
-  .flex {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+    padding: 20px;
   }
 }
 </style>
