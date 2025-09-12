@@ -28,12 +28,12 @@
         <template v-else>
             <div class="waterfall-container">
                 <div class="card" v-for="item in mediaList" :key="item.id ?? item.createtime">
-                    <div class="card-media">
-                        <span v-if="isVideo(item.mediaurl)" class="badge">视频</span>
-                        <video v-if="isVideo(item.mediaurl)" :src="item.mediaurl" autoplay loop muted playsinline
+                    <div class="card-media" :class="{ switching: item._switching }">
+                        <span v-if="isVideo(item._displayUrl)" class="badge">视频</span>
+                        <video v-if="isVideo(item._displayUrl)" :src="item._displayUrl" autoplay loop muted playsinline
                             class="media"></video>
-                        <el-image v-else :src="item.mediaurl" fit="cover" class="media"
-                            :preview-src-list="[item.mediaurl]" preview-teleported lazy hide-on-click-modal />
+                        <el-image v-else :src="item._displayUrl" fit="cover" class="media"
+                            :preview-src-list="[item._displayUrl]" preview-teleported lazy hide-on-click-modal />
                         <div class="media-actions">
                             <el-button :icon="Download" circle @click="downloadMedia(item.mediaurl)"
                                 class="download-btn" />
@@ -44,6 +44,20 @@
                             <div class="prompt-text">{{ item.prompt }}</div>
                             <el-button link type="primary" class="copy-btn"
                                 @click="copyPrompt(item.prompt)">复制</el-button>
+                        </div>
+                        <div class="card-actions">
+                            <el-button
+                                :loading="item._loadingOrigin"
+                                round
+                                class="origin-btn"
+                                :type="item._isOriginalShown ? 'success' : 'primary'"
+                                @click="showOrigin(item)"
+                            >
+                                <el-icon style="margin-right:6px;">
+                                    <component :is="item._isOriginalShown ? RefreshLeft : Picture" />
+                                </el-icon>
+                                {{ item._isOriginalShown ? '返回编辑图' : '查看原图' }}
+                            </el-button>
                         </div>
                         <div class="meta">
                             <div class="meta-left">
@@ -66,10 +80,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getAllLibraryService } from '@/api/ai.js';
+import { getAllLibraryService, getMediaOriginUrlService } from '@/api/ai.js';
 import { ElMessage } from 'element-plus';
 import { formatDate } from '@/utils/format';
-import { Download } from '@element-plus/icons-vue';
+import { Download, Picture, RefreshLeft } from '@element-plus/icons-vue';
 
 const mediaList = ref([]);
 const loading = ref(false);
@@ -90,7 +104,16 @@ const getMediaList = async (page = 1) => {
         pageNum.value = page;
         const response = await getAllLibraryService(pageNum.value, pageSize.value);
         const data = response?.data || {};
-        mediaList.value = Array.isArray(data.items) ? data.items : [];
+        const items = Array.isArray(data.items) ? data.items : [];
+        // enrich items with UI state
+        mediaList.value = items.map(it => ({
+            ...it,
+            _displayUrl: it.mediaurl,
+            _originUrl: null,
+            _isOriginalShown: false,
+            _loadingOrigin: false,
+            _switching: false,
+        }));
         total.value = Number(data.total || 0);
     } catch (error) {
         ElMessage.error('获取媒体库失败');
@@ -153,6 +176,59 @@ const copyPrompt = async (text) => {
         ElMessage.success('提示词已复制');
     } catch (e) {
         ElMessage.error('复制失败');
+    }
+};
+
+// 预加载图片，确保平滑切换
+const preloadImage = (url) => new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = reject;
+    img.src = url;
+});
+
+// 切换展示原图/编辑图
+const showOrigin = async (item) => {
+    try {
+        if (!item) return;
+        // 如果正在加载，直接返回
+        if (item._loadingOrigin) return;
+
+        // 已经是原图，则切回编辑图
+        if (item._isOriginalShown) {
+            item._switching = true;
+            await preloadImage(item.mediaurl).catch(() => {});
+            item._displayUrl = item.mediaurl;
+            item._isOriginalShown = false;
+            setTimeout(() => { item._switching = false; }, 280);
+            return;
+        }
+
+        if (!item.id) {
+            ElMessage.error('缺少媒体ID，无法获取原图');
+            return;
+        }
+
+        item._loadingOrigin = true;
+        // 如果没有缓存的originUrl，则请求后端
+        if (!item._originUrl) {
+            const res = await getMediaOriginUrlService(item.id);
+            const url = res?.data;
+            if (!url) throw new Error('原图地址为空');
+            item._originUrl = url;
+        }
+
+        // 平滑切换：先开启动画，预加载，再替换
+        item._switching = true;
+        await preloadImage(item._originUrl).catch(() => {});
+        item._displayUrl = item._originUrl;
+        item._isOriginalShown = true;
+        setTimeout(() => { item._switching = false; }, 280);
+    } catch (e) {
+        console.error(e);
+        ElMessage.error('获取原图失败');
+    } finally {
+        item._loadingOrigin = false;
     }
 };
 
@@ -303,6 +379,37 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     padding: 16px 0 8px;
+}
+
+/* Origin button & transition styles */
+.card-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.origin-btn {
+    border: none;
+    color: #fff;
+    background: linear-gradient(135deg, #409EFF, #36cfc9);
+    box-shadow: 0 6px 14px rgba(64, 158, 255, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.origin-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(64, 158, 255, 0.28);
+}
+
+/* Smooth media swap effect */
+.media {
+    transition: filter 0.28s ease, opacity 0.28s ease, transform 0.28s ease;
+}
+
+.card-media.switching .media {
+    filter: blur(2px) grayscale(6%);
+    opacity: 0.75;
+    transform: scale(0.985);
 }
 
 /* Responsive adjustments */
