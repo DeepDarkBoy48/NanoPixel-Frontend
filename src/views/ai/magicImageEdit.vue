@@ -28,6 +28,7 @@
                                                 plain>随机模版</el-button>
                                             <el-button @click="copyPrompt" :disabled="!prompt.trim()" plain>复制提示词
                                             </el-button>
+
                                         </div>
                                     </div>
                                     <div class="subcard">
@@ -103,6 +104,13 @@
 
                     <div class="input-area form">
                         <el-form>
+                            <el-form-item>
+                                <el-select v-model="selectedModel" placeholder="选择模型" size="large"
+                                    style="min-width: 180px">
+                                    <el-option v-for="m in modelOptions" :key="m.value" :label="m.label"
+                                        :value="m.value" />
+                                </el-select>
+                            </el-form-item>
                             <el-form-item>
                                 <el-input v-model="prompt" type="textarea" :rows="7"
                                     placeholder="请选择上方模版/预设，或直接在此处输入提示词" clearable />
@@ -319,6 +327,12 @@ const selectedFile = ref(null)
 const submitting = ref(false)
 const resultUrl = ref('')
 const previewUrl = ref('')
+// 模型选择（默认 nanobanana）
+const selectedModel = ref('nanobanana')
+const modelOptions = [
+    { value: 'nanobanana', label: 'NanoBanana（默认）' },
+    { value: 'seedream4', label: 'Seedream4' },
+]
 
 const canSubmit = computed(() => {
     return !!selectedFile.value && !!prompt.value.trim()
@@ -361,8 +375,13 @@ const onSubmit = async () => {
     submitting.value = true
     try {
         const formData = new FormData()
+        // 新增 originFile 参数：上传用户原图
+        formData.append('originFile', selectedFile.value)
+        // 保持兼容：继续传原有的 file 字段
         formData.append('file', selectedFile.value)
         formData.append('prompt', prompt.value.trim())
+        // 传递模型参数：未选择时默认 nanobanana
+        formData.append('model', selectedModel.value || 'nanobanana')
 
         const res = await imageEditService(formData)
         resultUrl.value = typeof res.data === 'string' ? res.data : (res.data?.url || '')

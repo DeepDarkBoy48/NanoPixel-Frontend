@@ -9,13 +9,13 @@
         <el-empty v-if="!selectedItem" description="从右侧选择一张图片" />
 
         <template v-else>
-          <el-alert
+          <!-- <el-alert
             title="点击上方图片可放大，点击放大层空白处可关闭"
             type="info"
             :closable="false"
             show-icon
             class="hint"
-          />
+          /> -->
 
           <el-image :src="selectedItem.mediaurl" fit="contain" class="preview"
             :preview-src-list="[selectedItem.mediaurl]" preview-teleported hide-on-click-modal />
@@ -71,13 +71,26 @@
         <div class="waterfall-container">
           <div class="card" :class="{ selected: item.id === selectedItem?.id }" v-for="item in mediaList"
             :key="item.id ?? item.createtime" @click="selectItem(item)">
-            <div class="card-media">
+            <div class="card-media" :class="{ switching: item._switching }">
               <span class="status-badge" :class="item.isPublic ? 'public' : 'private'">{{ item.isPublic ? '公开' : '私密'
                 }}</span>
-              <el-image :src="item.mediaurl" fit="cover" class="media" loading="lazy" />
+              <el-image :src="item._displayUrl" fit="cover" class="media" :preview-src-list="[item._displayUrl]"
+                preview-teleported lazy hide-on-click-modal />
+              <div class="media-actions">
+                <el-button :icon="Download" circle class="download-btn" @click.stop="downloadMedia(item._displayUrl)" />
+              </div>
             </div>
             <div class="card-body">
               <div class="prompt-text">{{ item.prompt }}</div>
+              <div class="card-actions">
+                <el-button :loading="item._loadingOrigin" round class="origin-btn"
+                  :type="item._isOriginalShown ? 'success' : 'primary'" @click.stop="showOrigin(item)">
+                  <el-icon style="margin-right:6px;">
+                    <component :is="item._isOriginalShown ? RefreshLeft : Picture" />
+                  </el-icon>
+                  {{ item._isOriginalShown ? '返回编辑图' : '查看原图' }}
+                </el-button>
+              </div>
               <div class="meta">
                 <span class="media-id">#{{ item.id }}</span>
                 <span class="create-time">{{ formatTime(item.createtime) }}</span>
@@ -95,19 +108,13 @@
   </div>
 
   <!-- 移动端详情悬浮窗 -->
-  <el-drawer
-    v-if="isMobile"
-    v-model="detailsDrawer"
-    direction="rtl"
-    size="85%"
-    :with-header="true"
-    title="图片详情"
-  >
+  <el-drawer v-if="isMobile" v-model="detailsDrawer" direction="rtl" size="85%" :with-header="true" title="图片详情">
     <el-empty v-if="!selectedItem" description="从右侧选择一张图片" />
     <template v-else>
       <el-alert title="点击图片可放大，点击空白关闭" type="info" :closable="false" show-icon class="hint" />
-      <el-image :src="selectedItem.mediaurl" fit="contain" style="width:100%;height:240px;border-radius:6px;background:#f5f7fa"
-        :preview-src-list="[selectedItem.mediaurl]" preview-teleported hide-on-click-modal />
+      <el-image :src="selectedItem.mediaurl" fit="contain"
+        style="width:100%;height:240px;border-radius:6px;background:#f5f7fa" :preview-src-list="[selectedItem.mediaurl]"
+        preview-teleported hide-on-click-modal />
 
       <el-descriptions :column="1" border class="desc" style="margin-top:10px;">
         <el-descriptions-item label="ID">{{ selectedItem.id }}</el-descriptions-item>
@@ -135,8 +142,9 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getUserLibraryService, setMediaPublicService } from '@/api/ai.js'
+import { getUserLibraryService, setMediaPublicService, getMediaOriginUrlService } from '@/api/ai.js'
 import { formatDate } from '@/utils/format'
+import { Download, Picture, RefreshLeft } from '@element-plus/icons-vue'
 
 const mediaList = ref([])
 const loading = ref(false)
@@ -163,7 +171,12 @@ const refresh = () => getMediaList(pageNum.value)
 
 const normalizeItem = (it) => ({
   ...it,
-  isPublic: it?.isPublic ?? it?.public ?? it?.ispublic
+  isPublic: it?.isPublic ?? it?.public ?? it?.ispublic,
+  _displayUrl: it.mediaurl,
+  _originUrl: null,
+  _isOriginalShown: false,
+  _loadingOrigin: false,
+  _switching: false,
 })
 
 const getMediaList = async (page = 1) => {
@@ -215,6 +228,76 @@ const onTogglePublic = async (val) => {
   }
 }
 
+// 下载当前展示的媒体
+const downloadMedia = async (url) => {
+  try {
+    const response = await fetch(url)
+    if (!response.ok) throw new Error('Network response was not ok.')
+    const blob = await response.blob()
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = url.split('/').pop() || 'download'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(link.href)
+    ElMessage.success('下载已开始')
+  } catch (error) {
+    console.error('Download error:', error)
+    ElMessage.error('下载失败')
+    window.open(url, '_blank')
+  }
+}
+
+// 预加载图片
+const preloadImage = (url) => new Promise((resolve, reject) => {
+  const img = new Image()
+  img.onload = () => resolve()
+  img.onerror = reject
+  img.src = url
+})
+
+// 切换原图/编辑图（与 library.vue 一致）
+const showOrigin = async (item) => {
+  try {
+    if (!item) return
+    if (item._loadingOrigin) return
+
+    if (item._isOriginalShown) { // 切回编辑图
+      item._switching = true
+      await preloadImage(item.mediaurl).catch(() => { })
+      item._displayUrl = item.mediaurl
+      item._isOriginalShown = false
+      setTimeout(() => { item._switching = false }, 280)
+      return
+    }
+
+    if (!item.id) {
+      ElMessage.error('缺少媒体ID，无法获取原图')
+      return
+    }
+
+    item._loadingOrigin = true
+    if (!item._originUrl) {
+      const res = await getMediaOriginUrlService(item.id)
+      const url = res?.data
+      if (!url) throw new Error('原图地址为空')
+      item._originUrl = url
+    }
+
+    item._switching = true
+    await preloadImage(item._originUrl).catch(() => { })
+    item._displayUrl = item._originUrl
+    item._isOriginalShown = true
+    setTimeout(() => { item._switching = false }, 280)
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('获取原图失败')
+  } finally {
+    item._loadingOrigin = false
+  }
+}
+
 const formatTime = (time) => {
   if (!time) return ''
   return formatDate(time, 'YYYY-MM-DD HH:mm')
@@ -257,30 +340,36 @@ onBeforeUnmount(() => {
 <style scoped>
 .history-page {
   display: grid;
-  grid-template-columns: 380px 1fr; /* 面板更宽 */
+  grid-template-columns: 380px 1fr;
+  /* 面板更宽 */
   gap: 12px;
 }
 
 /* 左侧面板吸附顶部，随页面滚动可见 */
-.left-panel{
+.left-panel {
   position: sticky;
-  top: var(--app-message-offset, 72px);
+  /* 贴紧容器顶部 */
+  top: 0;
   align-self: start;
-  max-height: calc(100vh - var(--app-message-offset, 72px) - 12px);
-  overflow: auto; /* 面板内容过长时内部滚动 */
+  /* 最大高度同步调整，保持底部留白 */
+  max-height: calc(100vh - 12px);
+  overflow: auto;
+  /* 面板内容过长时内部滚动 */
 }
 
 .left-card {
   height: 100%;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
 .left-header {
   font-weight: 600;
 }
 
-.hint{ margin-bottom: 10px; }
+.hint {
+  margin-bottom: 10px;
+}
 
 .preview {
   width: 100%;
@@ -358,7 +447,9 @@ onBeforeUnmount(() => {
     grid-template-columns: 1fr;
   }
 
-  .left-panel{ display: none; }
+  .left-panel {
+    display: none;
+  }
 
   .waterfall-container {
     column-count: 1;
@@ -393,6 +484,19 @@ onBeforeUnmount(() => {
   position: relative;
 }
 
+.media-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+.card-media:hover .media-actions {
+  opacity: 1;
+}
+
 .status-badge {
   position: absolute;
   top: 10px;
@@ -417,10 +521,46 @@ onBeforeUnmount(() => {
   display: block;
   max-height: 520px;
   object-fit: cover;
+  transition: filter .28s ease, opacity .28s ease, transform .28s ease;
+}
+
+.download-btn {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: transparent !important;
+}
+
+.download-btn:hover {
+  background-color: rgba(255, 255, 255, 1) !important;
 }
 
 .card-body {
   padding: 10px 12px;
+}
+
+.card-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.origin-btn {
+  border: none !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, #409EFF, #36cfc9) !important;
+  box-shadow: 0 6px 14px rgba(64, 158, 255, 0.25);
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+
+.origin-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(64, 158, 255, 0.28);
+}
+
+/* Smooth media swap effect */
+.card-media.switching .media {
+  filter: blur(2px) grayscale(6%);
+  opacity: 0.75;
+  transform: scale(0.985);
 }
 
 .prompt-text {

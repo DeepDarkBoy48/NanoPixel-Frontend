@@ -20,3 +20,8 @@ export const setMediaPublicService = (mediaId, isPublic) => {
     // 接口使用 query 参数
     return request.put("ai/media/public", null, { params: { mediaId, isPublic } });
 };
+
+// 根据媒体ID获取原图URL
+export const getMediaOriginUrlService = (mediaId) => {
+    return request.get("ai/media/originurl", { params: { mediaId } });
+};
