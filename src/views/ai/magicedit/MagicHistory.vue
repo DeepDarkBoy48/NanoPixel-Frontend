@@ -404,7 +404,7 @@ onBeforeUnmount(() => {
 
 .preview {
   width: 100%;
-  height: 400px;
+  height: 360px;
   background: var(--app-surface-2);
   border-radius: 6px;
   cursor: zoom-in;
