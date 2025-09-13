@@ -17,8 +17,22 @@
             class="hint"
           /> -->
 
-      <el-image :src="selectedItem.mediaurl" fit="contain" class="preview"
-        :preview-src-list="[selectedItem.mediaurl]" preview-teleported hide-on-click-modal />
+      <el-image :src="selectedItem._displayUrl" fit="contain" class="preview"
+        :preview-src-list="[selectedItem._displayUrl]" preview-teleported hide-on-click-modal />
+
+          <div class="side-actions">
+            <el-button :loading="selectedItem._loadingOrigin" size="small" type="primary" plain
+              @click="showOrigin(selectedItem)">
+              <el-icon style="margin-right:6px;">
+                <component :is="selectedItem._isOriginalShown ? RefreshLeft : Picture" />
+              </el-icon>
+              {{ selectedItem._isOriginalShown ? '返回编辑图' : '查看原图' }}
+            </el-button>
+
+            <el-button size="small" type="primary" plain @click="downloadMedia(selectedItem._displayUrl)">
+              点击下载
+            </el-button>
+          </div>
 
           <el-descriptions :column="1" border class="desc">
             <el-descriptions-item label="ID">{{ selectedItem.id }}</el-descriptions-item>
@@ -51,14 +65,25 @@
         </div>
       </div>
 
-      <div v-if="loading" class="waterfall-container">
-        <div class="skeleton-card" v-for="i in skeletonCount" :key="i">
-          <el-skeleton animated>
+      <div v-if="loading" class="list-container">
+        <div class="list-item skeleton">
+          <el-skeleton animated :rows="2">
             <template #template>
-              <el-skeleton-item variant="image" style="height: 180px;" />
-              <div style="padding:10px;">
-                <el-skeleton-item variant="text" style="width: 90%; margin-bottom: 8px;" />
-                <el-skeleton-item variant="text" style="width: 60%;" />
+              <div class="list-thumb skeleton-box"></div>
+              <div class="list-content">
+                <el-skeleton-item variant="text" style="width: 80%; margin-bottom: 8px;" />
+                <el-skeleton-item variant="text" style="width: 50%;" />
+              </div>
+            </template>
+          </el-skeleton>
+        </div>
+        <div class="list-item skeleton" v-for="i in 6" :key="i">
+          <el-skeleton animated :rows="2">
+            <template #template>
+              <div class="list-thumb skeleton-box"></div>
+              <div class="list-content">
+                <el-skeleton-item variant="text" style="width: 80%; margin-bottom: 8px;" />
+                <el-skeleton-item variant="text" style="width: 50%;" />
               </div>
             </template>
           </el-skeleton>
@@ -68,30 +93,16 @@
       <el-empty v-else-if="!mediaList.length" description="暂无作品" />
 
       <template v-else>
-        <div class="waterfall-container">
-          <div class="card" :class="{ selected: item.id === selectedItem?.id }" v-for="item in mediaList"
+        <div class="list-container">
+          <div class="list-item" :class="{ selected: item.id === selectedItem?.id }" v-for="item in mediaList"
             :key="item.id ?? item.createtime" @click="selectItem(item)">
-            <!-- 顶部工具条：常显 -->
-            <div class="media-header">
-              <el-button :loading="item._loadingOrigin" size="small" class="origin-btn"
-                type="primary" plain @click.stop="showOrigin(item)">
-                <el-icon style="margin-right:6px;">
-                  <component :is="item._isOriginalShown ? RefreshLeft : Picture" />
-                </el-icon>
-                {{ item._isOriginalShown ? '返回编辑图' : '查看原图' }}
-              </el-button>
-              <el-button size="small" type="primary" plain @click.stop="downloadMedia(item._displayUrl)">点击下载</el-button>
-            </div>
-            <div class="card-media" :class="{ switching: item._switching }">
-              <span class="status-badge" :class="item.isPublic ? 'public' : 'private'">{{ item.isPublic ? '公开' : '私密'
-                }}</span>
-              <el-image :src="item._displayUrl" fit="cover" class="media" :preview-src-list="[item._displayUrl]"
+            <div class="list-thumb-wrap" :class="{ switching: item._switching }">
+              <el-image :src="item._displayUrl" fit="cover" class="list-thumb" :preview-src-list="[item._displayUrl]"
                 preview-teleported lazy hide-on-click-modal />
             </div>
-            <div class="card-body">
+            <div class="list-content">
               <div class="prompt-text">{{ item.prompt }}</div>
               <div class="meta">
-                <span class="media-id">#{{ item.id }}</span>
                 <span class="create-time">{{ formatTime(item.createtime) }}</span>
               </div>
             </div>
@@ -111,9 +122,22 @@
     <el-empty v-if="!selectedItem" description="从右侧选择一张图片" />
     <template v-else>
       <el-alert title="点击图片可放大，点击空白关闭" type="info" :closable="false" show-icon class="hint" />
-      <el-image :src="selectedItem.mediaurl" fit="contain"
-        style="width:100%;height:240px;border-radius:6px;background:var(--app-surface-2)" :preview-src-list="[selectedItem.mediaurl]"
+      <el-image :src="selectedItem._displayUrl" fit="contain"
+        style="width:100%;height:240px;border-radius:6px;background:var(--app-surface-2)" :preview-src-list="[selectedItem._displayUrl]"
         preview-teleported hide-on-click-modal />
+
+      <div class="side-actions" style="margin-top:10px;">
+        <el-button :loading="selectedItem._loadingOrigin" size="small" type="primary" plain
+          @click="showOrigin(selectedItem)">
+          <el-icon style="margin-right:6px;">
+            <component :is="selectedItem._isOriginalShown ? RefreshLeft : Picture" />
+          </el-icon>
+          {{ selectedItem._isOriginalShown ? '返回编辑图' : '查看原图' }}
+        </el-button>
+        <el-button size="small" type="primary" plain @click="downloadMedia(selectedItem._displayUrl)">
+          点击下载
+        </el-button>
+      </div>
 
       <el-descriptions :column="1" border class="desc" style="margin-top:10px;">
         <el-descriptions-item label="ID">{{ selectedItem.id }}</el-descriptions-item>
@@ -339,8 +363,8 @@ onBeforeUnmount(() => {
 <style scoped>
 .history-page {
   display: grid;
-  grid-template-columns: 380px 1fr;
-  /* 面板更宽 */
+  grid-template-columns: 560px 1fr;
+  /* 侧边栏更宽 */
   gap: 12px;
 }
 
@@ -372,10 +396,16 @@ onBeforeUnmount(() => {
 
 .preview {
   width: 100%;
-  height: 260px;
+  height: 360px;
   background: var(--app-surface-2);
   border-radius: 6px;
   cursor: zoom-in;
+}
+
+.side-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .desc {
@@ -424,21 +454,10 @@ onBeforeUnmount(() => {
   font-size: 18px;
 }
 
-.waterfall-container {
-  column-count: 4;
-  column-gap: 16px;
-}
-
-@media (max-width: 1400px) {
-  .waterfall-container {
-    column-count: 3;
-  }
-}
-
-@media (max-width: 1100px) {
-  .waterfall-container {
-    column-count: 2;
-  }
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 @media (max-width: 768px) {
@@ -449,140 +468,46 @@ onBeforeUnmount(() => {
   .left-panel {
     display: none;
   }
-
-  .waterfall-container {
-    column-count: 1;
-  }
 }
 
-.card,
-.skeleton-card {
-  break-inside: avoid;
-  margin-bottom: 16px;
-  background: var(--app-surface);
-  border-radius: 12px;
-  overflow: hidden;
+/* 列表样式 */
+.list-item {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  padding: 10px;
   border: 1px solid var(--el-border-color);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
-  transition: transform .2s, box-shadow .2s, border-color .2s;
+  border-radius: 10px;
+  background: var(--app-surface);
+  transition: border-color .2s, box-shadow .2s, transform .2s;
   cursor: pointer;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  border-color: var(--el-border-color-light);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-}
-
-.card.selected {
-  border-color: var(--el-color-primary);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-color-primary) 25%, transparent);
-}
-
-.card-media {
-  position: relative;
-}
-
-.media-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  opacity: 0;
-  transition: opacity .3s ease;
-}
-
-.card-media:hover .media-actions { opacity: 1; }
-
-/* 顶部工具条（常显，位于图片上方） */
-.media-header {
-  display: flex;
-  gap: 8px;
-  padding: 8px;
-  background: var(--app-surface-2);
-  border-bottom: 1px solid var(--el-border-color);
-}
-
-.media-header .el-button {
-  border-radius: 999px;
-  height: 26px;
-  padding: 0 10px;
-  border-color: color-mix(in srgb, var(--app-primary) 35%, transparent);
-  color: var(--app-primary);
-  background: color-mix(in srgb, var(--app-primary) 8%, transparent);
-}
-.media-header .el-button:hover {
-  background: color-mix(in srgb, var(--app-primary) 14%, transparent);
-}
-
-.card-media { margin-top: 0; }
-
-.status-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 2;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  color: #fff;
-}
-
-.status-badge.public {
-  background: #67C23A;
-}
-
-.status-badge.private {
-  background: var(--el-text-color-secondary);
-}
-
-.media {
-  width: 100%;
-  display: block;
-  max-height: 520px;
-  object-fit: cover;
-  transition: filter .28s ease, opacity .28s ease, transform .28s ease;
-}
-
-.download-btn {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  border-color: transparent !important;
-}
-
-.download-btn:hover {
-  background-color: rgba(255, 255, 255, 1) !important;
-}
-
-.card-body {
-  padding: 10px 12px;
-  border-top: 1px solid var(--el-border-color);
-}
-
-.card-actions {
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.card-actions .origin-btn {
-  border: none !important;
-  color: #fff !important;
-  background: var(--app-primary) !important;
-  background: linear-gradient(135deg, var(--app-primary), color-mix(in srgb, var(--app-primary) 60%, #36cfc9)) !important;
-  box-shadow: 0 6px 14px color-mix(in srgb, var(--app-primary) 35%, transparent);
-  transition: transform .15s ease, box-shadow .2s ease;
-}
-
-.card-actions .origin-btn:hover {
+.list-item:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 18px color-mix(in srgb, var(--app-primary) 45%, transparent);
+  border-color: var(--el-border-color-light);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+}
+
+.list-item.selected {
+  border-color: var(--el-color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-color-primary) 22%, transparent);
+}
+
+.list-thumb-wrap { position: relative; }
+.list-thumb {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 6px;
 }
 
 /* Smooth media swap effect */
-.card-media.switching .media {
+.list-thumb-wrap.switching .list-thumb {
   filter: blur(2px) grayscale(6%);
-  opacity: 0.75;
+  opacity: 0.85;
   transform: scale(0.985);
+  transition: filter .28s ease, opacity .28s ease, transform .28s ease;
 }
 
 .prompt-text {
@@ -592,7 +517,7 @@ onBeforeUnmount(() => {
   color: var(--el-text-color-primary);
   line-height: 1.6;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -600,14 +525,10 @@ onBeforeUnmount(() => {
 .meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: 6px;
   font-size: 12px;
   color: var(--el-text-color-secondary);
-}
-
-.media-id {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .pagination-wrapper {

@@ -187,7 +187,7 @@ const activeMenu = computed(() => {
                     </el-menu-item>
                 </el-sub-menu>
 
-                <el-sub-menu index="/article">
+                <!-- <el-sub-menu index="/article">
                     <template #title>
                         <el-icon>
                             <UserFilled />
@@ -207,7 +207,7 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>文章管理</span>
                     </el-menu-item>
-                </el-sub-menu>
+                </el-sub-menu> -->
 
 
                 <el-sub-menu index="/user">
@@ -283,7 +283,7 @@ const activeMenu = computed(() => {
                         <span>智能对话</span>
                     </el-menu-item>
                 </el-sub-menu>
-
+<!-- 
                 <el-sub-menu index="/article">
                     <template #title>
                         <el-icon>
@@ -303,7 +303,7 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>文章管理</span>
                     </el-menu-item>
-                </el-sub-menu>
+                </el-sub-menu> -->
 
                 <el-sub-menu index="/user">
                     <template #title>
