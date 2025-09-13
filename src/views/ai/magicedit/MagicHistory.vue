@@ -103,6 +103,9 @@
             <div class="list-content">
               <div class="prompt-text">{{ item.prompt }}</div>
               <div class="meta">
+                <el-tag size="small" :type="item.isPublic ? 'success' : 'info'" effect="plain">
+                  {{ item.isPublic ? '公开' : '私密' }}
+                </el-tag>
                 <span class="create-time">{{ formatTime(item.createtime) }}</span>
               </div>
             </div>
@@ -175,7 +178,7 @@ const skeletonCount = 10
 
 // 右侧列表分页
 const pageNum = ref(1)
-const pageSize = ref(15)
+const pageSize = ref(10)
 const total = ref(0)
 
 // 左侧选中项
@@ -363,7 +366,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .history-page {
   display: grid;
-  grid-template-columns: 560px 1fr;
+  grid-template-columns: 500px 1fr;
   /* 侧边栏更宽 */
   gap: 12px;
 }
@@ -396,7 +399,7 @@ onBeforeUnmount(() => {
 
 .preview {
   width: 100%;
-  height: 360px;
+  height: 400px;
   background: var(--app-surface-2);
   border-radius: 6px;
   cursor: zoom-in;
@@ -525,7 +528,7 @@ onBeforeUnmount(() => {
 .meta {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 6px;
   font-size: 12px;
   color: var(--el-text-color-secondary);

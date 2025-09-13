@@ -104,9 +104,6 @@ const goBlog = () => {
             <p class="site-description">探索纳米像素的无限可能，让创意在这里绽放</p>
           </div>
           <el-form ref="form" size="large" autocomplete="off" v-if="isRegister" :model="registerData" :rules="rules">
-            <el-form-item>
-              <h1 class="form-title">注册</h1>
-            </el-form-item>
             <!-- prop="username"加入规则字段标签 -->
             <el-form-item prop="username">
               <!-- v-model="registerData.username" 绑定数据模型 -->
@@ -134,9 +131,6 @@ const goBlog = () => {
           </el-form>
           <!-- 登录表单 -->
           <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="rules">
-            <el-form-item>
-              <h1 class="form-title">登录</h1>
-            </el-form-item>
             <el-form-item prop="username">
               <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
             </el-form-item>
@@ -322,8 +316,39 @@ const goBlog = () => {
 
 @media (max-width: 768px) {
   .login-container {
-    width: 90%;
-    padding: 20px;
+    width: 92%;
+    padding: 16px;
+  }
+
+  .site-logo {
+    width: 120px;
+    margin-bottom: 12px;
+  }
+
+  .site-title {
+    font-size: 1.6rem;
+    margin: 6px 0 8px;
+  }
+
+  .site-description {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .site-info {
+    margin-bottom: 16px;
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: 10px;
+  }
+
+  .blog-button-container {
+    margin-top: 6px;
+  }
+
+  .flex {
+    margin-top: 0;
   }
 }
 </style>
