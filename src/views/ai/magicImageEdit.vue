@@ -493,7 +493,7 @@ async function copyPrompt() {
 }
 
 .subtitle {
-    color: #909399;
+    color: var(--el-text-color-secondary);
     font-size: 12px;
 }
 
@@ -510,7 +510,7 @@ async function copyPrompt() {
 }
 
 .form {
-    background: #fafafa;
+    background: var(--app-surface-2);
     padding: 16px;
     border-radius: 10px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) inset;
@@ -531,7 +531,7 @@ async function copyPrompt() {
 }
 
 .preview-card {
-    background: #fff;
+    background: var(--app-surface);
     border: 1px solid var(--el-border-color);
     border-radius: 10px;
     overflow: hidden;
@@ -541,7 +541,7 @@ async function copyPrompt() {
 .preview-title {
     padding: 10px 12px;
     font-weight: 600;
-    background: #f7f8fa;
+    background: var(--app-surface-2);
     border-bottom: 1px solid var(--el-border-color);
 }
 
@@ -577,7 +577,7 @@ async function copyPrompt() {
 }
 
 .subcard {
-    background: #fafafa;
+    background: var(--app-surface-2);
     padding: 16px;
     border-radius: 10px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) inset;
@@ -597,7 +597,7 @@ async function copyPrompt() {
 }
 
 .subcard {
-    background: #fff;
+    background: var(--app-surface);
     border: 1px solid var(--el-border-color);
     border-radius: 8px;
     padding: 10px;
@@ -678,7 +678,7 @@ async function copyPrompt() {
 }
 
 .hint {
-    color: #909399;
+    color: var(--el-text-color-secondary);
     font-size: 12px;
 }
 

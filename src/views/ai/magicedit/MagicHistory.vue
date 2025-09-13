@@ -17,8 +17,8 @@
             class="hint"
           /> -->
 
-          <el-image :src="selectedItem.mediaurl" fit="contain" class="preview"
-            :preview-src-list="[selectedItem.mediaurl]" preview-teleported hide-on-click-modal />
+      <el-image :src="selectedItem.mediaurl" fit="contain" class="preview"
+        :preview-src-list="[selectedItem.mediaurl]" preview-teleported hide-on-click-modal />
 
           <el-descriptions :column="1" border class="desc">
             <el-descriptions-item label="ID">{{ selectedItem.id }}</el-descriptions-item>
@@ -71,26 +71,25 @@
         <div class="waterfall-container">
           <div class="card" :class="{ selected: item.id === selectedItem?.id }" v-for="item in mediaList"
             :key="item.id ?? item.createtime" @click="selectItem(item)">
+            <!-- 顶部工具条：常显 -->
+            <div class="media-header">
+              <el-button :loading="item._loadingOrigin" size="small" class="origin-btn"
+                type="primary" plain @click.stop="showOrigin(item)">
+                <el-icon style="margin-right:6px;">
+                  <component :is="item._isOriginalShown ? RefreshLeft : Picture" />
+                </el-icon>
+                {{ item._isOriginalShown ? '返回编辑图' : '查看原图' }}
+              </el-button>
+              <el-button size="small" type="primary" plain @click.stop="downloadMedia(item._displayUrl)">点击下载</el-button>
+            </div>
             <div class="card-media" :class="{ switching: item._switching }">
               <span class="status-badge" :class="item.isPublic ? 'public' : 'private'">{{ item.isPublic ? '公开' : '私密'
                 }}</span>
               <el-image :src="item._displayUrl" fit="cover" class="media" :preview-src-list="[item._displayUrl]"
                 preview-teleported lazy hide-on-click-modal />
-              <div class="media-actions">
-                <el-button :icon="Download" circle class="download-btn" @click.stop="downloadMedia(item._displayUrl)" />
-              </div>
             </div>
             <div class="card-body">
               <div class="prompt-text">{{ item.prompt }}</div>
-              <div class="card-actions">
-                <el-button :loading="item._loadingOrigin" round class="origin-btn"
-                  :type="item._isOriginalShown ? 'success' : 'primary'" @click.stop="showOrigin(item)">
-                  <el-icon style="margin-right:6px;">
-                    <component :is="item._isOriginalShown ? RefreshLeft : Picture" />
-                  </el-icon>
-                  {{ item._isOriginalShown ? '返回编辑图' : '查看原图' }}
-                </el-button>
-              </div>
               <div class="meta">
                 <span class="media-id">#{{ item.id }}</span>
                 <span class="create-time">{{ formatTime(item.createtime) }}</span>
@@ -113,7 +112,7 @@
     <template v-else>
       <el-alert title="点击图片可放大，点击空白关闭" type="info" :closable="false" show-icon class="hint" />
       <el-image :src="selectedItem.mediaurl" fit="contain"
-        style="width:100%;height:240px;border-radius:6px;background:#f5f7fa" :preview-src-list="[selectedItem.mediaurl]"
+        style="width:100%;height:240px;border-radius:6px;background:var(--app-surface-2)" :preview-src-list="[selectedItem.mediaurl]"
         preview-teleported hide-on-click-modal />
 
       <el-descriptions :column="1" border class="desc" style="margin-top:10px;">
@@ -374,7 +373,7 @@ onBeforeUnmount(() => {
 .preview {
   width: 100%;
   height: 260px;
-  background: #f5f7fa;
+  background: var(--app-surface-2);
   border-radius: 6px;
   cursor: zoom-in;
 }
@@ -390,7 +389,7 @@ onBeforeUnmount(() => {
 .prompt-title {
   font-size: 13px;
   margin-bottom: 8px;
-  color: #606266;
+  color: var(--el-text-color-secondary);
 }
 
 .prompt-actions {
@@ -405,11 +404,11 @@ onBeforeUnmount(() => {
 }
 
 .publish-row .label {
-  color: #606266;
+  color: var(--el-text-color-primary);
 }
 
 .publish-row .tip {
-  color: #a6a9ad;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
 }
 
@@ -460,10 +459,10 @@ onBeforeUnmount(() => {
 .skeleton-card {
   break-inside: avoid;
   margin-bottom: 16px;
-  background: #fff;
-  border-radius: 10px;
+  background: var(--app-surface);
+  border-radius: 12px;
   overflow: hidden;
-  border: 2px solid #ebeef5;
+  border: 1px solid var(--el-border-color);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
   transition: transform .2s, box-shadow .2s, border-color .2s;
   cursor: pointer;
@@ -471,7 +470,7 @@ onBeforeUnmount(() => {
 
 .card:hover {
   transform: translateY(-4px);
-  border-color: #dcdfe6;
+  border-color: var(--el-border-color-light);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -493,9 +492,30 @@ onBeforeUnmount(() => {
   transition: opacity .3s ease;
 }
 
-.card-media:hover .media-actions {
-  opacity: 1;
+.card-media:hover .media-actions { opacity: 1; }
+
+/* 顶部工具条（常显，位于图片上方） */
+.media-header {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--app-surface-2);
+  border-bottom: 1px solid var(--el-border-color);
 }
+
+.media-header .el-button {
+  border-radius: 999px;
+  height: 26px;
+  padding: 0 10px;
+  border-color: color-mix(in srgb, var(--app-primary) 35%, transparent);
+  color: var(--app-primary);
+  background: color-mix(in srgb, var(--app-primary) 8%, transparent);
+}
+.media-header .el-button:hover {
+  background: color-mix(in srgb, var(--app-primary) 14%, transparent);
+}
+
+.card-media { margin-top: 0; }
 
 .status-badge {
   position: absolute;
@@ -513,7 +533,7 @@ onBeforeUnmount(() => {
 }
 
 .status-badge.private {
-  background: #909399;
+  background: var(--el-text-color-secondary);
 }
 
 .media {
@@ -535,6 +555,7 @@ onBeforeUnmount(() => {
 
 .card-body {
   padding: 10px 12px;
+  border-top: 1px solid var(--el-border-color);
 }
 
 .card-actions {
@@ -543,17 +564,18 @@ onBeforeUnmount(() => {
   justify-content: flex-start;
 }
 
-.origin-btn {
+.card-actions .origin-btn {
   border: none !important;
   color: #fff !important;
-  background: linear-gradient(135deg, #409EFF, #36cfc9) !important;
-  box-shadow: 0 6px 14px rgba(64, 158, 255, 0.25);
+  background: var(--app-primary) !important;
+  background: linear-gradient(135deg, var(--app-primary), color-mix(in srgb, var(--app-primary) 60%, #36cfc9)) !important;
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--app-primary) 35%, transparent);
   transition: transform .15s ease, box-shadow .2s ease;
 }
 
-.origin-btn:hover {
+.card-actions .origin-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(64, 158, 255, 0.28);
+  box-shadow: 0 10px 18px color-mix(in srgb, var(--app-primary) 45%, transparent);
 }
 
 /* Smooth media swap effect */
@@ -567,7 +589,12 @@ onBeforeUnmount(() => {
   white-space: pre-wrap;
   word-break: break-word;
   font-size: 14px;
-  color: #303133;
+  color: var(--el-text-color-primary);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .meta {
@@ -576,7 +603,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   margin-top: 6px;
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .media-id {

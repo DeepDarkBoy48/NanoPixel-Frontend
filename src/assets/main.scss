@@ -8,12 +8,28 @@
 
 body {
   margin: 0;
-  background-color: #f5f5f5;
+  background-color: var(--app-main-bg, #f5f5f5);
 }
 
 /* 全局消息位置：下移到头部导航下方 */
 :root{
   --app-message-offset: 72px; /* 桌面端头部高度约 60px + 间距 */
+  /* 主题色：GitHub 风格（亮） */
+  --el-color-primary: #0969DA; /* 链接/主操作蓝 */
+  --app-primary: #0969DA;
+  /* 布局变量（亮） */
+  --app-sider-bg: #f6f8fa;        /* 侧边栏背景 */
+  --app-sider-text: #24292f;      /* 侧边栏文字 */
+  --app-sider-active-bg: rgba(9, 105, 218, 0.12);
+  --app-sider-hover-bg: rgba(9, 105, 218, 0.08);
+  --app-main-bg: #f6f8fa;         /* 页面主背景 */
+  --app-header-bg: #f6f8fa;       /* 头部背景 */
+  --app-header-border: #d0d7de;   /* 边框 */
+  --app-header-icon: #57606a;     /* 头部图标 */
+  --app-header-icon-weak: #8b949e;
+  /* 表面背景（卡片/分组） */
+  --app-surface: #ffffff;         /* 卡片/弹层 */
+  --app-surface-2: #f6f8fa;       /* 次级表面 */
 }
 @media (max-width: 768px){
   :root{
@@ -45,4 +61,34 @@ body {
 }
 .el-message.is-closable {
   pointer-events: auto; /* 可关闭的消息仍可点击 */
+}
+
+/* iOS 输入时不要触发缩放：保证字体至少 16px */
+input, textarea, select {
+  font-size: 16px;
+}
+
+/* 旧版 iOS Safari 视口高度兼容（作为 100dvh 的兜底） */
+@supports not (height: 100dvh) {
+  .layout-container {
+    height: var(--app-vh, 100vh);
+  }
+}
+
+/* 暗色主题覆盖 */
+.dark {
+  color-scheme: dark;
+  --el-color-primary: #2f81f7; /* 链接/主操作蓝 */
+  --app-primary: #2f81f7;
+  --app-sider-bg: #161b22;      /* 侧边栏背景 */
+  --app-sider-text: #c9d1d9;    /* 侧边栏文字 */
+  --app-sider-active-bg: rgba(47, 129, 247, 0.20);
+  --app-sider-hover-bg: rgba(47, 129, 247, 0.12);
+  --app-main-bg: #0d1117;       /* 页面主背景 */
+  --app-header-bg: #161b22;     /* 头部背景 */
+  --app-header-border: #30363d; /* 边框 */
+  --app-header-icon: #c9d1d9;   /* 头部图标 */
+  --app-header-icon-weak: #8b949e;
+  --app-surface: #161b22;       /* 卡片/弹层 */
+  --app-surface-2: #0d1117;     /* 次级表面 */
 }

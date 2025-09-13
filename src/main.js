@@ -9,6 +9,8 @@ import "element-plus/dist/index.css"; //导入element-plus的样式
 import App from "./App.vue"; //导入app.vue
 import router from "@/router/router"; //导入路由
 import locale from 'element-plus/dist/locale/zh-cn.js' //导入element-plus的国际化
+import 'element-plus/theme-chalk/dark/css-vars.css' // Element Plus 暗色变量
+import useThemeStore from '@/store/theme.js'
 
 const app = createApp(App); //创建应用实例
 const pinia = createPinia(); //创建pinia实例
@@ -18,4 +20,6 @@ app.use(router); //使用路由
 app.use(ElementPlus,{locale}); //使用element-plus 并设置国际化
 
 //必须在mount前使用路由
+const themeStore = useThemeStore();
+themeStore.init();
 app.mount("#app"); //控制html元素

@@ -4,13 +4,17 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="src/assets/logo.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- 防止 iOS 输入时自动放大，并适配安全区 -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <!-- iOS PWA 基本适配 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="小猴几">
   <meta name="format-detection" content="telephone=no, email=no">
-  <meta name="theme-color" content="#409eff">
+  <!-- 主题色（GitHub 风格）：浅色=白色，深色= #0d1117 -->
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
   <!-- iOS 主屏图标：请在 public/ 放置 apple-touch-icon.png（180x180 PNG） -->
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <!-- 可选：Web App Manifest（Android/桌面浏览器使用）
@@ -20,6 +24,18 @@
 
 <body>
   <div id="app"></div>
+  <!-- 视口高度修复：在旧版 iOS 上尽可能增大可视区域 -->
+  <script>
+    (function () {
+      var setVh = function () {
+        var h = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+        document.documentElement.style.setProperty('--app-vh', h + 'px');
+      };
+      setVh();
+      window.addEventListener('resize', setVh);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', setVh);
+    })();
+  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 

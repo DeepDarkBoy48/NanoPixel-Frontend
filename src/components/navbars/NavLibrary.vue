@@ -6,7 +6,7 @@ const active = computed(() => route.path)
 </script>
 
 <template>
-  <el-menu mode="horizontal" :default-active="active" router class="module-nav" active-text-color="#409EFF">
+  <el-menu mode="horizontal" :default-active="active" router class="module-nav" :active-text-color="'var(--app-primary)'">
     <el-menu-item index="/ai/library">灵感流</el-menu-item>
     <el-menu-item index="/ai/library/browse">浏览</el-menu-item>
 

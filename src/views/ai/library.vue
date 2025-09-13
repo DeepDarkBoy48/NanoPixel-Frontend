@@ -28,16 +28,29 @@
         <template v-else>
             <div class="waterfall-container">
                 <div class="card" v-for="item in mediaList" :key="item.id ?? item.createtime">
+                    <!-- 顶部工具条：常显 -->
+                    <div class="media-header">
+                        <el-button
+                            :loading="item._loadingOrigin"
+                            size="small"
+                            class="origin-btn"
+                            type="primary"
+                            plain
+                            @click.stop="showOrigin(item)"
+                        >
+                            <el-icon style="margin-right:6px;">
+                                <component :is="item._isOriginalShown ? RefreshLeft : Picture" />
+                            </el-icon>
+                            {{ item._isOriginalShown ? '返回编辑图' : '查看原图' }}
+                        </el-button>
+                        <el-button size="small" type="primary" plain @click.stop="downloadMedia(item._displayUrl)">点击下载</el-button>
+                    </div>
                     <div class="card-media" :class="{ switching: item._switching }">
                         <span v-if="isVideo(item._displayUrl)" class="badge">视频</span>
                         <video v-if="isVideo(item._displayUrl)" :src="item._displayUrl" autoplay loop muted playsinline
                             class="media"></video>
                         <el-image v-else :src="item._displayUrl" fit="cover" class="media"
                             :preview-src-list="[item._displayUrl]" preview-teleported lazy hide-on-click-modal />
-                        <div class="media-actions">
-                            <el-button :icon="Download" circle @click="downloadMedia(item.mediaurl)"
-                                class="download-btn" />
-                        </div>
                     </div>
                     <div class="card-body">
                         <div class="prompt-row">
@@ -45,20 +58,7 @@
                             <el-button link type="primary" class="copy-btn"
                                 @click="copyPrompt(item.prompt)">复制</el-button>
                         </div>
-                        <div class="card-actions">
-                            <el-button
-                                :loading="item._loadingOrigin"
-                                round
-                                class="origin-btn"
-                                :type="item._isOriginalShown ? 'success' : 'primary'"
-                                @click="showOrigin(item)"
-                            >
-                                <el-icon style="margin-right:6px;">
-                                    <component :is="item._isOriginalShown ? RefreshLeft : Picture" />
-                                </el-icon>
-                                {{ item._isOriginalShown ? '返回编辑图' : '查看原图' }}
-                            </el-button>
-                        </div>
+                        
                         <div class="meta">
                             <div class="meta-left">
                                 <span class="username">{{ item.userName }}</span>
@@ -240,7 +240,7 @@ onMounted(() => {
 <style scoped>
 .library-container {
     padding: 20px;
-    background-color: #f5f7fa;
+    background-color: transparent; /* 继承主区域背景 */
 }
 
 .toolbar {
@@ -264,10 +264,10 @@ onMounted(() => {
 .skeleton-card {
     break-inside: avoid;
     margin-bottom: 16px;
-    background-color: #fff;
-    border-radius: 10px;
+    background-color: var(--app-surface);
+    border-radius: 12px;
     overflow: hidden;
-    border: 2px solid #ebeef5;
+    border: 1px solid var(--el-border-color);
     /* Softer, gradient-like shadow */
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -276,14 +276,35 @@ onMounted(() => {
 .card:hover {
     transform: translateY(-4px);
     /* Subtle highlight */
-    border-color: #dcdfe6;
+    border-color: var(--el-border-color-light);
     /* Enhanced shadow on hover */
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
-.card-media:hover .media-actions {
-    opacity: 1;
+.card-media:hover .media-actions { opacity: 1; }
+
+/* 顶部工具条（常显，位于图片上方） */
+.media-header {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    background: var(--app-surface-2);
+    border-bottom: 1px solid var(--el-border-color);
 }
+
+.media-header .el-button {
+    border-radius: 999px;
+    height: 26px;
+    padding: 0 10px;
+    border-color: color-mix(in srgb, var(--app-primary) 35%, transparent);
+    color: var(--app-primary);
+    background: color-mix(in srgb, var(--app-primary) 8%, transparent);
+}
+.media-header .el-button:hover {
+    background: color-mix(in srgb, var(--app-primary) 14%, transparent);
+}
+
+.card-media { margin-top: 0; }
 
 .card-media {
     position: relative;
@@ -329,6 +350,7 @@ onMounted(() => {
 
 .card-body {
     padding: 12px 14px 10px 14px;
+    border-top: 1px solid var(--el-border-color);
 }
 
 .prompt-row {
@@ -341,9 +363,13 @@ onMounted(() => {
     flex: 1;
     white-space: pre-wrap;
     word-break: break-word;
-    line-height: 1.5;
+    line-height: 1.6;
     font-size: 14px;
-    color: #303133;
+    color: var(--el-text-color-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .copy-btn {
@@ -356,7 +382,7 @@ onMounted(() => {
     align-items: center;
     margin-top: 8px;
     font-size: 12px;
-    color: #909399;
+    color: var(--el-text-color-secondary);
 }
 
 .meta-left {
@@ -366,7 +392,7 @@ onMounted(() => {
 }
 
 .media-id {
-    color: #a6a9ad;
+    color: var(--el-text-color-secondary);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
@@ -388,17 +414,18 @@ onMounted(() => {
     justify-content: flex-start;
 }
 
-.origin-btn {
+.card-actions .origin-btn {
     border: none;
     color: #fff;
-    background: linear-gradient(135deg, #409EFF, #36cfc9);
-    box-shadow: 0 6px 14px rgba(64, 158, 255, 0.25);
+    background: var(--app-primary);
+    background: linear-gradient(135deg, var(--app-primary), color-mix(in srgb, var(--app-primary) 60%, #36cfc9));
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--app-primary) 35%, transparent);
     transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
-.origin-btn:hover {
+.card-actions .origin-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 10px 18px rgba(64, 158, 255, 0.28);
+    box-shadow: 0 10px 18px color-mix(in srgb, var(--app-primary) 45%, transparent);
 }
 
 /* Smooth media swap effect */

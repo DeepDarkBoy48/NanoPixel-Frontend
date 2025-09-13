@@ -12,7 +12,9 @@ import {
     ChatLineRound,
     Fold,
     Expand,
-    Menu
+    Menu,
+    Sunny,
+    Moon
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 import { userInfoService } from '@/api/user.js'
@@ -56,6 +58,10 @@ getUserInfo();
 import { useRouter, useRoute } from 'vue-router'
 const router = useRouter();
 const route = useRoute();
+import useThemeStore from '@/store/theme.js'
+const themeStore = useThemeStore()
+const isDark = computed(() => themeStore.theme === 'dark')
+const toggleTheme = () => themeStore.toggle()
 
 // 顶部模块导航（核心）：
 // 根据当前路由前缀选择要渲染的“模块导航组件”，
@@ -137,8 +143,10 @@ const activeMenu = computed(() => {
         <el-aside v-if="!isMobile" :width="isCollapse ? '64px' : '200px'">
             <div class="el-aside__logo"></div>
             <!-- 菜单 -->
-            <el-menu :default-active="activeMenu" active-text-color="#ffd04b" background-color="#232323"
-                text-color="#fff" router :collapse="isCollapse" :collapse-transition="false">
+            <el-menu :default-active="activeMenu"
+                :active-text-color="'var(--app-primary)'"
+                :background-color="'var(--app-sider-bg)'"
+                :text-color="'var(--app-sider-text)'" router :collapse="isCollapse" :collapse-transition="false">
 
 
 
@@ -158,17 +166,24 @@ const activeMenu = computed(() => {
                         <span>魔法修图</span>
                     </el-menu-item>
 
+                    <el-menu-item index="/ai/magicImageEdit/history">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>我的图集</span>
+                    </el-menu-item>
+
                     <el-menu-item index="/ai/library">
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
-                        <span>图片库</span>
+                        <span>灵感广场</span>
                     </el-menu-item>
                     <el-menu-item index="/ai/chatRoom">
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
-                        <span>聊天室</span>
+                        <span>智能对话</span>
                     </el-menu-item>
                 </el-sub-menu>
 
@@ -231,8 +246,10 @@ const activeMenu = computed(() => {
         <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="200px" :with-header="false"
             class="mobile-drawer">
             <div class="el-aside__logo"></div>
-            <el-menu :default-active="activeMenu" active-text-color="#ffd04b" background-color="#232323"
-                text-color="#fff" router @select="drawerVisible = false">
+            <el-menu :default-active="activeMenu"
+                :active-text-color="'var(--app-primary)'"
+                :background-color="'var(--app-sider-bg)'"
+                :text-color="'var(--app-sider-text)'" router @select="drawerVisible = false">
                 <el-sub-menu index="/ai">
                     <template #title>
                         <el-icon>
@@ -240,23 +257,30 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>AI创作</span>
                     </template>
-                    <el-menu-item index="/ai/chatRoom">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span>聊天室</span>
-                    </el-menu-item>
+                   
                     <el-menu-item index="/ai/magicImageEdit">
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
                         <span>魔法修图</span>
                     </el-menu-item>
+                    <el-menu-item index="/ai/magicImageEdit/history">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>我的图集</span>
+                    </el-menu-item>
                     <el-menu-item index="/ai/library">
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
-                        <span>图片库</span>
+                        <span>灵感广场</span>
+                    </el-menu-item>
+                     <el-menu-item index="/ai/chatRoom">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>智能对话</span>
                     </el-menu-item>
                 </el-sub-menu>
 
@@ -328,9 +352,15 @@ const activeMenu = computed(() => {
                 <div class="header-center">
                     <component v-if="currentHeaderNav" :is="currentHeaderNav" />
                 </div>
-                <!-- 下拉菜单 -->
-                <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
-                <el-dropdown placement="bottom-end" @command="handleCommand">
+                <div class="header-right">
+                    <!-- 主题切换按钮 -->
+                    <el-icon class="header-icon theme-toggle" @click="toggleTheme"
+                        :title="isDark ? '切换为浅色' : '切换为深色'">
+                        <component :is="isDark ? Moon : Sunny" />
+                    </el-icon>
+                    <!-- 用户菜单 -->
+                    <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
+                    <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
                         <el-avatar :src="userInfoStore.info.userPic ? userInfoStore.info.userPic : avatar" />
                         <el-icon>
@@ -352,7 +382,8 @@ const activeMenu = computed(() => {
                             </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
-                </el-dropdown>
+                    </el-dropdown>
+                </div>
             </el-header>
 
             <!-- 中间区域 -->
@@ -369,11 +400,11 @@ const activeMenu = computed(() => {
 </template>
 <style lang="scss" scoped>
 .layout-container {
-    height: 100vh;
+    height: var(--app-vh, 100vh);
     overflow-x: hidden;
 
     .el-aside {
-        background-color: #232323;
+        background-color: var(--app-sider-bg); /* 侧边栏背景随主题 */
         transition: width 0.3s;
 
         &__logo {
@@ -383,6 +414,26 @@ const activeMenu = computed(() => {
 
         .el-menu {
             border-right: none;
+            /* Element Plus 菜单主题变量（统一浅/深） */
+            --el-menu-bg-color: var(--app-sider-bg);
+            --el-menu-text-color: var(--app-sider-text);
+            --el-menu-active-color: var(--app-primary);
+            --el-menu-hover-bg-color: var(--app-sider-hover-bg);
+            --el-menu-hover-text-color: var(--app-sider-text);
+        }
+
+        :deep(.el-menu-item.is-active),
+        :deep(.el-sub-menu.is-active),
+        :deep(.el-sub-menu__title.is-active) {
+            background-color: var(--app-sider-active-bg) !important;
+            color: var(--app-primary) !important;
+        }
+
+        :deep(.el-menu-item:hover) {
+            background-color: var(--app-sider-hover-bg);
+        }
+        :deep(.el-sub-menu__title:hover) {
+            background-color: var(--app-sider-hover-bg);
         }
     }
 
@@ -399,6 +450,11 @@ const activeMenu = computed(() => {
         overflow-y: auto;
         overflow-x: hidden;
         box-sizing: border-box;
+        /* 主区域背景与边框色（随主题） */
+        background: var(--app-main-bg);
+        --el-border-color: var(--app-header-border);
+        --el-border-color-light: var(--app-header-border);
+        --el-border-color-lighter: var(--app-header-border);
 
         @media (max-width: 768px) {
             padding: 8px;
@@ -409,6 +465,8 @@ const activeMenu = computed(() => {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        background: var(--app-header-bg);
+        border-bottom: 1px solid var(--app-header-border);
 
         .header-left {
             display: flex;
@@ -433,7 +491,7 @@ const activeMenu = computed(() => {
                 font-size: 24px;
                 margin-right: 12px;
                 cursor: pointer;
-                color: #555;
+                color: var(--app-header-icon);
                 transition: color 0.3s;
 
                 &:hover {
@@ -447,7 +505,7 @@ const activeMenu = computed(() => {
             align-items: center;
 
             .el-icon {
-                color: #999;
+                color: var(--app-header-icon-weak);
                 margin-left: 10px;
             }
 
@@ -456,13 +514,20 @@ const activeMenu = computed(() => {
                 outline: none;
             }
         }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px; /* 拉开与头像的距离 */
+            margin-left: 8px;
+        }
     }
 }
 
 :deep(.mobile-drawer) {
     .el-drawer__body {
         padding: 0;
-        background-color: #232323;
+        background-color: var(--app-sider-bg);
     }
 
     .el-menu {
@@ -493,7 +558,7 @@ const activeMenu = computed(() => {
         width: 100%;
         overflow: hidden;
         /* 禁止整体横向滚动 */
-        background: var(--el-bg-color, #fff);
+        background: var(--app-main-bg);
         /* 适配 iOS 安全区域 */
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
@@ -506,7 +571,7 @@ const activeMenu = computed(() => {
         position: sticky;
         top: env(safe-area-inset-top);
         z-index: 100;
-        background: var(--el-bg-color, #fff);
+        background: var(--app-header-bg);
     }
 }
 </style>
