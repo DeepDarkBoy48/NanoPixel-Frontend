@@ -371,6 +371,11 @@ onBeforeUnmount(() => {
   gap: 12px;
 }
 
+/* 防止右侧内容在小屏时出现横向溢出被裁切 */
+.right-panel {
+  min-width: 0;
+}
+
 /* 左侧面板吸附顶部，随页面滚动可见 */
 .left-panel {
   position: sticky;
@@ -534,9 +539,43 @@ onBeforeUnmount(() => {
   color: var(--el-text-color-secondary);
 }
 
+/* 让右侧文字列在 grid 中可以正确缩小，不产生横向溢出 */
+.list-content {
+  min-width: 0;
+}
+
+.meta .create-time {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .pagination-wrapper {
   display: flex;
   justify-content: center;
   padding: 12px 0 8px;
+}
+
+/* 移动端优化：
+ * - 在窄屏下减小缩略图列宽与高度，避免右侧内容被裁切
+ * - 极窄屏下改为上下布局，图片占满宽度，信息在下方显示
+ */
+@media (max-width: 768px) {
+  .list-item {
+    grid-template-columns: 120px 1fr;
+    gap: 10px;
+  }
+  .list-thumb {
+    height: 100px;
+  }
+}
+
+@media (max-width: 420px) {
+  .list-item {
+    grid-template-columns: 1fr;
+  }
+  .list-thumb {
+    height: 56vw; /* 近似 16:9，随屏幕自适应 */
+  }
 }
 </style>
