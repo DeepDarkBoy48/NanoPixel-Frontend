@@ -42,7 +42,12 @@
 
           <div class="prompt-block">
             <div class="prompt-title">提示词</div>
-            <el-input type="textarea" :model-value="selectedItem.prompt" readonly autosize />
+            <el-input
+              type="textarea"
+              :model-value="selectedItem.prompt"
+              readonly
+              :autosize="{ minRows: 3, maxRows: 8 }"
+            />
             <div class="prompt-actions">
               <el-button size="small" @click="copyPrompt(selectedItem.prompt)" :loading="copying">复制</el-button>
             </div>
@@ -150,7 +155,12 @@
 
       <div class="prompt-block">
         <div class="prompt-title">提示词</div>
-        <el-input type="textarea" :model-value="selectedItem.prompt" readonly autosize />
+        <el-input
+          type="textarea"
+          :model-value="selectedItem.prompt"
+          readonly
+          :autosize="{ minRows: 3, maxRows: 8 }"
+        />
         <div class="prompt-actions">
           <el-button size="small" @click="copyPrompt(selectedItem.prompt)" :loading="copying">复制</el-button>
         </div>
@@ -383,9 +393,10 @@ onBeforeUnmount(() => {
   top: 0;
   align-self: start;
   /* 最大高度同步调整，保持底部留白 */
-  max-height: calc(100vh - 12px);
+  max-height: calc(100dvh - 12px);
   overflow: auto;
   /* 面板内容过长时内部滚动 */
+  -webkit-overflow-scrolling: touch; /* iPad 内嵌滚动更顺滑 */
 }
 
 .left-card {
@@ -404,7 +415,7 @@ onBeforeUnmount(() => {
 
 .preview {
   width: 100%;
-  height: 360px;
+  height: 300px;
   background: var(--app-surface-2);
   border-radius: 6px;
   cursor: zoom-in;
@@ -439,6 +450,12 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   margin-top: 12px;
+  position: sticky; /* 让发布开关在侧栏底部始终可见 */
+  bottom: 0;
+  padding: 10px 0 6px;
+  background: var(--app-surface);
+  border-top: 1px solid var(--el-border-color);
+  z-index: 1;
 }
 
 .publish-row .label {
