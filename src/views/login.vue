@@ -197,18 +197,21 @@ const goBlog = () => {
   position: relative;
   z-index: 1;
   width: 420px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
   padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.4),
+    0 0 60px 0 rgba(233, 69, 96, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.5);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px 0 rgba(0, 0, 0, 0.5),
+      0 0 80px 0 rgba(233, 69, 96, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -225,10 +228,12 @@ const goBlog = () => {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -257,11 +262,25 @@ const goBlog = () => {
 }
 
 :deep(.el-input__inner) {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   color: #fff;
+  font-weight: 500;
+  backdrop-filter: blur(5px);
+
   &::placeholder {
-    color: #ccc;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  &:focus {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(233, 69, 96, 0.8);
+    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.3);
+    color: #fff;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -272,6 +291,7 @@ const goBlog = () => {
 .button-group {
   .el-button {
     width: 100%;
+
     &:first-child {
       margin-bottom: 10px;
     }
@@ -285,6 +305,7 @@ const goBlog = () => {
 
 .blog-button {
   color: #eee;
+
   &:hover {
     color: #fff;
   }
@@ -292,12 +313,24 @@ const goBlog = () => {
 
 .button {
   width: 100%;
-  background: linear-gradient(45deg, #e94560, #533483);
+  background: linear-gradient(135deg, #e94560, #533483);
   border: none;
-  transition: background 0.3s ease;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(233, 69, 96, 0.3);
 
   &:hover {
-    background: linear-gradient(45deg, #533483, #e94560);
+    background: linear-gradient(135deg, #533483, #e94560);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(233, 69, 96, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
   }
 }
 
@@ -305,9 +338,10 @@ const goBlog = () => {
   width: 100%;
   display: flex;
   justify-content: center;
-  
+
   .el-link {
     color: #eee;
+
     &:hover {
       color: #fff;
     }

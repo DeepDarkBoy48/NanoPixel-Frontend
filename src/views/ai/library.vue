@@ -54,7 +54,7 @@
                     </div>
                     <div class="card-body">
                         <div class="prompt-row">
-                            <div class="prompt-text">{{ item.prompt }}</div>
+                            <div class="prompt-text">{{ getDisplayPrompt(item.prompt) }}</div>
                             <el-button link type="primary" class="copy-btn"
                                 @click="copyPrompt(item.prompt)">复制</el-button>
                         </div>
@@ -177,6 +177,15 @@ const copyPrompt = async (text) => {
     } catch (e) {
         ElMessage.error('复制失败');
     }
+};
+
+// 限制展示的提示词字符数（尽量展示100字以内都要展示）
+const DISPLAY_CHAR_LIMIT = 200;
+const getDisplayPrompt = (text) => {
+    if (!text) return '';
+    const s = String(text);
+    if (s.length <= DISPLAY_CHAR_LIMIT) return s;
+    return s.slice(0, DISPLAY_CHAR_LIMIT) + '…';
 };
 
 // 预加载图片，确保平滑切换
@@ -366,10 +375,7 @@ onMounted(() => {
     line-height: 1.6;
     font-size: 14px;
     color: var(--el-text-color-primary);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    /* 取消行数裁剪，改为按字符数限制 */
 }
 
 .copy-btn {

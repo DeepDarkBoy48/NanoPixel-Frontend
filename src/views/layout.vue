@@ -143,10 +143,9 @@ const activeMenu = computed(() => {
         <el-aside v-if="!isMobile" :width="isCollapse ? '64px' : '200px'">
             <div class="el-aside__logo"></div>
             <!-- 菜单 -->
-            <el-menu :default-active="activeMenu"
-                :active-text-color="'var(--app-primary)'"
-                :background-color="'var(--app-sider-bg)'"
-                :text-color="'var(--app-sider-text)'" router :collapse="isCollapse" :collapse-transition="false">
+            <el-menu :default-active="activeMenu" :active-text-color="'var(--app-primary)'"
+                :background-color="'var(--app-sider-bg)'" :text-color="'var(--app-sider-text)'" router
+                :collapse="isCollapse" :collapse-transition="false">
 
 
 
@@ -246,10 +245,9 @@ const activeMenu = computed(() => {
         <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="200px" :with-header="false"
             class="mobile-drawer">
             <div class="el-aside__logo"></div>
-            <el-menu :default-active="activeMenu"
-                :active-text-color="'var(--app-primary)'"
-                :background-color="'var(--app-sider-bg)'"
-                :text-color="'var(--app-sider-text)'" router @select="drawerVisible = false">
+            <el-menu :default-active="activeMenu" :active-text-color="'var(--app-primary)'"
+                :background-color="'var(--app-sider-bg)'" :text-color="'var(--app-sider-text)'" router
+                @select="drawerVisible = false">
                 <el-sub-menu index="/ai">
                     <template #title>
                         <el-icon>
@@ -257,7 +255,7 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>AI创作</span>
                     </template>
-                   
+
                     <el-menu-item index="/ai/magicImageEdit">
                         <el-icon>
                             <ChatLineRound />
@@ -276,14 +274,14 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>灵感广场</span>
                     </el-menu-item>
-                     <el-menu-item index="/ai/chatRoom">
+                    <el-menu-item index="/ai/chatRoom">
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
                         <span>智能对话</span>
                     </el-menu-item>
                 </el-sub-menu>
-<!-- 
+                <!-- 
                 <el-sub-menu index="/article">
                     <template #title>
                         <el-icon>
@@ -354,34 +352,33 @@ const activeMenu = computed(() => {
                 </div>
                 <div class="header-right">
                     <!-- 主题切换按钮 -->
-                    <el-icon class="header-icon theme-toggle" @click="toggleTheme"
-                        :title="isDark ? '切换为浅色' : '切换为深色'">
+                    <el-icon class="header-icon theme-toggle" @click="toggleTheme" :title="isDark ? '切换为浅色' : '切换为深色'">
                         <component :is="isDark ? Moon : Sunny" />
                     </el-icon>
                     <!-- 用户菜单 -->
                     <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
                     <el-dropdown placement="bottom-end" @command="handleCommand">
-                    <span class="el-dropdown__box">
-                        <el-avatar :src="userInfoStore.info.userPic ? userInfoStore.info.userPic : avatar" />
-                        <el-icon>
-                            <CaretBottom />
-                        </el-icon>
-                    </span> <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item command="info" :icon="User">
-                                基本资料
-                            </el-dropdown-item>
-                            <el-dropdown-item command="avatar" :icon="Crop">
-                                更换头像
-                            </el-dropdown-item>
-                            <el-dropdown-item command="resetPassword" :icon="EditPen">
-                                重置密码
-                            </el-dropdown-item>
-                            <el-dropdown-item command="logout" :icon="SwitchButton">
-                                退出登录
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
+                        <span class="el-dropdown__box">
+                            <el-avatar :src="userInfoStore.info.userPic ? userInfoStore.info.userPic : avatar" />
+                            <el-icon>
+                                <CaretBottom />
+                            </el-icon>
+                        </span> <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item command="info" :icon="User">
+                                    基本资料
+                                </el-dropdown-item>
+                                <el-dropdown-item command="avatar" :icon="Crop">
+                                    更换头像
+                                </el-dropdown-item>
+                                <el-dropdown-item command="resetPassword" :icon="EditPen">
+                                    重置密码
+                                </el-dropdown-item>
+                                <el-dropdown-item command="logout" :icon="SwitchButton">
+                                    退出登录
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
                     </el-dropdown>
                 </div>
             </el-header>
@@ -404,7 +401,8 @@ const activeMenu = computed(() => {
     overflow-x: hidden;
 
     .el-aside {
-        background-color: var(--app-sider-bg); /* 侧边栏背景随主题 */
+        background-color: var(--app-sider-bg);
+        /* 侧边栏背景随主题 */
         transition: width 0.3s;
 
         &__logo {
@@ -432,6 +430,7 @@ const activeMenu = computed(() => {
         :deep(.el-menu-item:hover) {
             background-color: var(--app-sider-hover-bg);
         }
+
         :deep(.el-sub-menu__title:hover) {
             background-color: var(--app-sider-hover-bg);
         }
@@ -518,7 +517,8 @@ const activeMenu = computed(() => {
         .header-right {
             display: flex;
             align-items: center;
-            gap: 14px; /* 拉开与头像的距离 */
+            gap: 14px;
+            /* 拉开与头像的距离 */
             margin-left: 8px;
         }
     }
@@ -532,6 +532,29 @@ const activeMenu = computed(() => {
 
     .el-menu {
         border-right: none;
+        /* Element Plus 菜单主题变量（统一浅/深） */
+        --el-menu-bg-color: var(--app-sider-bg);
+        --el-menu-text-color: var(--app-sider-text);
+        --el-menu-active-color: var(--app-primary);
+        --el-menu-hover-bg-color: var(--app-sider-hover-bg);
+        --el-menu-hover-text-color: var(--app-sider-text);
+    }
+
+    /* 移动端抽屉菜单项激活状态样式 */
+    .el-menu-item.is-active,
+    .el-sub-menu.is-active,
+    .el-sub-menu__title.is-active {
+        background-color: var(--app-sider-active-bg) !important;
+        color: var(--app-primary) !important;
+    }
+
+    /* 移动端抽屉菜单项悬停状态样式 */
+    .el-menu-item:hover {
+        background-color: var(--app-sider-hover-bg);
+    }
+
+    .el-sub-menu__title:hover {
+        background-color: var(--app-sider-hover-bg);
     }
 }
 
