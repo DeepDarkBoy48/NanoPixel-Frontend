@@ -30,35 +30,26 @@
                 <div class="card" v-for="item in mediaList" :key="item.id ?? item.createtime">
                     <!-- 顶部工具条：常显 -->
                     <div class="media-header">
-                        <el-button
-                            :loading="item._loadingOrigin"
-                            size="small"
-                            class="origin-btn"
-                            type="primary"
-                            plain
-                            @click.stop="showOrigin(item)"
-                        >
+                        <el-button :loading="item._loadingOrigin" size="small" class="origin-btn" type="primary" plain
+                            @click.stop="showOrigin(item)">
                             <el-icon style="margin-right:6px;">
                                 <component :is="item._isOriginalShown ? RefreshLeft : Picture" />
                             </el-icon>
                             {{ item._isOriginalShown ? '返回编辑图' : '查看原图' }}
                         </el-button>
-                        <el-button size="small" type="primary" plain @click.stop="downloadMedia(item._displayUrl)">点击下载</el-button>
+                        <el-button size="small" class="detail-btn" @click.stop="goToDetail(item)">查看详情</el-button>
                     </div>
                     <div class="card-media" :class="{ switching: item._switching }">
                         <span v-if="isVideo(item._displayUrl)" class="badge">视频</span>
                         <video v-if="isVideo(item._displayUrl)" :src="item._displayUrl" autoplay loop muted playsinline
                             class="media"></video>
-                        <el-image v-else :src="item._displayUrl" fit="cover" class="media"
-                            :preview-src-list="[item._displayUrl]" preview-teleported lazy hide-on-click-modal />
+                        <el-image v-else :src="item._displayUrl" fit="cover" class="media" lazy />
                     </div>
                     <div class="card-body">
                         <div class="prompt-row">
                             <div class="prompt-text">{{ getDisplayPrompt(item.prompt) }}</div>
-                            <el-button link type="primary" class="copy-btn"
-                                @click="copyPrompt(item.prompt)">复制</el-button>
                         </div>
-                        
+
                         <div class="meta">
                             <div class="meta-left">
                                 <span class="username">{{ item.userName }}</span>
@@ -80,6 +71,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { getAllLibraryService, getMediaOriginUrlService } from '@/api/ai.js';
 import { ElMessage } from 'element-plus';
 import { formatDate } from '@/utils/format';
@@ -94,8 +86,18 @@ const pageNum = ref(1);
 const pageSize = ref(15);
 const total = ref(0);
 
+const router = useRouter();
+
 const refresh = () => {
     getMediaList(pageNum.value);
+};
+
+const goToDetail = (item) => {
+    if (item.id) {
+        router.push(`/ai/library/${item.id}`);
+    } else {
+        ElMessage.info('该作品没有详情信息');
+    }
 };
 
 const getMediaList = async (page = 1) => {
@@ -180,7 +182,7 @@ const copyPrompt = async (text) => {
 };
 
 // 限制展示的提示词字符数（尽量展示100字以内都要展示）
-const DISPLAY_CHAR_LIMIT = 200;
+const DISPLAY_CHAR_LIMIT = 100;
 const getDisplayPrompt = (text) => {
     if (!text) return '';
     const s = String(text);
@@ -206,7 +208,7 @@ const showOrigin = async (item) => {
         // 已经是原图，则切回编辑图
         if (item._isOriginalShown) {
             item._switching = true;
-            await preloadImage(item.mediaurl).catch(() => {});
+            await preloadImage(item.mediaurl).catch(() => { });
             item._displayUrl = item.mediaurl;
             item._isOriginalShown = false;
             setTimeout(() => { item._switching = false; }, 280);
@@ -229,7 +231,7 @@ const showOrigin = async (item) => {
 
         // 平滑切换：先开启动画，预加载，再替换
         item._switching = true;
-        await preloadImage(item._originUrl).catch(() => {});
+        await preloadImage(item._originUrl).catch(() => { });
         item._displayUrl = item._originUrl;
         item._isOriginalShown = true;
         setTimeout(() => { item._switching = false; }, 280);
@@ -249,7 +251,8 @@ onMounted(() => {
 <style scoped>
 .library-container {
     padding: 20px;
-    background-color: transparent; /* 继承主区域背景 */
+    background-color: transparent;
+    /* 继承主区域背景 */
 }
 
 .toolbar {
@@ -290,7 +293,9 @@ onMounted(() => {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
 }
 
-.card-media:hover .media-actions { opacity: 1; }
+.card-media:hover .media-actions {
+    opacity: 1;
+}
 
 /* 顶部工具条（常显，位于图片上方） */
 .media-header {
@@ -309,11 +314,26 @@ onMounted(() => {
     color: var(--app-primary);
     background: color-mix(in srgb, var(--app-primary) 8%, transparent);
 }
+
 .media-header .el-button:hover {
     background: color-mix(in srgb, var(--app-primary) 14%, transparent);
 }
 
-.card-media { margin-top: 0; }
+.media-header .detail-btn {
+    border-color: #f37a24;
+    color: #f37a24;
+    background: color-mix(in srgb, #f37a24 10%, transparent);
+}
+
+.media-header .detail-btn:hover {
+    color: #f37a24;
+    border-color: #f37a24;
+    background: color-mix(in srgb, #f37a24 20%, transparent);
+}
+
+.card-media {
+    margin-top: 0;
+}
 
 .card-media {
     position: relative;

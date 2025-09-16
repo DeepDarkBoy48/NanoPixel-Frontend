@@ -178,6 +178,12 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>灵感广场</span>
                     </el-menu-item>
+                    <el-menu-item index="/ai/canvas">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>Canvas</span>
+                    </el-menu-item>
                     <el-menu-item index="/ai/chatRoom">
                         <el-icon>
                             <ChatLineRound />
@@ -273,6 +279,12 @@ const activeMenu = computed(() => {
                             <ChatLineRound />
                         </el-icon>
                         <span>灵感广场</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/canvas">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>Canvas</span>
                     </el-menu-item>
                     <el-menu-item index="/ai/chatRoom">
                         <el-icon>

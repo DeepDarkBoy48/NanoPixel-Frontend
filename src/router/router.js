@@ -17,6 +17,8 @@ import MagicModels from "@/views/ai/magicedit/MagicModels.vue";
 import LibraryBrowse from "@/views/ai/librarypages/LibraryBrowse.vue";
 import LibraryCollections from "@/views/ai/librarypages/LibraryCollections.vue";
 import LibraryFavorites from "@/views/ai/librarypages/LibraryFavorites.vue";
+import canvasVue from "@/views/ai/canvas.vue";
+import LibraryDetail from "@/views/ai/libraryDetail.vue";
 
 // 路由配置说明：
 // - 根路径使用 Layout 作为统一布局容器，所有业务页面作为其子路由渲染在 <router-view/>
@@ -51,6 +53,10 @@ const routes = [
       { path: "/ai/library/browse", component: LibraryBrowse },
       { path: "/ai/library/collections", component: LibraryCollections },
       { path: "/ai/library/favorites", component: LibraryFavorites },
+      { path: "/ai/library/:mediaId", component: LibraryDetail },
+
+      // AI 模块：Canvas
+      { path: "/ai/canvas", component: canvasVue },
     ],
   },
   { path: "/blog", component: BlogVue },

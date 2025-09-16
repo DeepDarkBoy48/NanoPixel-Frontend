@@ -25,3 +25,8 @@ export const setMediaPublicService = (mediaId, isPublic) => {
 export const getMediaOriginUrlService = (mediaId) => {
     return request.get("ai/media/originurl", { params: { mediaId } });
 };
+
+// 根据媒体ID获取详细信息
+export const getMediaByIdService = (mediaId) => {
+    return request.get(`ai/media/${mediaId}`);
+};
