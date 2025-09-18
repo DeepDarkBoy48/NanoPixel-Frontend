@@ -1,203 +1,197 @@
 <template>
-  <div class="history-page">
-    <div class="left-panel" v-if="!isMobile">
-      <el-card shadow="never" class="left-card">
-        <template #header>
-          <div class="left-header">已选图片详情</div>
-        </template>
+  <div>
+    <div class="history-page">
+      <div class="list-panel">
+        <div class="toolbar">
+          <h2 class="title">我的作品</h2>
+          <div class="actions">
+            <el-button size="small" @click="refresh" :loading="loading">刷新</el-button>
+          </div>
+        </div>
 
-        <el-empty v-if="!selectedItem" description="从右侧选择一张图片" />
+        <div v-if="loading" class="list-container">
+          <div class="list-item skeleton">
+            <el-skeleton animated :rows="2">
+              <template #template>
+                <div class="list-thumb skeleton-box"></div>
+                <div class="list-content">
+                  <el-skeleton-item variant="text" style="width: 80%; margin-bottom: 8px;" />
+                  <el-skeleton-item variant="text" style="width: 50%;" />
+                </div>
+              </template>
+            </el-skeleton>
+          </div>
+          <div class="list-item skeleton" v-for="i in 6" :key="i">
+            <el-skeleton animated :rows="2">
+              <template #template>
+                <div class="list-thumb skeleton-box"></div>
+                <div class="list-content">
+                  <el-skeleton-item variant="text" style="width: 80%; margin-bottom: 8px;" />
+                  <el-skeleton-item variant="text" style="width: 50%;" />
+                </div>
+              </template>
+            </el-skeleton>
+          </div>
+        </div>
+
+        <el-empty v-else-if="!mediaList.length" description="暂无作品" />
 
         <template v-else>
-          <!-- <el-alert
-            title="点击上方图片可放大，点击放大层空白处可关闭"
-            type="info"
-            :closable="false"
-            show-icon
-            class="hint"
-          /> -->
-
-      <el-image :src="selectedItem._displayUrl" fit="contain" class="preview"
-        :preview-src-list="[selectedItem._displayUrl]" preview-teleported hide-on-click-modal />
-
-          <div class="side-actions">
-            <el-button :loading="selectedItem._loadingOrigin" size="small" type="primary" plain
-              @click="showOrigin(selectedItem)">
-              <el-icon style="margin-right:6px;">
-                <component :is="selectedItem._isOriginalShown ? RefreshLeft : Picture" />
-              </el-icon>
-              {{ selectedItem._isOriginalShown ? '返回编辑图' : '查看原图' }}
-            </el-button>
-
-            <el-button size="small" type="primary" plain @click="downloadMedia(selectedItem._displayUrl)">
-              点击下载
-            </el-button>
-          </div>
-
-          <el-descriptions :column="1" border class="desc">
-            <el-descriptions-item label="ID">{{ selectedItem.id }}</el-descriptions-item>
-            <el-descriptions-item label="创建时间">{{ formatTime(selectedItem.createtime) }}</el-descriptions-item>
-            <el-descriptions-item label="作者">{{ selectedItem.userName }}</el-descriptions-item>
-          </el-descriptions>
-
-          <div class="prompt-block">
-            <div class="prompt-title">提示词</div>
-            <el-input
-              type="textarea"
-              :model-value="selectedItem.prompt"
-              readonly
-              :autosize="{ minRows: 3, maxRows: 8 }"
-            />
-            <div class="prompt-actions">
-              <el-button size="small" @click="copyPrompt(selectedItem.prompt)" :loading="copying">复制</el-button>
+          <div class="list-container">
+            <div class="list-item" :class="{ selected: item.id === selectedItem?.id }" v-for="item in mediaList"
+              :key="item.id ?? item.createtime">
+              <div class="list-thumb-wrap">
+                <el-image :src="item._displayUrl" fit="cover" class="list-thumb" lazy />
+              </div>
+              <div class="list-content">
+                <div class="prompt-text">{{ item.prompt }}</div>
+                <div class="meta">
+                  <el-tag size="small" :type="item.isPublic ? 'success' : 'info'" effect="plain">
+                    {{ item.isPublic ? '公开' : '私密' }}
+                  </el-tag>
+                  <span class="create-time">{{ formatTime(item.createtime) }}</span>
+                </div>
+                <div class="list-actions">
+                  <el-button size="small" type="primary" plain @click="openDetails(item)">查看详情</el-button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="publish-row">
-            <div class="label">发布状态</div>
-            <el-switch v-model="selectedPublic" :active-text="'公开'" :inactive-text="'私密'" :loading="publishing"
-              @change="onTogglePublic" />
+          <div class="pagination-wrapper">
+            <el-pagination background layout="prev, pager, next, jumper, ->, total" :current-page="pageNum"
+              :page-size="pageSize" :total="total" @current-change="handlePageChange" />
           </div>
         </template>
-      </el-card>
+      </div>
     </div>
 
-    <div class="right-panel">
-      <div class="toolbar">
-        <h2 class="title">我的作品</h2>
-        <div class="actions">
-          <el-button size="small" @click="refresh" :loading="loading">刷新</el-button>
+    <!-- 图片详情抽屉（PC & 移动端通用） -->
+    <el-drawer v-model="detailsDrawer" direction="rtl" :size="drawerSize" :with-header="true" title="图片详情"
+      append-to-body destroy-on-close :body-class="'history-drawer-body'">
+      <div class="drawer-wrapper">
+        <div v-if="drawerLoading" class="drawer-loading">
+          <el-skeleton :rows="6" animated />
         </div>
-      </div>
-
-      <div v-if="loading" class="list-container">
-        <div class="list-item skeleton">
-          <el-skeleton animated :rows="2">
-            <template #template>
-              <div class="list-thumb skeleton-box"></div>
-              <div class="list-content">
-                <el-skeleton-item variant="text" style="width: 80%; margin-bottom: 8px;" />
-                <el-skeleton-item variant="text" style="width: 50%;" />
-              </div>
-            </template>
-          </el-skeleton>
-        </div>
-        <div class="list-item skeleton" v-for="i in 6" :key="i">
-          <el-skeleton animated :rows="2">
-            <template #template>
-              <div class="list-thumb skeleton-box"></div>
-              <div class="list-content">
-                <el-skeleton-item variant="text" style="width: 80%; margin-bottom: 8px;" />
-                <el-skeleton-item variant="text" style="width: 50%;" />
-              </div>
-            </template>
-          </el-skeleton>
-        </div>
-      </div>
-
-      <el-empty v-else-if="!mediaList.length" description="暂无作品" />
-
-      <template v-else>
-        <div class="list-container">
-          <div class="list-item" :class="{ selected: item.id === selectedItem?.id }" v-for="item in mediaList"
-            :key="item.id ?? item.createtime" @click="selectItem(item)">
-            <div class="list-thumb-wrap" :class="{ switching: item._switching }">
-              <el-image :src="item._displayUrl" fit="cover" class="list-thumb" :preview-src-list="[item._displayUrl]"
-                preview-teleported lazy hide-on-click-modal />
-            </div>
-            <div class="list-content">
-              <div class="prompt-text">{{ item.prompt }}</div>
-              <div class="meta">
-                <el-tag size="small" :type="item.isPublic ? 'success' : 'info'" effect="plain">
-                  {{ item.isPublic ? '公开' : '私密' }}
-                </el-tag>
-                <span class="create-time">{{ formatTime(item.createtime) }}</span>
+        <el-empty v-else-if="!drawerDetail" description="未找到媒体详情" />
+        <div v-else class="drawer-board">
+          <section class="media-row">
+            <div class="media-card">
+              <header>
+                <h3>原图</h3>
+                <p>起始素材</p>
+              </header>
+              <div class="media-frame">
+                <template v-if="drawerDetail.originurl">
+                  <span v-if="isVideo(drawerDetail.originurl)" class="badge">视频</span>
+                  <video v-if="isVideo(drawerDetail.originurl)" :src="drawerDetail.originurl" controls playsinline
+                    class="media-element"></video>
+                  <el-image v-else :src="drawerDetail.originurl" fit="contain" class="media-element"
+                    :preview-src-list="[drawerDetail.originurl]" preview-teleported hide-on-click-modal />
+                </template>
+                <el-empty v-else description="暂无原图" :image-size="120" class="placeholder" />
               </div>
             </div>
-          </div>
-        </div>
+            <div class="media-card">
+              <header>
+                <h3>AI 输出</h3>
+                <p>生成结果</p>
+              </header>
+              <div class="media-frame">
+                <span v-if="isVideo(drawerDetail.mediaurl)" class="badge">视频</span>
+                <video v-if="isVideo(drawerDetail.mediaurl)" :src="drawerDetail.mediaurl" controls playsinline
+                  class="media-element"></video>
+                <el-image v-else :src="drawerDetail.mediaurl" fit="contain" class="media-element"
+                  :preview-src-list="[drawerDetail.mediaurl]" preview-teleported hide-on-click-modal />
+              </div>
+            </div>
+          </section>
 
-        <div class="pagination-wrapper">
-          <el-pagination background layout="prev, pager, next, jumper, ->, total" :current-page="pageNum"
-            :page-size="pageSize" :total="total" @current-change="handlePageChange" />
+          <section class="prompt-section">
+            <header>
+              <h3>提示词</h3>
+              <el-button v-if="drawerDetail.prompt" size="small" link type="primary" :loading="copying"
+                @click="copyPrompt(drawerDetail.prompt)">复制</el-button>
+            </header>
+            <div class="prompt-content" v-if="drawerDetail.prompt">{{ drawerDetail.prompt }}</div>
+            <div class="prompt-content empty" v-else>暂无提示词</div>
+          </section>
+
+          <section class="meta-section">
+            <header>
+              <h3>其他信息</h3>
+            </header>
+            <div class="meta-grid">
+              <div class="meta-item">
+                <span class="label">媒体 ID</span>
+                <span class="value">#{{ drawerDetail.id }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">作者</span>
+                <span class="value">{{ drawerDetail.username || '未知' }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">创建时间</span>
+                <span class="value">{{ formatTime(drawerDetail.createtime) }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">模型</span>
+                <span class="value">{{ drawerDetail.model || '未提供' }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">生成地址</span>
+                <span class="value">
+                  <el-link v-if="drawerDetail.mediaurl" :href="drawerDetail.mediaurl" target="_blank" type="primary">
+                    打开链接
+                  </el-link>
+                  <span v-else>暂无</span>
+                </span>
+              </div>
+              <div class="meta-item">
+                <span class="label">原图地址</span>
+                <span class="value">
+                  <el-link v-if="drawerDetail.originurl" :href="drawerDetail.originurl" target="_blank" type="primary">
+                    打开链接
+                  </el-link>
+                  <span v-else>暂无</span>
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <section class="publish-section">
+            <div class="publish-label">发布状态</div>
+            <el-switch v-model="selectedPublic" :active-text="'公开'" :inactive-text="'私密'" :loading="publishing"
+              @change="onTogglePublic" />
+          </section>
         </div>
-      </template>
-    </div>
+      </div>
+    </el-drawer>
   </div>
-
-  <!-- 移动端详情悬浮窗 -->
-  <el-drawer v-if="isMobile" v-model="detailsDrawer" direction="rtl" size="85%" :with-header="true" title="图片详情">
-    <el-empty v-if="!selectedItem" description="从右侧选择一张图片" />
-    <template v-else>
-      <el-alert title="点击图片可放大，点击空白关闭" type="info" :closable="false" show-icon class="hint" />
-      <el-image :src="selectedItem._displayUrl" fit="contain"
-        style="width:100%;height:240px;border-radius:6px;background:var(--app-surface-2)" :preview-src-list="[selectedItem._displayUrl]"
-        preview-teleported hide-on-click-modal />
-
-      <div class="side-actions" style="margin-top:10px;">
-        <el-button :loading="selectedItem._loadingOrigin" size="small" type="primary" plain
-          @click="showOrigin(selectedItem)">
-          <el-icon style="margin-right:6px;">
-            <component :is="selectedItem._isOriginalShown ? RefreshLeft : Picture" />
-          </el-icon>
-          {{ selectedItem._isOriginalShown ? '返回编辑图' : '查看原图' }}
-        </el-button>
-        <el-button size="small" type="primary" plain @click="downloadMedia(selectedItem._displayUrl)">
-          点击下载
-        </el-button>
-      </div>
-
-      <el-descriptions :column="1" border class="desc" style="margin-top:10px;">
-        <el-descriptions-item label="ID">{{ selectedItem.id }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间">{{ formatTime(selectedItem.createtime) }}</el-descriptions-item>
-        <el-descriptions-item label="作者">{{ selectedItem.userName }}</el-descriptions-item>
-      </el-descriptions>
-
-      <div class="prompt-block">
-        <div class="prompt-title">提示词</div>
-        <el-input
-          type="textarea"
-          :model-value="selectedItem.prompt"
-          readonly
-          :autosize="{ minRows: 3, maxRows: 8 }"
-        />
-        <div class="prompt-actions">
-          <el-button size="small" @click="copyPrompt(selectedItem.prompt)" :loading="copying">复制</el-button>
-        </div>
-      </div>
-
-      <div class="publish-row">
-        <div class="label">发布状态</div>
-        <el-switch v-model="selectedPublic" :active-text="'公开'" :inactive-text="'私密'" :loading="publishing"
-          @change="onTogglePublic" />
-      </div>
-    </template>
-  </el-drawer>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getUserLibraryService, setMediaPublicService, getMediaOriginUrlService } from '@/api/ai.js'
+import { getUserLibraryService, setMediaPublicService, getMediaByIdService } from '@/api/ai.js'
 import { formatDate } from '@/utils/format'
-import { Download, Picture, RefreshLeft } from '@element-plus/icons-vue'
 
 const mediaList = ref([])
 const loading = ref(false)
-const skeletonCount = 10
 
 // 右侧列表分页
 const pageNum = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-// 左侧选中项
+// 当前选中项
 const selectedItem = ref(null)
 const selectedPublic = ref(false)
 const publishing = ref(false)
 const copying = ref(false)
 const isMobile = ref(false)
 const detailsDrawer = ref(false)
+const drawerSize = computed(() => (isMobile.value ? '95%' : '960px'))
 
 const checkIsMobile = () => {
   isMobile.value = window.innerWidth < 768
@@ -205,14 +199,34 @@ const checkIsMobile = () => {
 
 const refresh = () => getMediaList(pageNum.value)
 
+const drawerDetail = ref(null)
+const drawerLoading = ref(false)
+
+const toBoolean = (val) => {
+  if (typeof val === 'boolean') return val
+  if (typeof val === 'number') return val === 1
+  if (typeof val === 'string') {
+    const lowered = val.toLowerCase()
+    return lowered === '1' || lowered === 'true'
+  }
+  return false
+}
+
 const normalizeItem = (it) => ({
   ...it,
-  isPublic: it?.isPublic ?? it?.public ?? it?.ispublic,
+  isPublic: toBoolean(it?.isPublic ?? it?.public ?? it?.ispublic),
   _displayUrl: it.mediaurl,
-  _originUrl: null,
-  _isOriginalShown: false,
-  _loadingOrigin: false,
-  _switching: false,
+})
+
+const normalizeDetail = (data) => ({
+  id: data?.id ?? null,
+  mediaurl: data?.mediaurl ?? '',
+  originurl: data?.originurl ?? '',
+  prompt: data?.prompt ?? '',
+  createtime: data?.createtime ?? '',
+  username: data?.username ?? data?.userName ?? '',
+  model: data?.model ?? '',
+  isPublic: toBoolean(data?.isPublic ?? data?.ispublic),
 })
 
 const getMediaList = async (page = 1) => {
@@ -235,102 +249,67 @@ const handlePageChange = (p) => {
   getMediaList(p)
 }
 
-const selectItem = (item) => {
-  selectedItem.value = item
-  if (isMobile.value) {
-    detailsDrawer.value = true
+const loadDetail = async (mediaId) => {
+  if (!mediaId) {
+    drawerDetail.value = null
+    return
+  }
+  try {
+    drawerLoading.value = true
+    drawerDetail.value = null
+    const res = await getMediaByIdService(mediaId)
+    const data = res?.data
+    if (!data) {
+      drawerDetail.value = null
+      ElMessage.warning('未找到该媒体')
+      return
+    }
+    drawerDetail.value = normalizeDetail(data)
+    selectedPublic.value = drawerDetail.value.isPublic
+  } catch (e) {
+    console.error(e)
+    drawerDetail.value = null
+    ElMessage.error('获取媒体详情失败')
+  } finally {
+    drawerLoading.value = false
   }
 }
 
-// 同步 isPublic 到开关（后端可能未返回该字段）
-watch(selectedItem, (val) => {
-  selectedPublic.value = !!val?.isPublic
+const openDetails = async (item) => {
+  selectedItem.value = item
+  selectedPublic.value = !!item?.isPublic
+  detailsDrawer.value = true
+  await loadDetail(item?.id)
+}
+
+watch(drawerDetail, (detailVal) => {
+  if (detailVal) {
+    selectedPublic.value = detailVal.isPublic
+  }
+})
+
+watch(detailsDrawer, (visible) => {
+  if (!visible) {
+    drawerDetail.value = null
+    drawerLoading.value = false
+  }
 })
 
 const onTogglePublic = async (val) => {
-  if (!selectedItem.value) return
+  if (!drawerDetail.value?.id) return
   try {
     publishing.value = true
-    await setMediaPublicService(selectedItem.value.id, !!val)
-    // 本地同步状态，后端未返回 isPublic 时也能立即反映
-    selectedItem.value.isPublic = !!val
-    const idx = mediaList.value.findIndex(m => m.id === selectedItem.value.id)
+    await setMediaPublicService(drawerDetail.value.id, !!val)
+    drawerDetail.value.isPublic = !!val
+    if (selectedItem.value) {
+      selectedItem.value.isPublic = !!val
+    }
+    const idx = mediaList.value.findIndex(m => m.id === drawerDetail.value.id)
     if (idx > -1) mediaList.value[idx].isPublic = !!val
   } catch (e) {
-    // 失败时回滚 UI
     selectedPublic.value = !val
   } finally {
     publishing.value = false
-  }
-}
-
-// 下载当前展示的媒体
-const downloadMedia = async (url) => {
-  try {
-    const response = await fetch(url)
-    if (!response.ok) throw new Error('Network response was not ok.')
-    const blob = await response.blob()
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = url.split('/').pop() || 'download'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(link.href)
-    ElMessage.success('下载已开始')
-  } catch (error) {
-    console.error('Download error:', error)
-    ElMessage.error('下载失败')
-    window.open(url, '_blank')
-  }
-}
-
-// 预加载图片
-const preloadImage = (url) => new Promise((resolve, reject) => {
-  const img = new Image()
-  img.onload = () => resolve()
-  img.onerror = reject
-  img.src = url
-})
-
-// 切换原图/编辑图（与 library.vue 一致）
-const showOrigin = async (item) => {
-  try {
-    if (!item) return
-    if (item._loadingOrigin) return
-
-    if (item._isOriginalShown) { // 切回编辑图
-      item._switching = true
-      await preloadImage(item.mediaurl).catch(() => { })
-      item._displayUrl = item.mediaurl
-      item._isOriginalShown = false
-      setTimeout(() => { item._switching = false }, 280)
-      return
-    }
-
-    if (!item.id) {
-      ElMessage.error('缺少媒体ID，无法获取原图')
-      return
-    }
-
-    item._loadingOrigin = true
-    if (!item._originUrl) {
-      const res = await getMediaOriginUrlService(item.id)
-      const url = res?.data
-      if (!url) throw new Error('原图地址为空')
-      item._originUrl = url
-    }
-
-    item._switching = true
-    await preloadImage(item._originUrl).catch(() => { })
-    item._displayUrl = item._originUrl
-    item._isOriginalShown = true
-    setTimeout(() => { item._switching = false }, 280)
-  } catch (e) {
-    console.error(e)
-    ElMessage.error('获取原图失败')
-  } finally {
-    item._loadingOrigin = false
   }
 }
 
@@ -362,6 +341,12 @@ const copyPrompt = async (text) => {
   }
 }
 
+const isVideo = (url) => {
+  if (!url) return false
+  const lower = url.toLowerCase()
+  return ['.mp4', '.webm', '.ogg'].some(ext => lower.endsWith(ext))
+}
+
 onMounted(() => {
   getMediaList()
   checkIsMobile()
@@ -375,96 +360,14 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .history-page {
-  display: grid;
-  grid-template-columns: 500px 1fr;
-  /* 侧边栏更宽 */
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-/* 防止右侧内容在小屏时出现横向溢出被裁切 */
-.right-panel {
+/* 防止列表在小屏时出现横向溢出被裁切 */
+.list-panel {
   min-width: 0;
-}
-
-/* 左侧面板吸附顶部，随页面滚动可见 */
-.left-panel {
-  position: sticky;
-  /* 贴紧容器顶部 */
-  top: 0;
-  align-self: start;
-  /* 最大高度同步调整，保持底部留白 */
-  max-height: calc(100dvh - 12px);
-  overflow: auto;
-  /* 面板内容过长时内部滚动 */
-  -webkit-overflow-scrolling: touch; /* iPad 内嵌滚动更顺滑 */
-}
-
-.left-card {
-  height: 100%;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-}
-
-.left-header {
-  font-weight: 600;
-}
-
-.hint {
-  margin-bottom: 10px;
-}
-
-.preview {
-  width: 100%;
-  height: 300px;
-  background: var(--app-surface-2);
-  border-radius: 6px;
-  cursor: zoom-in;
-}
-
-.side-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.desc {
-  margin-top: 10px;
-}
-
-.prompt-block {
-  margin-top: 12px;
-}
-
-.prompt-title {
-  font-size: 13px;
-  margin-bottom: 8px;
-  color: var(--el-text-color-secondary);
-}
-
-.prompt-actions {
-  margin-top: 8px;
-}
-
-.publish-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 12px;
-  position: sticky; /* 让发布开关在侧栏底部始终可见 */
-  bottom: 0;
-  padding: 10px 0 6px;
-  background: var(--app-surface);
-  border-top: 1px solid var(--el-border-color);
-  z-index: 1;
-}
-
-.publish-row .label {
-  color: var(--el-text-color-primary);
-}
-
-.publish-row .tip {
-  color: var(--el-text-color-secondary);
-  font-size: 12px;
 }
 
 .toolbar {
@@ -485,16 +388,6 @@ onBeforeUnmount(() => {
   gap: 10px;
 }
 
-@media (max-width: 768px) {
-  .history-page {
-    grid-template-columns: 1fr;
-  }
-
-  .left-panel {
-    display: none;
-  }
-}
-
 /* 列表样式 */
 .list-item {
   display: grid;
@@ -505,13 +398,13 @@ onBeforeUnmount(() => {
   border-radius: 10px;
   background: var(--app-surface);
   transition: border-color .2s, box-shadow .2s, transform .2s;
-  cursor: pointer;
+  cursor: default;
 }
 
 .list-item:hover {
   transform: translateY(-1px);
   border-color: var(--el-border-color-light);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
 }
 
 .list-item.selected {
@@ -519,20 +412,15 @@ onBeforeUnmount(() => {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-color-primary) 22%, transparent);
 }
 
-.list-thumb-wrap { position: relative; }
+.list-thumb-wrap {
+  position: relative;
+}
+
 .list-thumb {
   width: 100%;
   height: 150px;
   object-fit: cover;
   border-radius: 6px;
-}
-
-/* Smooth media swap effect */
-.list-thumb-wrap.switching .list-thumb {
-  filter: blur(2px) grayscale(6%);
-  opacity: 0.85;
-  transform: scale(0.985);
-  transition: filter .28s ease, opacity .28s ease, transform .28s ease;
 }
 
 .prompt-text {
@@ -556,6 +444,10 @@ onBeforeUnmount(() => {
   color: var(--el-text-color-secondary);
 }
 
+.list-actions {
+  margin-top: 10px;
+}
+
 /* 让右侧文字列在 grid 中可以正确缩小，不产生横向溢出 */
 .list-content {
   min-width: 0;
@@ -570,7 +462,27 @@ onBeforeUnmount(() => {
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  padding: 12px 0 8px;
+  padding: 16px 8px 20px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.pagination-wrapper :deep(.el-pagination) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  min-width: min(100%, 520px);
+}
+
+.pagination-wrapper :deep(.el-pagination__rightwrapper) {
+  flex: 1 1 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.pagination-wrapper :deep(.el-pagination__editor) {
+  margin-top: 4px;
 }
 
 /* 移动端优化：
@@ -582,17 +494,196 @@ onBeforeUnmount(() => {
     grid-template-columns: 120px 1fr;
     gap: 10px;
   }
+
   .list-thumb {
     height: 100px;
   }
+}
+
+.history-drawer-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 18px 18px;
+  box-sizing: border-box;
+}
+
+.drawer-loading {
+  padding: 24px 8px;
+}
+
+.drawer-board {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.media-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.media-card {
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--el-border-color) 70%, transparent);
+  background: var(--app-surface);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.media-card header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.media-card header p {
+  margin: 4px 0 0;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+}
+
+.media-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: clamp(280px, 45vh, 420px);
+  border-radius: 18px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--app-surface-2) 75%, #fff 25%);
+}
+
+.media-element,
+.media-frame :deep(img) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--app-surface-2);
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(64, 158, 255, 0.9);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prompt-section,
+.meta-section,
+.publish-section {
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--el-border-color) 70%, transparent);
+  background: var(--app-surface);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prompt-section header,
+.meta-section header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.prompt-section header h3,
+.meta-section header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.prompt-content {
+  line-height: 1.7;
+  color: var(--el-text-color-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--app-surface-2) 90%, transparent);
+}
+
+.prompt-content.empty {
+  color: var(--el-text-color-secondary);
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 18px;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-item .label {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.meta-item .value {
+  font-size: 14px;
+  color: var(--el-text-color-primary);
+  word-break: break-all;
+}
+
+.publish-section {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.publish-label {
+  font-weight: 600;
+  color: var(--el-text-color-primary);
 }
 
 @media (max-width: 420px) {
   .list-item {
     grid-template-columns: 1fr;
   }
+
   .list-thumb {
-    height: 56vw; /* 近似 16:9，随屏幕自适应 */
+    height: 56vw;
+    /* 近似 16:9，随屏幕自适应 */
+  }
+}
+
+@media (min-width: 768px) {
+  .media-row {
+    grid-template-columns: 1fr 1fr;
   }
 }
 </style>

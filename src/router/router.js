@@ -11,12 +11,7 @@ import UserChatRoomVue from "@/views/ai/UserChatRoom.vue";
 import BlogVue from "@/views/blog/blog.vue";
 import magicImageEditVue from "@/views/ai/magicImageEdit.vue";
 import libraryVue from "@/views/ai/library.vue";
-import MagicTemplates from "@/views/ai/magicedit/MagicTemplates.vue";
 import MagicHistory from "@/views/ai/magicedit/MagicHistory.vue";
-import MagicModels from "@/views/ai/magicedit/MagicModels.vue";
-import LibraryBrowse from "@/views/ai/librarypages/LibraryBrowse.vue";
-import LibraryCollections from "@/views/ai/librarypages/LibraryCollections.vue";
-import LibraryFavorites from "@/views/ai/librarypages/LibraryFavorites.vue";
 import canvasVue from "@/views/ai/canvas.vue";
 import LibraryDetail from "@/views/ai/libraryDetail.vue";
 
@@ -44,15 +39,10 @@ const routes = [
 
       // AI 模块：魔法修图（入口 + 子页面）
       { path: "/ai/magicImageEdit", component: magicImageEditVue },
-      { path: "/ai/magicImageEdit/templates", component: MagicTemplates },
       { path: "/ai/magicImageEdit/history", component: MagicHistory },
-      { path: "/ai/magicImageEdit/models", component: MagicModels },
 
       // AI 模块：图片库（入口 + 子页面）
       { path: "/ai/library", component: libraryVue },
-      { path: "/ai/library/browse", component: LibraryBrowse },
-      { path: "/ai/library/collections", component: LibraryCollections },
-      { path: "/ai/library/favorites", component: LibraryFavorites },
       { path: "/ai/library/:mediaId", component: LibraryDetail },
 
       // AI 模块：Canvas

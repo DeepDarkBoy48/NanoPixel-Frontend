@@ -66,8 +66,6 @@ const toggleTheme = () => themeStore.toggle()
 // 顶部模块导航（核心）：
 // 根据当前路由前缀选择要渲染的“模块导航组件”，
 // 这样不同模块可以在同一布局头部呈现不同的二级导航。
-import NavMagicImageEdit from '@/components/navbars/NavMagicImageEdit.vue'
-import NavLibrary from '@/components/navbars/NavLibrary.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 const handleCommand = (command) => {
     //判断指令
@@ -116,21 +114,12 @@ const handleMenuClick = () => {
     }
 }
 
-// 当前显示的模块导航组件（核心）：
-// 通过路由前缀匹配来确定头部中部区域展示哪个导航组件。
-// 注意：按需扩展时只需要在下面增加一个分支并导入组件即可。
-const currentHeaderNav = computed(() => {
-    const path = route.path || ''
-    if (path.startsWith('/ai/magicImageEdit')) return NavMagicImageEdit
-    if (path.startsWith('/ai/library')) return NavLibrary
-    return null
-})
-
 // 侧边菜单高亮同步（核心）：
 // 当处于模块内的子路由时，让左侧菜单仍高亮该模块的“入口路径”。
 // 这样点击模块导航切换子页时，左侧不会跳到其它高亮。
 const activeMenu = computed(() => {
     const path = route.path || ''
+    if (path.startsWith('/ai/magicImageEdit/history')) return '/ai/magicImageEdit/history'
     if (path.startsWith('/ai/magicImageEdit')) return '/ai/magicImageEdit'
     if (path.startsWith('/ai/library')) return '/ai/library'
     return path
@@ -178,12 +167,12 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>灵感广场</span>
                     </el-menu-item>
-                    <el-menu-item index="/ai/canvas">
+                    <!-- <el-menu-item index="/ai/canvas">
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
                         <span>Canvas</span>
-                    </el-menu-item>
+                    </el-menu-item> -->
                     <el-menu-item index="/ai/chatRoom">
                         <el-icon>
                             <ChatLineRound />
@@ -280,12 +269,12 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>灵感广场</span>
                     </el-menu-item>
-                    <el-menu-item index="/ai/canvas">
+                    <!-- <el-menu-item index="/ai/canvas">
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
                         <span>Canvas</span>
-                    </el-menu-item>
+                    </el-menu-item> -->
                     <el-menu-item index="/ai/chatRoom">
                         <el-icon>
                             <ChatLineRound />
@@ -359,9 +348,7 @@ const activeMenu = computed(() => {
                     </el-icon>
                     <span class="header-title"></span><strong>{{ userInfoStore.info.nickname }}</strong>
                 </div>
-                <div class="header-center">
-                    <component v-if="currentHeaderNav" :is="currentHeaderNav" />
-                </div>
+                <div class="header-center"></div>
                 <div class="header-right">
                     <!-- 主题切换按钮 -->
                     <el-icon class="header-icon theme-toggle" @click="toggleTheme" :title="isDark ? '切换为浅色' : '切换为深色'">

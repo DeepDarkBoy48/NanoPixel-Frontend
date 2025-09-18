@@ -148,8 +148,15 @@
                             <div class="preview-title">生成结果</div>
                             <div class="preview-body">
                                 <el-empty v-if="!resultUrl" description="提交后查看生成结果" />
-                                <el-image v-else :src="resultUrl" fit="contain" class="preview-image"
+                                <el-image v-if="resultUrl" :src="resultUrl" fit="contain" class="preview-image"
                                     :preview-src-list="[resultUrl]" preview-teleported hide-on-click-modal />
+                                <div v-if="submitting" class="generation-loading">
+                                    <div class="generation-spinner" aria-hidden="true"></div>
+                                    <div class="generation-text" aria-live="polite">
+                                        <strong>正在生成…</strong>
+                                        <span>预计耗时约30秒，请耐心等待</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -373,6 +380,7 @@ const onReset = () => {
 const onSubmit = async () => {
     if (!canSubmit.value || submitting.value) return
     submitting.value = true
+    ElMessage.info('已提交，请等待大约30秒生成结果…')
     try {
         const formData = new FormData()
         // 新增 originFile 参数：上传用户原图
@@ -386,6 +394,7 @@ const onSubmit = async () => {
         const res = await imageEditService(formData)
         resultUrl.value = typeof res.data === 'string' ? res.data : (res.data?.url || '')
     } catch (e) {
+        ElMessage.error('生成失败，请稍后重试')
     } finally {
         submitting.value = false
     }
@@ -546,7 +555,9 @@ async function copyPrompt() {
 }
 
 .preview-body {
+    position: relative;
     padding: 12px;
+    min-height: 280px;
 }
 
 .preview-image {
@@ -567,6 +578,57 @@ async function copyPrompt() {
     flex-direction: column;
     gap: 8px;
     margin-bottom: 8px;
+}
+
+.preview-body :deep(.el-empty) {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.generation-loading {
+    position: absolute;
+    inset: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(64, 158, 255, 0.25);
+    border-radius: 8px;
+    backdrop-filter: blur(2px);
+    z-index: 5;
+}
+
+.generation-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(64, 158, 255, 0.2);
+    border-top-color: var(--el-color-primary);
+    border-radius: 50%;
+    animation: generation-spin 0.9s linear infinite;
+}
+
+.generation-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+}
+
+.generation-text strong {
+    color: var(--el-text-color-primary);
+}
+
+@keyframes generation-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .preset-toolbar .row {

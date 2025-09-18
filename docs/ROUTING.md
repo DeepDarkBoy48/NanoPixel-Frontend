@@ -12,9 +12,7 @@
 
 - `src/router/router.js`：集中定义路由（含模块路由）。
 - `src/views/layout.vue`：左侧菜单、头部、主内容；包含“模块导航”的选择逻辑。
-- 模块导航组件：
-  - `src/components/navbars/NavMagicImageEdit.vue`
-  - `src/components/navbars/NavLibrary.vue`
+- 当前头部未渲染模块导航，保留空位以便未来扩展。
 
 ## 路由结构（关键片段）
 
@@ -35,9 +33,7 @@ const routes = [
 
       // AI 模块：魔法修图
       { path: '/ai/magicImageEdit', component: magicImageEditVue },
-      { path: '/ai/magicImageEdit/templates', component: MagicTemplates },
       { path: '/ai/magicImageEdit/history', component: MagicHistory },
-      { path: '/ai/magicImageEdit/models', component: MagicModels },
 
       // AI 模块：图片库
       { path: '/ai/library', component: libraryVue },
@@ -55,12 +51,8 @@ const routes = [
 
 ```js
 // 当前显示的模块导航组件
-const currentHeaderNav = computed(() => {
-  const path = route.path || ''
-  if (path.startsWith('/ai/magicImageEdit')) return NavMagicImageEdit
-  if (path.startsWith('/ai/library')) return NavLibrary
-  return null // 非模块页不展示模块导航
-})
+// 当前导航已移除，可在此处按需添加模块导航组件
+const currentHeaderNav = computed(() => null)
 ```
 
 模板中居中渲染：
@@ -79,6 +71,7 @@ const currentHeaderNav = computed(() => {
 ```js
 const activeMenu = computed(() => {
   const path = route.path || ''
+  if (path.startsWith('/ai/magicImageEdit/history')) return '/ai/magicImageEdit/history'
   if (path.startsWith('/ai/magicImageEdit')) return '/ai/magicImageEdit'
   if (path.startsWith('/ai/library')) return '/ai/library'
   return path
@@ -107,4 +100,3 @@ const activeMenu = computed(() => {
 ---
 
 维护建议：模块前缀与导航组件 1:1 映射，命名保持统一，后续扩展时只改三处（组件、路由、映射）即可，全局感知点最少。
-
