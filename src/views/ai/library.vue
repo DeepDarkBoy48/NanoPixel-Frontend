@@ -59,9 +59,6 @@
                         <div class="meta">
                             <div class="meta-left">
                                 <span class="username">{{ item.username || item.userName }}</span>
-                                <span v-if="item.id" class="media-id">#{{ item.id }}</span>
-                                <el-tag v-if="item.model" size="small" type="info" effect="plain" class="model-tag">{{
-                                    item.model }}</el-tag>
                             </div>
                             <div class="meta-right">
                                 <span class="review-count" title="评论数" @click.stop="goToDetail(item)" role="button">
@@ -207,7 +204,7 @@ const copyPrompt = async (text) => {
 };
 
 // 限制展示的提示词字符数（尽量展示100字以内都要展示）
-const DISPLAY_CHAR_LIMIT = 100;
+const DISPLAY_CHAR_LIMIT = 50;
 const getDisplayPrompt = (text) => {
     if (!text) return '';
     const s = String(text);
@@ -278,6 +275,16 @@ onMounted(() => {
     padding: 20px;
     background-color: transparent;
     /* 继承主区域背景 */
+    animation: containerFadeIn 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes containerFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .toolbar {
@@ -290,6 +297,25 @@ onMounted(() => {
 .title {
     margin: 0;
     font-size: 18px;
+    background: linear-gradient(135deg, var(--el-text-color-primary) 0%, var(--app-primary) 70%, #4facfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+    animation: titleShimmer 3s ease-in-out infinite;
+    background-size: 200% 100%;
+}
+
+@keyframes titleShimmer {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .actions {
@@ -298,14 +324,84 @@ onMounted(() => {
     gap: 8px;
 }
 
+.actions .el-button:not(.sort-group .el-button) {
+    background: linear-gradient(135deg, var(--app-primary) 0%, #4facfe 100%);
+    border: none;
+    color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.actions .el-button:not(.sort-group .el-button)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.actions .el-button:not(.sort-group .el-button):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.actions .el-button:not(.sort-group .el-button):hover::before {
+    left: 100%;
+}
+
 .sort-group :deep(.el-button.is-plain) {
     border-color: var(--el-border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sort-group :deep(.el-button.is-plain::before) {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.sort-group :deep(.el-button.is-plain:hover::before) {
+    left: 100%;
+}
+
+.sort-group :deep(.el-button.is-plain:hover) {
+    border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
 }
 
 .sort-group :deep(.el-button--primary.is-plain) {
     /* 激活态：更明显 */
     border-color: color-mix(in srgb, var(--el-color-primary) 55%, transparent);
-    background: color-mix(in srgb, var(--el-color-primary) 14%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--el-color-primary) 14%, transparent) 0%,
+            color-mix(in srgb, var(--el-color-primary) 10%, transparent) 100%);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    animation: activeButtonPulse 2s ease-in-out infinite;
+}
+
+@keyframes activeButtonPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
 }
 
 .waterfall-container {
@@ -317,21 +413,90 @@ onMounted(() => {
 .skeleton-card {
     break-inside: avoid;
     margin-bottom: 16px;
-    background-color: var(--app-surface);
+    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 96%, #667eea 4%) 100%);
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--el-border-color);
     /* Softer, gradient-like shadow */
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: all 0.4s ease;
+    animation: cardSlideIn 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    position: relative;
+}
+
+.skeleton-card {
+    animation: skeletonFadeIn 0.6s ease-out forwards;
+}
+
+@keyframes skeletonFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 70% 30%, rgba(102, 126, 234, 0.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.card>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* 错开动画 - 根据卡片在瀑布流中的位置 */
+.card:nth-child(5n+1) {
+    animation-delay: 0.1s;
+}
+
+.card:nth-child(5n+2) {
+    animation-delay: 0.2s;
+}
+
+.card:nth-child(5n+3) {
+    animation-delay: 0.3s;
+}
+
+.card:nth-child(5n+4) {
+    animation-delay: 0.4s;
+}
+
+.card:nth-child(5n+5) {
+    animation-delay: 0.5s;
+}
+
+@keyframes cardSlideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px) scale(1.02);
     /* Subtle highlight */
-    border-color: var(--el-border-color-light);
+    border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
     /* Enhanced shadow on hover */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(102, 126, 234, 0.1) inset,
+        0 0 30px rgba(102, 126, 234, 0.15);
+}
+
+.card:hover::before {
+    opacity: 1;
 }
 
 .card-media:hover .media-actions {
@@ -345,6 +510,12 @@ onMounted(() => {
     padding: 8px;
     background: var(--app-surface-2);
     border-bottom: 1px solid var(--el-border-color);
+    transition: all 0.3s ease;
+}
+
+.card:hover .media-header {
+    background: color-mix(in srgb, var(--app-surface-2) 90%, #667eea 10%);
+    border-bottom-color: color-mix(in srgb, var(--app-primary) 30%, transparent);
 }
 
 .media-header .el-button {
@@ -353,32 +524,124 @@ onMounted(() => {
     padding: 0 10px;
     border-color: color-mix(in srgb, var(--app-primary) 35%, transparent);
     color: var(--app-primary);
-    background: color-mix(in srgb, var(--app-primary) 8%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--app-primary) 8%, transparent) 0%,
+            color-mix(in srgb, var(--app-primary) 5%, transparent) 100%);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.1);
+}
+
+.media-header .el-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+    transition: left 0.5s ease;
 }
 
 .media-header .el-button:hover {
-    background: color-mix(in srgb, var(--app-primary) 14%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--app-primary) 15%, transparent) 0%,
+            color-mix(in srgb, var(--app-primary) 10%, transparent) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.media-header .el-button:hover::before {
+    left: 100%;
+}
+
+.card:hover .media-header .el-button {
+    animation: buttonPulse 2s ease-in-out infinite;
+    border-color: color-mix(in srgb, var(--app-primary) 50%, transparent);
+}
+
+.card:hover .media-header .detail-btn {
+    animation: detailButtonPulse 2s ease-in-out infinite;
+    border-color: color-mix(in srgb, #f37a24 60%, transparent);
+}
+
+@keyframes buttonPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.1);
+    }
+
+    50% {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        transform: translateY(-1px) scale(1.02);
+    }
+}
+
+@keyframes detailButtonPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 2px 6px rgba(243, 122, 36, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 4px 15px rgba(243, 122, 36, 0.35);
+        transform: translateY(-1px) scale(1.02);
+    }
 }
 
 .media-header .detail-btn {
     border-color: #f37a24;
     color: #f37a24;
-    background: color-mix(in srgb, #f37a24 10%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, #f37a24 10%, transparent) 0%,
+            color-mix(in srgb, #f37a24 6%, transparent) 100%);
+    box-shadow: 0 2px 6px rgba(243, 122, 36, 0.15);
+}
+
+.media-header .detail-btn::before {
+    background: linear-gradient(90deg, transparent, rgba(243, 122, 36, 0.2), transparent);
 }
 
 .media-header .detail-btn:hover {
     color: #f37a24;
     border-color: #f37a24;
-    background: color-mix(in srgb, #f37a24 20%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, #f37a24 20%, transparent) 0%,
+            color-mix(in srgb, #f37a24 15%, transparent) 100%);
+    box-shadow: 0 4px 12px rgba(243, 122, 36, 0.25);
 }
 
 .card-media {
     margin-top: 0;
+    position: relative;
+    overflow: hidden;
+    /* No border needed here, card has border */
 }
 
-.card-media {
-    position: relative;
-    /* No border needed here, card has border */
+.card-media::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg,
+            transparent 0%,
+            rgba(102, 126, 234, 0.08) 25%,
+            transparent 50%,
+            rgba(79, 172, 254, 0.08) 75%,
+            transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.card:hover .card-media::after {
+    opacity: 1;
 }
 
 .media-actions {
@@ -403,12 +666,35 @@ onMounted(() => {
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 2;
-    background: rgba(0, 0, 0, 0.7);
+    z-index: 3;
+    background: linear-gradient(135deg, #1a4fff 0%, #667eea 100%);
     color: #fff;
     font-size: 12px;
     padding: 3px 9px;
     border-radius: 999px;
+    transition: all 0.3s ease;
+    animation: badgePulse 2s ease-in-out infinite;
+    box-shadow: 0 2px 8px rgba(26, 79, 255, 0.4);
+    backdrop-filter: blur(8px);
+}
+
+.badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(26, 79, 255, 0.6);
+}
+
+@keyframes badgePulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(26, 79, 255, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(26, 79, 255, 0.6);
+    }
 }
 
 .media {
@@ -416,6 +702,14 @@ onMounted(() => {
     display: block;
     max-height: 520px;
     object-fit: cover;
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover .media {
+    transform: scale(1.05);
+    filter: brightness(1.05) contrast(1.05);
 }
 
 .card-body {
@@ -456,12 +750,15 @@ onMounted(() => {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex: 1;
+    min-width: 0;
 }
 
 .meta-right {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .media-id {
@@ -473,25 +770,53 @@ onMounted(() => {
     line-height: 1;
 }
 
+.username {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .review-count {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 2px 8px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--el-color-warning) 15%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--el-color-warning) 15%, transparent) 0%,
+            color-mix(in srgb, var(--el-color-warning) 10%, transparent) 100%);
     border: 1px solid color-mix(in srgb, var(--el-color-warning) 40%, transparent);
     color: var(--el-color-warning);
     font-weight: 600;
     font-size: 13px;
     line-height: 1.2;
     cursor: pointer;
-    transition: background-color .15s ease, border-color .15s ease, transform .05s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+}
+
+.review-count::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 193, 7, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.review-count:hover::before {
+    left: 100%;
 }
 
 .review-icon {
     color: var(--el-color-warning);
     font-size: 16px;
+    transition: all 0.3s ease;
+    animation: reviewIconPulse 2s ease-in-out infinite;
 }
 
 .hot-flag {
@@ -500,21 +825,73 @@ onMounted(() => {
     margin-left: 2px;
     font-size: 16px;
     line-height: 1;
+    animation: hotFlagFlicker 1.5s ease-in-out infinite;
 }
 
 .review-count:hover {
-    background: color-mix(in srgb, var(--el-color-warning) 22%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--el-color-warning) 25%, transparent) 0%,
+            color-mix(in srgb, var(--el-color-warning) 20%, transparent) 100%);
+    border-color: color-mix(in srgb, var(--el-color-warning) 60%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.review-count:hover .review-icon {
+    transform: scale(1.2);
+    color: #ff9800;
+}
+
+.card:hover .review-count {
+    animation: reviewCountPulse 2s ease-in-out infinite;
     border-color: color-mix(in srgb, var(--el-color-warning) 60%, transparent);
 }
 
-.review-count:active {
-    transform: translateY(1px);
+@keyframes reviewCountPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+        transform: scale(1.05);
+    }
 }
 
-/* Remove original colorful border */
-.card::before {
-    display: none;
+.review-count:active {
+    transform: translateY(0);
 }
+
+@keyframes reviewIconPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes hotFlagFlicker {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+/* 卡片特效样式已在上方定义 */
 
 .pagination-wrapper {
     display: flex;
@@ -576,6 +953,17 @@ onMounted(() => {
 @media (max-width: 520px) {
     .waterfall-container {
         column-count: 1;
+    }
+
+    /* 紧凑化底部信息，确保显示时间与评论 */
+    .review-count {
+        padding: 2px 6px;
+        font-size: 12px;
+    }
+
+    .create-time {
+        font-size: 12px;
+        white-space: nowrap;
     }
 }
 </style>

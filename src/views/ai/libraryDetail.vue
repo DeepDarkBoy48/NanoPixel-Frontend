@@ -59,7 +59,7 @@
                         </div>
                     </div>
 
-                    
+
 
                     <section class="prompt-card">
                         <header>
