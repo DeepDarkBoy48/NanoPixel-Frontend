@@ -5,9 +5,12 @@ export const imageEditService = (formData) => {
     return request.post("ai/imageEdit", formData);
 };
 
-// 获取所有媒体库信息的接口（分页）
-export const getAllLibraryService = (pageNum, pageSize) => {
-    return request.get("ai/Alllibrary", { params: { pageNum, pageSize } });
+// 获取所有媒体库信息的接口（分页 + 排序）
+// sortBy: 'review_count' | 'createtime'
+export const getAllLibraryService = (pageNum, pageSize, sortBy) => {
+    const params = { pageNum, pageSize };
+    if (sortBy) params.sortBy = sortBy;
+    return request.get("ai/Alllibrary", { params });
 };
 
 // 获取当前用户的媒体（分页）

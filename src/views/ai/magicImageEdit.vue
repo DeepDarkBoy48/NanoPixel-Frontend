@@ -16,21 +16,21 @@
                         <el-form>
                             <div class="form-section">
                                 <h4 class="section-title">模板选择</h4>
-                                <el-form-item label="请选择一个分类">
+                                <el-form-item>
                                     <el-select v-model="selectedPromptCategoryId" placeholder="请选择分类"
                                         style="width: 100%" size="large" :loading="promptCategoriesLoading"
                                         :disabled="promptCategoriesLoading" @change="handlePromptCategoryChange">
                                         <el-option v-for="item in promptCategories" :key="item.id"
                                             :label="item.categoryName" :value="item.id">
                                             <div class="category-option">
-                                                <span class="category-option__name">{{ item.categoryName }}</span>
+                                                <span class="category-option__name" :title="item.categoryName">{{ item.categoryName }}</span>
                                                 <span class="category-option__count">{{ item.promptCount ?? 0 }}
                                                     个模版</span>
                                             </div>
                                         </el-option>
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item label="请选择一个模版">
+                                <el-form-item>
                                     <el-select v-model="selectedPromptId" placeholder="请选择模版" style="width: 100%"
                                         clearable size="large" :loading="promptOptionsLoading"
                                         :disabled="promptOptionsLoading || !promptOptions.length"
@@ -47,18 +47,18 @@
 
                             <div class="form-section">
                                 <h4 class="section-title">参数配置</h4>
-                                <el-form-item label="选择模型">
+                                <el-form-item>
                                     <el-select v-model="selectedModel" placeholder="选择模型" size="large"
                                         style="width: 100%">
                                         <el-option v-for="m in modelOptions" :key="m.value" :label="m.label"
                                             :value="m.value" />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item label="提示词内容">
+                                <el-form-item>
                                     <el-input v-model="prompt" type="textarea" :rows="7"
                                         placeholder="请选择上方模版/预设，或直接在此处输入提示词" clearable />
                                 </el-form-item>
-                                <el-form-item label="上传图片">
+                                <el-form-item>
                                     <el-upload class="uploader" :auto-upload="false" :limit="1" :show-file-list="true"
                                         :on-change="handleFileChange" :on-remove="handleFileRemove"
                                         :file-list="fileList" accept="image/*">
@@ -423,16 +423,25 @@ onMounted(() => {
 
 .category-option {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
     line-height: 1.2;
 }
 
 .category-option__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-weight: 600;
 }
 
 .category-option__count {
+    flex: none;
+    white-space: nowrap;
     font-size: 12px;
     color: var(--el-text-color-secondary);
 }
@@ -521,14 +530,18 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-    .form {
-        padding: 12px;
-    }
+    .page-container { padding: 10px; }
+    .content { gap: 16px; }
+    .form { padding: 10px; }
+    .card { border-radius: 10px; }
+    .title { gap: 8px; }
+    .subtitle { font-size: 11px; }
 
     .unified-form :deep(.el-form-item) {
         flex-direction: column;
         align-items: stretch;
-        gap: 6px;
+        gap: 4px;
+        margin-bottom: 8px;
     }
 
     .unified-form :deep(.el-form-item__label) {
@@ -543,7 +556,7 @@ onMounted(() => {
         flex-direction: column;
         align-items: stretch;
         width: 100%;
-        gap: 12px;
+        gap: 8px;
     }
 
     .unified-form :deep(.el-select),
@@ -552,5 +565,22 @@ onMounted(() => {
     .unified-form :deep(.el-upload) {
         width: 100%;
     }
+
+    /* 紧凑化输入高度 */
+    .unified-form :deep(.el-input__wrapper) { padding: 0 10px; }
+    .unified-form :deep(.el-button--large) { --el-button-size-height: 36px; }
+    .unified-form :deep(.el-textarea__inner) { min-height: 110px; }
+
+    .form-section { margin-bottom: 14px; }
+    .form-section:not(:last-child) { padding-bottom: 12px; }
+    .section-title { margin-bottom: 8px; font-size: 13px; }
+
+    .preview-image { height: 42vh; }
+}
+
+@media (max-width: 520px) {
+    .subtitle { display: none; }
+    .preview-title { padding: 8px 10px; }
+    .preview-body { padding: 10px; }
 }
 </style>

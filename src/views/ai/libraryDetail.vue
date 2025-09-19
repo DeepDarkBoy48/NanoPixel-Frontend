@@ -59,10 +59,7 @@
                         </div>
                     </div>
 
-                    <div class="connector">
-                        <div class="arrow"></div>
-                        <div class="arrow"></div>
-                    </div>
+                    
 
                     <section class="prompt-card">
                         <header>
@@ -118,7 +115,7 @@
                 <aside class="comment-panel">
                     <header>
                         <div>
-                            <h3>协作评论</h3>
+                            <h3>评论区</h3>
                             <p>围绕该作品的讨论与反馈</p>
                         </div>
                         <el-button size="small" type="primary" plain @click="toggleCommentForm">
@@ -127,25 +124,15 @@
                     </header>
 
                     <div v-if="showCommentForm" class="comment-form" :class="{ 'is-submitting': submittingReview }">
-                        <el-input
-                            v-model="newReviewContent"
-                            type="textarea"
-                            :rows="4"
-                            maxlength="500"
-                            show-word-limit
-                            placeholder="写下你的想法，最多 500 字"
-                        />
+                        <el-input v-model="newReviewContent" type="textarea" :rows="4" maxlength="500" show-word-limit
+                            placeholder="写下你的想法，最多 500 字" />
                         <div class="comment-form__actions">
                             <el-button size="small" @click="cancelReview" :disabled="submittingReview">
                                 取消
                             </el-button>
-                            <el-button
-                                size="small"
-                                type="primary"
-                                :disabled="!newReviewContent.trim() || submittingReview"
-                                :loading="submittingReview"
-                                @click="submitReview"
-                            >
+                            <el-button size="small" type="primary"
+                                :disabled="!newReviewContent.trim() || submittingReview" :loading="submittingReview"
+                                @click="submitReview">
                                 发布
                             </el-button>
                         </div>
@@ -466,20 +453,7 @@ watch(mediaId, (id) => {
     justify-content: center;
 }
 
-.connector {
-    display: flex;
-    justify-content: space-around;
-    gap: 30%;
-    padding: 4px 12px 0;
-}
-
-.arrow {
-    width: 36px;
-    height: 48px;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--app-primary) 45%, transparent), transparent 90%);
-    clip-path: polygon(50% 0, 0 70%, 35% 70%, 35% 100%, 65% 100%, 65% 70%, 100% 70%);
-    opacity: 0.8;
-}
+/* removed connector arrows */
 
 .prompt-card,
 .meta-card {
@@ -548,16 +522,16 @@ watch(mediaId, (id) => {
 }
 
 .comment-panel {
-    flex: 0 0 340px;
+    flex: 0 0 360px;
     background: var(--app-surface);
     border-radius: 28px;
-    border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
+    border: 1px solid color-mix(in srgb, var(--el-border-color) 74%, transparent);
     padding: 20px;
     box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    max-height: clamp(420px, 70vh, 640px);
+    gap: 18px;
+    max-height: clamp(560px, 85vh, 980px);
 }
 
 .comment-panel header {
@@ -607,8 +581,8 @@ watch(mediaId, (id) => {
     overflow: auto;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding-right: 6px;
+    gap: 16px;
+    padding-right: 8px;
 }
 
 .comment-list :deep(.el-empty) {

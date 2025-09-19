@@ -152,9 +152,18 @@
             class="responsive-dialog" destroy-on-close>
             <el-form ref="promptFormRef" :model="promptForm" :rules="promptRules" label-width="90px">
                 <el-form-item label="所属分类" prop="categoryId">
-                    <el-select v-model="promptForm.categoryId" placeholder="请选择分类" clearable>
-                        <el-option v-for="item in categories" :key="item.id" :label="item.categoryName"
-                            :value="item.id" />
+                    <el-select v-model="promptForm.categoryId" placeholder="请选择分类" clearable class="category-select">
+                        <el-option
+                            v-for="item in categories"
+                            :key="item.id"
+                            :label="item.categoryName"
+                            :value="item.id"
+                        >
+                            <div class="select-option">
+                                <span class="select-option__name" :title="item.categoryName">{{ item.categoryName }}</span>
+                                <span class="select-option__count">{{ item.promptCount ?? 0 }} 个模版</span>
+                            </div>
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="提示词内容" prop="content">
@@ -922,5 +931,33 @@ onMounted(async () => {
     .prompt-cell__meta {
         display: none;
     }
+}
+
+/* 分类下拉项：显示“名称 + 计数”，长名称省略 */
+.category-select :deep(.el-select-dropdown__item) {
+    display: flex;
+    align-items: center;
+}
+
+.select-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
+.select-option__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select-option__count {
+    flex: none;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
 }
 </style>

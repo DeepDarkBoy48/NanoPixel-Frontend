@@ -12,9 +12,10 @@ import {
     ChatLineRound,
     Fold,
     Expand,
-    Menu,
     Sunny,
-    Moon
+    Moon,
+    Picture,
+    MagicStick,
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 import { userInfoService } from '@/api/user.js'
@@ -143,36 +144,38 @@ const activeMenu = computed(() => {
                 <el-sub-menu index="/ai">
                     <template #title>
                         <el-icon>
-                            <ChatLineRound />
+                            <MagicStick />
                         </el-icon>
                         <span>AI创作</span>
                     </template>
 
                     <el-menu-item index="/ai/magicImageEdit">
                         <el-icon>
-                            <ChatLineRound />
+                            <Crop />
                         </el-icon>
-                        <span>魔法修图</span>
+                        <span class="menu-label">魔法修图</span>
+                        <span class="hot-badge">🔥 HOT</span>
                     </el-menu-item>
 
                     <el-menu-item index="/ai/magicImageEdit/history">
                         <el-icon>
-                            <ChatLineRound />
+                            <Picture />
                         </el-icon>
-                        <span>我的图集</span>
+                        <span class="menu-label">我的图集</span>
                     </el-menu-item>
 
                     <el-menu-item index="/ai/library">
                         <el-icon>
-                            <ChatLineRound />
+                            <Promotion />
                         </el-icon>
-                        <span>灵感广场</span>
+                        <span class="menu-label">灵感广场</span>
+                        <span class="hot-badge">🔥 HOT</span>
                     </el-menu-item>
                     <el-menu-item index="/ai/prompt">
                         <el-icon>
-                            <ChatLineRound />
+                            <EditPen />
                         </el-icon>
-                        <span>Prompt管理</span>
+                        <span class="menu-label">Prompt管理</span>
                     </el-menu-item>
                     <!-- <el-menu-item index="/ai/canvas">
                         <el-icon>
@@ -184,7 +187,7 @@ const activeMenu = computed(() => {
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
-                        <span>智能对话</span>
+                        <span class="menu-label">智能对话</span>
                     </el-menu-item>
                 </el-sub-menu>
 
@@ -260,34 +263,36 @@ const activeMenu = computed(() => {
                 <el-sub-menu index="/ai">
                     <template #title>
                         <el-icon>
-                            <ChatLineRound />
+                            <MagicStick />
                         </el-icon>
                         <span>AI创作</span>
                     </template>
 
                     <el-menu-item index="/ai/magicImageEdit">
                         <el-icon>
-                            <ChatLineRound />
+                            <Crop />
                         </el-icon>
-                        <span>魔法修图</span>
+                        <span class="menu-label">魔法修图</span>
+                        <span class="hot-badge">🔥 HOT</span>
                     </el-menu-item>
                     <el-menu-item index="/ai/magicImageEdit/history">
                         <el-icon>
-                            <ChatLineRound />
+                            <Picture />
                         </el-icon>
-                        <span>我的图集</span>
+                        <span class="menu-label">我的图集</span>
                     </el-menu-item>
                     <el-menu-item index="/ai/library">
                         <el-icon>
-                            <ChatLineRound />
+                            <Promotion />
                         </el-icon>
-                        <span>灵感广场</span>
+                        <span class="menu-label">灵感广场</span>
+                        <span class="hot-badge">🔥 HOT</span>
                     </el-menu-item>
                     <el-menu-item index="/ai/prompt">
                         <el-icon>
-                            <ChatLineRound />
+                            <EditPen />
                         </el-icon>
-                        <span>Prompt管理</span>
+                        <span class="menu-label">Prompt管理</span>
                     </el-menu-item>
                     <!-- <el-menu-item index="/ai/canvas">
                         <el-icon>
@@ -299,7 +304,7 @@ const activeMenu = computed(() => {
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
-                        <span>智能对话</span>
+                        <span class="menu-label">智能对话</span>
                     </el-menu-item>
                 </el-sub-menu>
                 <!-- 
@@ -370,8 +375,18 @@ const activeMenu = computed(() => {
             <!-- 头部区域 -->
             <el-header>
                 <div class="header-left">
-                    <el-icon @click="handleMenuClick" class="header-icon">
-                        <component :is="isMobile ? Menu : (isCollapse ? Expand : Fold)" />
+                    <el-icon
+                        @click="handleMenuClick"
+                        class="header-icon"
+                        role="button"
+                        :aria-label="isMobile ? (drawerVisible ? '关闭菜单' : '打开菜单') : (isCollapse ? '展开侧边栏' : '折叠侧边栏')"
+                    >
+                        <template v-if="isMobile">
+                            <span class="hamburger-icon" :class="{ 'is-open': drawerVisible }"></span>
+                        </template>
+                        <template v-else>
+                            <component :is="isCollapse ? Expand : Fold" />
+                        </template>
                     </el-icon>
                     <span class="header-title"></span><strong>{{ userInfoStore.info.nickname }}</strong>
                 </div>
@@ -444,6 +459,25 @@ const activeMenu = computed(() => {
             --el-menu-active-color: var(--app-primary);
             --el-menu-hover-bg-color: var(--app-sider-hover-bg);
             --el-menu-hover-text-color: var(--app-sider-text);
+        }
+
+        /* 菜单项文字与 HOT 徽标 */
+        :deep(.el-menu-item) {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hot-badge {
+            margin-left: 4px;
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-size: 10px;
+            line-height: 1.2;
+            color: #d4380d;
+            background: color-mix(in srgb, #fa8c16 18%, transparent);
+            border: 1px solid color-mix(in srgb, #fa8c16 45%, transparent);
+            user-select: none;
         }
 
         :deep(.el-menu-item.is-active),
@@ -522,6 +556,30 @@ const activeMenu = computed(() => {
                 &:hover {
                     color: var(--el-color-primary);
                 }
+
+                /* 经典三横杠（移动端） */
+                .hamburger-icon {
+                    position: relative;
+                    display: inline-block;
+                    width: 22px;
+                    height: 2px;
+                    background-color: currentColor;
+                    border-radius: 2px;
+                }
+
+                .hamburger-icon::before,
+                .hamburger-icon::after {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    width: 100%;
+                    height: 2px;
+                    background-color: currentColor;
+                    border-radius: 2px;
+                }
+
+                .hamburger-icon::before { top: -6px; }
+                .hamburger-icon::after { top: 6px; }
             }
         }
 

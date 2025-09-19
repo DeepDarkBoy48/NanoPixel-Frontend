@@ -3,6 +3,12 @@
         <div class="toolbar">
             <h2 class="title">灵感库</h2>
             <div class="actions">
+                <el-button-group class="sort-group">
+                    <el-button size="small" :type="sortBy === 'review_count' ? 'primary' : 'default'" plain
+                        @click="setSortBy('review_count')">按热度</el-button>
+                    <el-button size="small" :type="sortBy === 'createtime' ? 'primary' : 'default'" plain
+                        @click="setSortBy('createtime')">按时间</el-button>
+                </el-button-group>
                 <el-button size="small" @click="refresh" :loading="loading">刷新</el-button>
             </div>
         </div>
@@ -52,10 +58,22 @@
 
                         <div class="meta">
                             <div class="meta-left">
-                                <span class="username">{{ item.userName }}</span>
+                                <span class="username">{{ item.username || item.userName }}</span>
                                 <span v-if="item.id" class="media-id">#{{ item.id }}</span>
+                                <el-tag v-if="item.model" size="small" type="info" effect="plain" class="model-tag">{{
+                                    item.model }}</el-tag>
                             </div>
-                            <span class="create-time">{{ formatTime(item.createtime) }}</span>
+                            <div class="meta-right">
+                                <span class="review-count" title="评论数" @click.stop="goToDetail(item)" role="button">
+                                    <el-icon class="review-icon">
+                                        <ChatDotRound />
+                                    </el-icon>
+                                    {{ item.reviewcount ?? 0 }}
+                                    <span v-if="(item.reviewcount ?? 0) > 3" class="hot-flag" aria-label="热议"
+                                        title="热议">🔥</span>
+                                </span>
+                                <span class="create-time">{{ formatTime(item.createtime) }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -75,7 +93,7 @@ import { useRouter } from 'vue-router';
 import { getAllLibraryService, getMediaOriginUrlService } from '@/api/ai.js';
 import { ElMessage } from 'element-plus';
 import { formatDate } from '@/utils/format';
-import { Download, Picture, RefreshLeft } from '@element-plus/icons-vue';
+import { Download, Picture, RefreshLeft, ChatDotRound } from '@element-plus/icons-vue';
 
 const mediaList = ref([]);
 const loading = ref(false);
@@ -85,11 +103,18 @@ const skeletonCount = 10;
 const pageNum = ref(1);
 const pageSize = ref(15);
 const total = ref(0);
+const sortBy = ref('review_count'); // 默认按评论数排序
 
 const router = useRouter();
 
 const refresh = () => {
     getMediaList(pageNum.value);
+};
+
+const setSortBy = (val) => {
+    if (sortBy.value === val) return;
+    sortBy.value = val;
+    getMediaList(1);
 };
 
 const goToDetail = (item) => {
@@ -104,7 +129,7 @@ const getMediaList = async (page = 1) => {
     try {
         loading.value = true;
         pageNum.value = page;
-        const response = await getAllLibraryService(pageNum.value, pageSize.value);
+        const response = await getAllLibraryService(pageNum.value, pageSize.value, sortBy.value);
         const data = response?.data || {};
         const items = Array.isArray(data.items) ? data.items : [];
         // enrich items with UI state
@@ -267,6 +292,22 @@ onMounted(() => {
     font-size: 18px;
 }
 
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-group :deep(.el-button.is-plain) {
+    border-color: var(--el-border-color);
+}
+
+.sort-group :deep(.el-button--primary.is-plain) {
+    /* 激活态：更明显 */
+    border-color: color-mix(in srgb, var(--el-color-primary) 55%, transparent);
+    background: color-mix(in srgb, var(--el-color-primary) 14%, transparent);
+}
+
 .waterfall-container {
     column-count: 5;
     column-gap: 16px;
@@ -417,9 +458,57 @@ onMounted(() => {
     gap: 8px;
 }
 
+.meta-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .media-id {
     color: var(--el-text-color-secondary);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.model-tag {
+    line-height: 1;
+}
+
+.review-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--el-color-warning) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--el-color-warning) 40%, transparent);
+    color: var(--el-color-warning);
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, transform .05s ease;
+}
+
+.review-icon {
+    color: var(--el-color-warning);
+    font-size: 16px;
+}
+
+.hot-flag {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2px;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.review-count:hover {
+    background: color-mix(in srgb, var(--el-color-warning) 22%, transparent);
+    border-color: color-mix(in srgb, var(--el-color-warning) 60%, transparent);
+}
+
+.review-count:active {
+    transform: translateY(1px);
 }
 
 /* Remove original colorful border */

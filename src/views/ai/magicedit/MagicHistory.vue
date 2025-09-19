@@ -46,10 +46,22 @@
               <div class="list-content">
                 <div class="prompt-text">{{ item.prompt }}</div>
                 <div class="meta">
-                  <el-tag size="small" :type="item.isPublic ? 'success' : 'info'" effect="plain">
-                    {{ item.isPublic ? '公开' : '私密' }}
-                  </el-tag>
-                  <span class="create-time">{{ formatTime(item.createtime) }}</span>
+                  <div class="meta-left">
+                    <el-tag size="small" :type="item.isPublic ? 'success' : 'info'" effect="plain">
+                      {{ item.isPublic ? '公开' : '私密' }}
+                    </el-tag>
+                    <el-tag v-if="item.model" size="small" type="info" effect="plain" class="model-tag">
+                      {{ item.model }}
+                    </el-tag>
+                  </div>
+                  <div class="meta-right">
+                    <span class="review-count" title="评论数" @click.stop="openDetails(item)" role="button">
+                      <el-icon class="review-icon"><ChatDotRound /></el-icon>
+                      {{ item.reviewcount ?? 0 }}
+                      <span v-if="(item.reviewcount ?? 0) > 5" class="hot-flag" aria-label="热议" title="热议">🔥</span>
+                    </span>
+                    <span class="create-time">{{ formatTime(item.createtime) }}</span>
+                  </div>
                 </div>
                 <div class="list-actions">
                   <el-switch
@@ -184,6 +196,7 @@ import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getUserLibraryService, setMediaPublicService, getMediaByIdService } from '@/api/ai.js'
 import { formatDate } from '@/utils/format'
+import { ChatDotRound } from '@element-plus/icons-vue'
 
 const mediaList = ref([])
 const loading = ref(false)
@@ -479,6 +492,18 @@ onBeforeUnmount(() => {
   color: var(--el-text-color-secondary);
 }
 
+.meta-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .list-actions {
   margin-top: 10px;
   display: flex;
@@ -495,6 +520,48 @@ onBeforeUnmount(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.model-tag {
+  line-height: 1;
+}
+
+.review-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--el-color-warning) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--el-color-warning) 40%, transparent);
+  color: var(--el-color-warning);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, transform .05s ease;
+}
+
+.review-icon {
+  color: var(--el-color-warning);
+  font-size: 16px;
+}
+
+.hot-flag {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.review-count:hover {
+  background: color-mix(in srgb, var(--el-color-warning) 22%, transparent);
+  border-color: color-mix(in srgb, var(--el-color-warning) 60%, transparent);
+}
+
+.review-count:active {
+  transform: translateY(1px);
 }
 
 .pagination-wrapper {
