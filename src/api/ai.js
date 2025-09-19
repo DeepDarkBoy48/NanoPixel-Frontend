@@ -30,3 +30,54 @@ export const getMediaOriginUrlService = (mediaId) => {
 export const getMediaByIdService = (mediaId) => {
     return request.get(`ai/media/${mediaId}`);
 };
+
+// Prompt 分类管理
+export const listPromptCategoriesService = () => {
+    return request.get("prompt-category");
+};
+
+export const createPromptCategoryService = (payload) => {
+    return request.post("prompt-category", payload);
+};
+
+export const updatePromptCategoryService = (id, payload) => {
+    return request.put(`prompt-category/${id}`, payload);
+};
+
+export const deletePromptCategoryService = (id) => {
+    return request.delete(`prompt-category/${id}`);
+};
+
+// Prompt 管理
+export const listSavedPromptsService = (categoryId) => {
+    return request.get("saved-prompt", { params: categoryId ? { categoryId } : {} });
+};
+
+export const createSavedPromptService = (payload) => {
+    return request.post("saved-prompt", payload);
+};
+
+export const updateSavedPromptService = (id, payload) => {
+    return request.put(`saved-prompt/${id}`, payload);
+};
+
+export const deleteSavedPromptService = (id) => {
+    return request.delete(`saved-prompt/${id}`);
+};
+
+// 评论（Review）相关接口
+export const listReviewsByMediaService = (mediaId) => {
+    return request.get(`review/list/${mediaId}`);
+};
+
+export const listUserReviewsService = () => {
+    return request.get("review/userlist");
+};
+
+export const addReviewService = (payload) => {
+    return request.post("review/add", payload);
+};
+
+export const deleteReviewService = (id) => {
+    return request.delete(`review/${id}`);
+};

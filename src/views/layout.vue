@@ -122,6 +122,7 @@ const activeMenu = computed(() => {
     if (path.startsWith('/ai/magicImageEdit/history')) return '/ai/magicImageEdit/history'
     if (path.startsWith('/ai/magicImageEdit')) return '/ai/magicImageEdit'
     if (path.startsWith('/ai/library')) return '/ai/library'
+    if (path.startsWith('/ai/prompt')) return '/ai/prompt'
     return path
 })
 </script>
@@ -166,6 +167,12 @@ const activeMenu = computed(() => {
                             <ChatLineRound />
                         </el-icon>
                         <span>灵感广场</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/prompt">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>Prompt管理</span>
                     </el-menu-item>
                     <!-- <el-menu-item index="/ai/canvas">
                         <el-icon>
@@ -232,6 +239,13 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>重置密码</span>
                     </el-menu-item>
+
+                    <el-menu-item index="/user/review">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>我的评论</span>
+                    </el-menu-item>
                 </el-sub-menu>
             </el-menu>
         </el-aside>
@@ -268,6 +282,12 @@ const activeMenu = computed(() => {
                             <ChatLineRound />
                         </el-icon>
                         <span>灵感广场</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/prompt">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>Prompt管理</span>
                     </el-menu-item>
                     <!-- <el-menu-item index="/ai/canvas">
                         <el-icon>
@@ -331,6 +351,13 @@ const activeMenu = computed(() => {
                             <EditPen />
                         </el-icon>
                         <span>重置密码</span>
+                    </el-menu-item>
+
+                    <el-menu-item index="/user/review">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span>我的评论</span>
                     </el-menu-item>
 
 

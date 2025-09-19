@@ -52,6 +52,15 @@
                   <span class="create-time">{{ formatTime(item.createtime) }}</span>
                 </div>
                 <div class="list-actions">
+                  <el-switch
+                    :model-value="item.isPublic"
+                    inline-prompt
+                    size="small"
+                    active-text="公开"
+                    inactive-text="私密"
+                    :disabled="item._updating"
+                    @change="(val) => handleItemPublicChange(item, val)"
+                  />
                   <el-button size="small" type="primary" plain @click="openDetails(item)">查看详情</el-button>
                 </div>
               </div>
@@ -216,6 +225,7 @@ const normalizeItem = (it) => ({
   ...it,
   isPublic: toBoolean(it?.isPublic ?? it?.public ?? it?.ispublic),
   _displayUrl: it.mediaurl,
+  _updating: false,
 })
 
 const normalizeDetail = (data) => ({
@@ -310,6 +320,31 @@ const onTogglePublic = async (val) => {
     selectedPublic.value = !val
   } finally {
     publishing.value = false
+  }
+}
+
+const handleItemPublicChange = async (item, nextVal) => {
+  if (!item?.id || item._updating) return
+  const target = !!nextVal
+  const original = !!item.isPublic
+  if (target === original) return
+  item._updating = true
+  try {
+    await setMediaPublicService(item.id, target)
+    item.isPublic = target
+    if (selectedItem.value?.id === item.id) {
+      selectedItem.value.isPublic = target
+      selectedPublic.value = target
+    }
+    if (drawerDetail.value?.id === item.id) {
+      drawerDetail.value.isPublic = target
+      selectedPublic.value = target
+    }
+    ElMessage.success(`已设置为${target ? '公开' : '私密'}`)
+  } catch (e) {
+    ElMessage.error('更新公开状态失败')
+  } finally {
+    item._updating = false
   }
 }
 
@@ -446,6 +481,9 @@ onBeforeUnmount(() => {
 
 .list-actions {
   margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* 让右侧文字列在 grid 中可以正确缩小，不产生横向溢出 */

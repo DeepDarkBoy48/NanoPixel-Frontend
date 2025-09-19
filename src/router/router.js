@@ -7,6 +7,7 @@ import ArticleManageVue from "@/views/article/ArticleManage.vue";
 import UserInfoVue from "@/views/user/UserInfo.vue";
 import UserAvatarVUe from "@/views/user/UserAvatar.vue";
 import UserResetPasswordVue from "@/views/user/UserResetPassword.vue";
+import ReviewVue from "@/views/user/Review.vue";
 import UserChatRoomVue from "@/views/ai/UserChatRoom.vue";
 import BlogVue from "@/views/blog/blog.vue";
 import magicImageEditVue from "@/views/ai/magicImageEdit.vue";
@@ -14,6 +15,7 @@ import libraryVue from "@/views/ai/library.vue";
 import MagicHistory from "@/views/ai/magicedit/MagicHistory.vue";
 import canvasVue from "@/views/ai/canvas.vue";
 import LibraryDetail from "@/views/ai/libraryDetail.vue";
+import promptManagerVue from "@/views/ai/promptManager.vue";
 
 // 路由配置说明：
 // - 根路径使用 Layout 作为统一布局容器，所有业务页面作为其子路由渲染在 <router-view/>
@@ -34,6 +36,7 @@ const routes = [
       { path: "/user/info", component: UserInfoVue },
       { path: "/user/avatar", component: UserAvatarVUe },
       { path: "/user/resetPassword", component: UserResetPasswordVue },
+      { path: "/user/review", component: ReviewVue },
       // AI 模块：聊天室
       { path: "/ai/chatRoom", component: UserChatRoomVue },
 
@@ -44,6 +47,9 @@ const routes = [
       // AI 模块：图片库（入口 + 子页面）
       { path: "/ai/library", component: libraryVue },
       { path: "/ai/library/:mediaId", component: LibraryDetail },
+
+      // AI 模块：Prompt 管理
+      { path: "/ai/prompt", component: promptManagerVue },
 
       // AI 模块：Canvas
       { path: "/ai/canvas", component: canvasVue },

@@ -119,26 +119,48 @@
                     <header>
                         <div>
                             <h3>协作评论</h3>
-                            <p>团队围绕此素材的讨论</p>
+                            <p>围绕该作品的讨论与反馈</p>
                         </div>
-                        <el-button size="small" plain type="primary">新增评论</el-button>
+                        <el-button size="small" type="primary" plain @click="toggleCommentForm">
+                            {{ showCommentForm ? '收起' : '新增评论' }}
+                        </el-button>
                     </header>
-                    <div class="comment-list">
-                        <div class="comment-item" v-for="comment in comments" :key="comment.id">
-                            <div class="comment-meta">
-                                <div class="avatar">{{ comment.initials }}</div>
-                                <div>
-                                    <div class="name-row">
-                                        <span class="name">{{ comment.author }}</span>
-                                        <span class="role">{{ comment.role }}</span>
-                                    </div>
-                                    <span class="time">{{ comment.time }}</span>
+
+                    <div v-if="showCommentForm" class="comment-form" :class="{ 'is-submitting': submittingReview }">
+                        <el-input
+                            v-model="newReviewContent"
+                            type="textarea"
+                            :rows="4"
+                            maxlength="500"
+                            show-word-limit
+                            placeholder="写下你的想法，最多 500 字"
+                        />
+                        <div class="comment-form__actions">
+                            <el-button size="small" @click="cancelReview" :disabled="submittingReview">
+                                取消
+                            </el-button>
+                            <el-button
+                                size="small"
+                                type="primary"
+                                :disabled="!newReviewContent.trim() || submittingReview"
+                                :loading="submittingReview"
+                                @click="submitReview"
+                            >
+                                发布
+                            </el-button>
+                        </div>
+                    </div>
+
+                    <div class="comment-list" v-loading="reviewsLoading">
+                        <el-empty v-if="!reviewsLoading && !normalizedReviews.length" description="暂时没有评论" />
+                        <div v-else class="comment-item" v-for="review in normalizedReviews" :key="review.id">
+                            <div class="comment-avatar">{{ review.initials }}</div>
+                            <div class="comment-body">
+                                <div class="comment-head">
+                                    <span class="comment-author">{{ review.userName }}</span>
+                                    <span class="comment-time">{{ review.time }}</span>
                                 </div>
-                            </div>
-                            <p class="comment-text">{{ comment.content }}</p>
-                            <div class="comment-actions">
-                                <el-button size="small" link>回复</el-button>
-                                <el-button size="small" link type="danger">标记</el-button>
+                                <p class="comment-content">{{ review.content }}</p>
                             </div>
                         </div>
                     </div>
@@ -153,7 +175,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { ArrowLeft } from '@element-plus/icons-vue';
-import { getMediaByIdService } from '@/api/ai.js';
+import { getMediaByIdService, listReviewsByMediaService, addReviewService } from '@/api/ai.js';
 import { formatDate } from '@/utils/format';
 
 const route = useRoute();
@@ -161,39 +183,18 @@ const router = useRouter();
 
 const detail = ref(null);
 const loading = ref(false);
-
-const comments = ref([
-    {
-        id: 1,
-        author: '设计组 · 阿辰',
-        role: '视觉设计',
-        initials: 'AC',
-        time: '今天 10:32',
-        content: '构图已经满足 Web 封面尺寸，需要在 AI 图上补充一层轻微颗粒感增加质感。'
-    },
-    {
-        id: 2,
-        author: '产品 · Lili',
-        role: '产品经理',
-        initials: 'PL',
-        time: '今天 09:58',
-        content: '提示词里的场景氛围不错，想再强调人物的交互动作，可以补充“注视镜头、侧身挥手”等描述。'
-    },
-    {
-        id: 3,
-        author: '运营 · Ken',
-        role: '内容运营',
-        initials: 'K',
-        time: '昨天 18:40',
-        content: '计划把该素材用于首页活动 Banner，请在导出时保留 4K 分辨率原图。'
-    }
-]);
+const reviews = ref([]);
+const reviewsLoading = ref(false);
+const showCommentForm = ref(false);
+const newReviewContent = ref('');
+const submittingReview = ref(false);
 
 const mediaId = computed(() => route.params.mediaId);
 
 const loadDetail = async (id) => {
     if (!id) {
         detail.value = null;
+        reviews.value = [];
         return;
     }
     try {
@@ -204,6 +205,7 @@ const loadDetail = async (id) => {
         if (!detail.value) {
             ElMessage.warning('未找到该媒体');
         }
+        await fetchReviews(id);
     } catch (error) {
         console.error(error);
         detail.value = null;
@@ -211,6 +213,86 @@ const loadDetail = async (id) => {
     } finally {
         loading.value = false;
     }
+};
+
+const fetchReviews = async (id) => {
+    if (!id) {
+        reviews.value = [];
+        return;
+    }
+    try {
+        reviewsLoading.value = true;
+        const response = await listReviewsByMediaService(id);
+        const list = Array.isArray(response?.data) ? response.data : [];
+        reviews.value = list;
+    } catch (error) {
+        console.error('加载评论失败', error);
+        ElMessage.error('加载评论失败');
+        reviews.value = [];
+    } finally {
+        reviewsLoading.value = false;
+    }
+};
+
+const toggleCommentForm = () => {
+    showCommentForm.value = !showCommentForm.value;
+    if (!showCommentForm.value) {
+        newReviewContent.value = '';
+    }
+};
+
+const cancelReview = () => {
+    newReviewContent.value = '';
+    showCommentForm.value = false;
+};
+
+const submitReview = async () => {
+    const media = detail.value?.id ?? mediaId.value;
+    const content = newReviewContent.value.trim();
+    if (!media || !content) return;
+    try {
+        submittingReview.value = true;
+        await addReviewService({
+            mediaId: Number(media),
+            content,
+        });
+        ElMessage.success('评论已发布');
+        newReviewContent.value = '';
+        showCommentForm.value = false;
+        await fetchReviews(media);
+    } catch (error) {
+        console.error('发布评论失败', error);
+        ElMessage.error('发布评论失败');
+    } finally {
+        submittingReview.value = false;
+    }
+};
+
+const normalizedReviews = computed(() => {
+    return reviews.value.map((item, index) => {
+        const name = item?.userName ?? '匿名用户';
+        return {
+            id: item?.id ?? `temp-${index}`,
+            content: item?.content ?? '',
+            userName: String(name),
+            initials: getInitials(String(name)),
+            time: formatTime(item?.createTime),
+        };
+    });
+});
+
+const getInitials = (name) => {
+    if (!name) return '友';
+    const clean = String(name).trim();
+    if (!clean) return '友';
+    const parts = clean.split(/\s+/);
+    if (parts.length === 1) {
+        const segment = parts[0];
+        return segment.slice(0, 2).toUpperCase();
+    }
+    const first = parts[0].charAt(0);
+    const last = parts[parts.length - 1].charAt(0);
+    return `${first}${last}`.toUpperCase();
 };
 
 const goBack = () => {
@@ -254,6 +336,7 @@ onMounted(() => {
 });
 
 watch(mediaId, (id) => {
+    cancelReview();
     loadDetail(id);
 });
 </script>
@@ -496,33 +579,54 @@ watch(mediaId, (id) => {
     font-size: 13px;
 }
 
-.comment-list {
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding-right: 6px;
-}
-
-.comment-item {
+.comment-form {
     border-radius: 18px;
-    padding: 16px 18px;
-    background: color-mix(in srgb, var(--app-surface-2) 92%, #101727 8%);
-    border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
+    padding: 16px;
+    background: color-mix(in srgb, var(--app-surface-2) 90%, #101727 10%);
+    border: 1px solid color-mix(in srgb, var(--el-border-color) 70%, transparent);
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.comment-meta {
-    display: flex;
-    gap: 12px;
-    align-items: center;
+.comment-form.is-submitting {
+    opacity: 0.8;
 }
 
-.avatar {
-    width: 34px;
-    height: 34px;
+.comment-form__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.comment-form :deep(.el-textarea__inner) {
+    min-height: 120px;
+}
+
+.comment-list {
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-right: 6px;
+}
+
+.comment-list :deep(.el-empty) {
+    margin: 40px 0;
+}
+
+.comment-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--app-surface-2) 92%, #101727 8%);
+    border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
+}
+
+.comment-avatar {
+    flex: 0 0 36px;
+    height: 36px;
     border-radius: 12px;
     background: color-mix(in srgb, var(--app-primary) 28%, #3840ff 72%);
     display: flex;
@@ -530,42 +634,39 @@ watch(mediaId, (id) => {
     justify-content: center;
     color: #fff;
     font-weight: 600;
+    font-size: 14px;
 }
 
-.name-row {
+.comment-body {
+    flex: 1;
     display: flex;
-    gap: 8px;
-    align-items: center;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
 }
 
-.name {
+.comment-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.comment-author {
     font-weight: 600;
+    color: var(--el-text-color-primary);
 }
 
-.role {
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--app-primary) 14%, transparent);
-    color: var(--app-primary);
-}
-
-.time {
-    display: block;
-    margin-top: 2px;
+.comment-time {
     font-size: 12px;
     color: var(--el-text-color-secondary);
 }
 
-.comment-text {
+.comment-content {
     margin: 0;
     color: var(--el-text-color-primary);
     line-height: 1.6;
-}
-
-.comment-actions {
-    display: flex;
-    gap: 8px;
+    word-break: break-word;
 }
 
 @media (max-width: 1200px) {
