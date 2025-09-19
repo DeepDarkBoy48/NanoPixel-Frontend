@@ -67,7 +67,16 @@
                             <el-button v-if="detail.prompt" size="small" link type="primary"
                                 @click="copyPrompt(detail.prompt)">复制</el-button>
                         </header>
-                        <div class="prompt-content" v-if="detail.prompt">{{ detail.prompt }}</div>
+                        <div class="prompt-content" v-if="detail.prompt" @click="copyPrompt(detail.prompt, $event)"
+                            title="点击复制提示词">
+                            {{ detail.prompt }}
+                            <div class="copy-hint">
+                                <el-icon>
+                                    <DocumentCopy />
+                                </el-icon>
+                                <span>点击复制</span>
+                            </div>
+                        </div>
                         <div class="prompt-content empty" v-else>暂无提示词</div>
                     </section>
 
@@ -161,7 +170,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { ArrowLeft } from '@element-plus/icons-vue';
+import { ArrowLeft, DocumentCopy } from '@element-plus/icons-vue';
 import { getMediaByIdService, listReviewsByMediaService, addReviewService } from '@/api/ai.js';
 import { formatDate } from '@/utils/format';
 
@@ -298,7 +307,7 @@ const formatTime = (time) => {
     return formatDate(time, 'YYYY-MM-DD HH:mm');
 };
 
-const copyPrompt = async (text) => {
+const copyPrompt = async (text, event) => {
     try {
         if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(text);
@@ -312,7 +321,24 @@ const copyPrompt = async (text) => {
             document.execCommand('copy');
             document.body.removeChild(textarea);
         }
-        ElMessage.success('提示词已复制');
+
+        // 添加复制成功的视觉反馈
+        if (event && event.target) {
+            const target = event.target.closest('.prompt-content');
+            const hintSpan = target?.querySelector('.copy-hint span');
+            if (target && hintSpan) {
+                const originalText = hintSpan.textContent;
+                target.classList.add('copy-success');
+                hintSpan.textContent = '已复制!';
+
+                setTimeout(() => {
+                    target.classList.remove('copy-success');
+                    hintSpan.textContent = originalText;
+                }, 600);
+            }
+        }
+
+        ElMessage.success('✅ 提示词已复制到剪贴板');
     } catch (error) {
         ElMessage.error('复制失败');
     }
@@ -359,14 +385,49 @@ watch(mediaId, (id) => {
     padding: 16px 20px 20px;
     border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
     border-radius: 28px;
-    background: color-mix(in srgb, var(--app-surface) 94%, #fff 6%);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--el-border-color) 35%, transparent);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--app-surface) 94%, #fff 6%) 0%, color-mix(in srgb, var(--app-surface) 96%, #667eea 4%) 100%);
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--el-border-color) 35%, transparent),
+        0 20px 60px rgba(15, 23, 42, 0.08);
+    animation: boardFadeIn 1s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes boardFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .board-header {
     display: flex;
     justify-content: flex-start;
     margin-bottom: 12px;
+}
+
+.board-header .el-button {
+    background: linear-gradient(135deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 90%, #667eea 10%) 100%);
+    border: 1px solid color-mix(in srgb, var(--app-primary) 30%, transparent);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+}
+
+.board-header .el-button:hover {
+    background: linear-gradient(135deg, var(--app-primary) 0%, #4facfe 100%);
+    color: #fff;
+    border-color: var(--app-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.board-header .el-button .toolbar-icon {
+    transition: transform 0.3s ease;
+}
+
+.board-header .el-button:hover .toolbar-icon {
+    transform: translateX(-2px);
 }
 
 
@@ -393,18 +454,77 @@ watch(mediaId, (id) => {
     flex: 1;
     border-radius: 28px;
     border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
-    background: var(--app-surface);
+    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 96%, #667eea 4%) 100%);
     box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
     padding: 16px 18px 18px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    transition: all 0.4s ease;
+    animation: cardSlideUp 0.8s ease-out forwards;
+    transform: translateY(20px);
+    opacity: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.stage-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.stage-card>* {
+    position: relative;
+    z-index: 1;
+}
+
+.stage-card:hover {
+    transform: translateY(-8px);
+    box-shadow:
+        0 25px 50px rgba(15, 23, 42, 0.15),
+        0 0 0 1px rgba(102, 126, 234, 0.1) inset,
+        0 0 30px rgba(102, 126, 234, 0.1);
+    border-color: color-mix(in srgb, var(--app-primary) 30%, transparent);
+}
+
+.stage-card:nth-child(1) {
+    animation-delay: 0.2s;
+}
+
+.stage-card:nth-child(2) {
+    animation-delay: 0.4s;
+}
+
+@keyframes cardSlideUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .stage-card header h3 {
     margin: 0;
     font-size: 16px;
     font-weight: 600;
+    background: linear-gradient(135deg, var(--el-text-color-primary) 0%, var(--app-primary) 70%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+}
+
+.stage-card:hover header h3 {
+    background: linear-gradient(135deg, var(--app-primary) 0%, #4facfe 70%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .stage-card header p {
@@ -423,6 +543,42 @@ watch(mediaId, (id) => {
     border-radius: 22px;
     overflow: hidden;
     background: color-mix(in srgb, var(--app-surface-2) 70%, #fff 30%);
+    transition: all 0.4s ease;
+    cursor: zoom-in;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.media-frame::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg,
+            transparent 0%,
+            rgba(102, 126, 234, 0.05) 25%,
+            transparent 50%,
+            rgba(118, 75, 162, 0.05) 75%,
+            transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.media-frame:hover {
+    transform: scale(1.02);
+    box-shadow:
+        inset 0 0 0 2px rgba(102, 126, 234, 0.2),
+        0 8px 30px rgba(0, 0, 0, 0.15),
+        0 0 40px rgba(102, 126, 234, 0.1);
+}
+
+.media-frame:hover::after {
+    opacity: 1;
 }
 
 .media-element,
@@ -431,18 +587,46 @@ watch(mediaId, (id) => {
     height: 100%;
     object-fit: contain;
     background: var(--app-surface-2);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.media-frame:hover .media-element,
+.media-frame:hover :deep(img) {
+    filter: brightness(1.05) contrast(1.05);
 }
 
 .badge {
     position: absolute;
     top: 12px;
     left: 12px;
-    z-index: 2;
-    background: rgba(26, 79, 255, 0.86);
+    z-index: 3;
+    background: linear-gradient(135deg, #1a4fff 0%, #667eea 100%);
     color: #fff;
     font-size: 11px;
     padding: 4px 10px;
     border-radius: 999px;
+    transition: all 0.3s ease;
+    animation: badgePulse 2s ease-in-out infinite;
+    box-shadow: 0 2px 8px rgba(26, 79, 255, 0.3);
+}
+
+.badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(26, 79, 255, 0.5);
+}
+
+@keyframes badgePulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 .placeholder {
@@ -459,12 +643,55 @@ watch(mediaId, (id) => {
 .meta-card {
     border-radius: 26px;
     border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
-    background: var(--app-surface);
+    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 95%, #667eea 5%) 100%);
     box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
     padding: 18px 20px 20px;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    transition: all 0.4s ease;
+    animation: cardSlideUp 0.8s ease-out forwards;
+    transform: translateY(20px);
+    opacity: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.prompt-card::before,
+.meta-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 70% 30%, rgba(118, 75, 162, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.prompt-card>*,
+.meta-card>* {
+    position: relative;
+    z-index: 1;
+}
+
+.prompt-card:hover,
+.meta-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 20px 40px rgba(15, 23, 42, 0.12),
+        0 0 0 1px rgba(118, 75, 162, 0.1) inset,
+        0 0 25px rgba(118, 75, 162, 0.08);
+    border-color: color-mix(in srgb, var(--app-primary) 25%, transparent);
+}
+
+.prompt-card {
+    animation-delay: 0.6s;
+}
+
+.meta-card {
+    animation-delay: 0.8s;
 }
 
 .prompt-card header,
@@ -479,16 +706,155 @@ watch(mediaId, (id) => {
     margin: 0;
     font-size: 16px;
     font-weight: 600;
+    background: linear-gradient(135deg, var(--el-text-color-primary) 0%, var(--app-primary) 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+}
+
+.prompt-card:hover header h3,
+.meta-card:hover header h3 {
+    background: linear-gradient(135deg, var(--app-primary) 0%, #764ba2 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.prompt-card header .el-button {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--app-primary) 10%, transparent) 0%, color-mix(in srgb, var(--app-primary) 15%, transparent) 100%);
+    border: 1px solid color-mix(in srgb, var(--app-primary) 30%, transparent);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.prompt-card header .el-button:hover {
+    background: linear-gradient(135deg, var(--app-primary) 0%, #4facfe 100%);
+    color: #fff;
+    border-color: var(--app-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .prompt-content {
     border-radius: 18px;
     border: 1px solid color-mix(in srgb, var(--app-primary) 18%, transparent);
-    background: color-mix(in srgb, var(--app-primary) 12%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--app-primary) 12%, transparent) 0%,
+            color-mix(in srgb, var(--app-primary) 8%, transparent) 100%);
     padding: 18px;
     line-height: 1.7;
     white-space: pre-wrap;
     color: var(--el-text-color-primary);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+}
+
+.prompt-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(102, 126, 234, 0.1) 50%,
+            transparent 100%);
+    transition: left 0.5s ease;
+    pointer-events: none;
+}
+
+.prompt-content:hover {
+    border-color: color-mix(in srgb, var(--app-primary) 30%, transparent);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--app-primary) 15%, transparent) 0%,
+            color-mix(in srgb, var(--app-primary) 10%, transparent) 100%);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+}
+
+.prompt-content:hover::before {
+    left: 100%;
+}
+
+.copy-hint {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.prompt-content:hover .copy-hint {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.copy-hint .el-icon {
+    font-size: 14px;
+    animation: copyIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes copyIconPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.prompt-content:active {
+    transform: scale(0.98);
+    border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
+}
+
+.prompt-content.copy-success {
+    background: linear-gradient(135deg,
+            color-mix(in srgb, #67c23a 20%, transparent) 0%,
+            color-mix(in srgb, #67c23a 15%, transparent) 100%) !important;
+    border-color: color-mix(in srgb, #67c23a 40%, transparent) !important;
+    animation: copySuccessFlash 0.6s ease-out;
+}
+
+.prompt-content.copy-success .copy-hint {
+    background: rgba(103, 194, 58, 0.9) !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+@keyframes copySuccessFlash {
+    0% {
+        box-shadow: 0 0 20px rgba(103, 194, 58, 0.8);
+    }
+
+    50% {
+        box-shadow: 0 0 30px rgba(103, 194, 58, 0.6);
+        transform: scale(1.02);
+    }
+
+    100% {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+        transform: scale(1);
+    }
 }
 
 .prompt-content.empty {
@@ -507,31 +873,120 @@ watch(mediaId, (id) => {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--app-surface-2) 50%, transparent);
+    border: 1px solid color-mix(in srgb, var(--el-border-color) 60%, transparent);
+    transition: all 0.3s ease;
+    animation: metaItemSlideIn 0.6s ease-out forwards;
+    transform: translateX(-10px);
+    opacity: 0;
+}
+
+.meta-item:hover {
+    background: color-mix(in srgb, var(--app-surface-2) 80%, transparent);
+    border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.meta-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.meta-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.meta-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.meta-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.meta-item:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.meta-item:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+@keyframes metaItemSlideIn {
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .meta-item .label {
     font-size: 12px;
-    color: var(--el-text-color-secondary);
+    background: linear-gradient(135deg, var(--el-text-color-secondary) 0%, color-mix(in srgb, var(--app-primary) 60%, var(--el-text-color-secondary) 40%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     letter-spacing: 0.5px;
     text-transform: uppercase;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.meta-item:hover .label {
+    background: linear-gradient(135deg, var(--app-primary) 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .meta-item .value {
     font-size: 14px;
     color: var(--el-text-color-primary);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.meta-item:hover .value {
+    color: color-mix(in srgb, var(--app-primary) 80%, var(--el-text-color-primary) 20%);
+    transform: translateX(2px);
 }
 
 .comment-panel {
     flex: 0 0 360px;
-    background: var(--app-surface);
+    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 95%, #667eea 5%) 100%);
     border-radius: 28px;
     border: 1px solid color-mix(in srgb, var(--el-border-color) 74%, transparent);
     padding: 20px;
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.12),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 0 20px rgba(102, 126, 234, 0.1);
     display: flex;
     flex-direction: column;
     gap: 18px;
     max-height: clamp(560px, 85vh, 980px);
+    position: relative;
+    overflow: hidden;
+}
+
+.comment-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.comment-panel>* {
+    position: relative;
+    z-index: 1;
 }
 
 .comment-panel header {
@@ -543,8 +998,24 @@ watch(mediaId, (id) => {
 
 .comment-panel header h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
+    background: linear-gradient(135deg, var(--el-text-color-primary) 0%, var(--app-primary) 70%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.comment-panel header .el-button {
+    background: linear-gradient(135deg, var(--app-primary) 0%, color-mix(in srgb, var(--app-primary) 80%, #4facfe) 100%);
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.comment-panel header .el-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 .comment-panel header p {
@@ -556,11 +1027,30 @@ watch(mediaId, (id) => {
 .comment-form {
     border-radius: 18px;
     padding: 16px;
-    background: color-mix(in srgb, var(--app-surface-2) 90%, #101727 10%);
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--app-surface-2) 90%, #101727 10%) 0%,
+            color-mix(in srgb, var(--app-surface-2) 85%, #667eea 15%) 100%);
     border: 1px solid color-mix(in srgb, var(--el-border-color) 70%, transparent);
     display: flex;
     flex-direction: column;
     gap: 10px;
+    transition: all 0.3s ease;
+    animation: formSlideDown 0.4s ease-out forwards;
+    transform: translateY(-10px);
+    opacity: 0;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+}
+
+.comment-form:hover {
+    border-color: color-mix(in srgb, var(--app-primary) 50%, transparent);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.15);
+}
+
+@keyframes formSlideDown {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .comment-form.is-submitting {
@@ -596,19 +1086,131 @@ watch(mediaId, (id) => {
     border-radius: 18px;
     background: color-mix(in srgb, var(--app-surface-2) 92%, #101727 8%);
     border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
+    transition: all 0.3s ease;
+    animation: commentSlideIn 0.6s ease-out forwards;
+    transform: translateY(10px);
+    opacity: 0;
+}
+
+.comment-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
+    background: color-mix(in srgb, var(--app-surface-2) 95%, #101727 5%);
+}
+
+@keyframes commentSlideIn {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 错开动画 - 让评论按顺序出现 */
+.comment-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.comment-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.comment-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.comment-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.comment-item:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.comment-item:nth-child(n+6) {
+    animation-delay: 0.6s;
 }
 
 .comment-avatar {
     flex: 0 0 36px;
     height: 36px;
     border-radius: 12px;
-    background: color-mix(in srgb, var(--app-primary) 28%, #3840ff 72%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
     font-weight: 600;
     font-size: 14px;
+    position: relative;
+    transition: all 0.3s ease;
+    animation: avatarPulse 2s ease-in-out infinite;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.comment-avatar::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffecd2);
+    border-radius: 14px;
+    z-index: -1;
+    animation: avatarGlow 3s ease-in-out infinite;
+    opacity: 0.7;
+}
+
+.comment-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.comment-item:nth-child(2n) .comment-avatar {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+}
+
+.comment-item:nth-child(3n) .comment-avatar {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+
+.comment-item:nth-child(4n) .comment-avatar {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+}
+
+.comment-item:nth-child(5n) .comment-avatar {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    box-shadow: 0 4px 15px rgba(250, 112, 154, 0.3);
+}
+
+@keyframes avatarPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes avatarGlow {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: rotate(0deg);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: rotate(180deg);
+    }
 }
 
 .comment-body {
@@ -628,7 +1230,23 @@ watch(mediaId, (id) => {
 
 .comment-author {
     font-weight: 600;
-    color: var(--el-text-color-primary);
+    background: linear-gradient(135deg, var(--el-text-color-primary) 0%, color-mix(in srgb, var(--app-primary) 80%, var(--el-text-color-primary) 20%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: textShimmer 3s ease-in-out infinite;
+}
+
+@keyframes textShimmer {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .comment-time {
@@ -641,6 +1259,23 @@ watch(mediaId, (id) => {
     color: var(--el-text-color-primary);
     line-height: 1.6;
     word-break: break-word;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.comment-item:hover .comment-content {
+    text-shadow: 0 1px 3px rgba(102, 126, 234, 0.1);
+    transform: translateX(2px);
+}
+
+.comment-time {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    transition: all 0.3s ease;
+}
+
+.comment-item:hover .comment-time {
+    color: color-mix(in srgb, var(--app-primary) 70%, var(--el-text-color-secondary) 30%);
 }
 
 @media (max-width: 1200px) {
