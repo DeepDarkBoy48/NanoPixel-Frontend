@@ -18,7 +18,7 @@
                                 <h4 class="section-title">模板选择</h4>
                                 <el-form-item label="请选择一个分类">
                                     <el-select v-model="selectedPromptCategoryId" placeholder="请选择分类"
-                                        style="width: 100%" size="large" filterable :loading="promptCategoriesLoading"
+                                        style="width: 100%" size="large" :loading="promptCategoriesLoading"
                                         :disabled="promptCategoriesLoading" @change="handlePromptCategoryChange">
                                         <el-option v-for="item in promptCategories" :key="item.id"
                                             :label="item.categoryName" :value="item.id">
@@ -32,7 +32,7 @@
                                 </el-form-item>
                                 <el-form-item label="请选择一个模版">
                                     <el-select v-model="selectedPromptId" placeholder="请选择模版" style="width: 100%"
-                                        clearable filterable size="large" :loading="promptOptionsLoading"
+                                        clearable size="large" :loading="promptOptionsLoading"
                                         :disabled="promptOptionsLoading || !promptOptions.length"
                                         @change="onPromptChange">
                                         <el-option v-for="item in promptDropdownOptions" :key="item.value"

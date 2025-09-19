@@ -152,7 +152,7 @@
             class="responsive-dialog" destroy-on-close>
             <el-form ref="promptFormRef" :model="promptForm" :rules="promptRules" label-width="90px">
                 <el-form-item label="所属分类" prop="categoryId">
-                    <el-select v-model="promptForm.categoryId" placeholder="请选择分类" clearable filterable>
+                    <el-select v-model="promptForm.categoryId" placeholder="请选择分类" clearable>
                         <el-option v-for="item in categories" :key="item.id" :label="item.categoryName"
                             :value="item.id" />
                     </el-select>
