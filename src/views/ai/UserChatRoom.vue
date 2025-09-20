@@ -56,12 +56,12 @@ const connectWs = () => {
     isInitializing.value = true
 
     // 本地开发环境，直接连接后端
-    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
-    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    // const host = window.location.host;
-    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = window.location.host;
+    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
