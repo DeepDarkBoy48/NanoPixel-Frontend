@@ -61,8 +61,9 @@
                                         placeholder="请选择上方模版/预设，或直接在此处输入提示词" clearable />
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-upload class="uploader" :auto-upload="false" :limit="1" :show-file-list="true"
-                                        :on-change="handleFileChange" :on-remove="handleFileRemove"
+                                    <el-upload ref="uploaderRef" class="uploader" :auto-upload="false" :limit="1"
+                                        :show-file-list="true" :on-change="handleFileChange"
+                                        :on-remove="handleFileRemove" :on-exceed="handleFileExceed"
                                         :file-list="fileList" accept="image/*">
                                         <el-button type="primary">选择图片</el-button>
                                         <template #tip>
@@ -113,7 +114,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
 import { imageEditService, listPromptCategoriesService, listSavedPromptsService } from '@/api/ai'
 
@@ -224,6 +225,7 @@ function applyText(text) {
 }
 
 
+const uploaderRef = ref(null)
 const fileList = ref([])
 const selectedFile = ref(null)
 const submitting = ref(false)
@@ -240,22 +242,30 @@ const canSubmit = computed(() => {
     return !!selectedFile.value && !!prompt.value.trim()
 })
 
-const revokePreview = () => {
-    if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
-}
-
 const handleFileChange = (uploadFile, uploadFiles) => {
     selectedFile.value = uploadFile?.raw || null
     fileList.value = uploadFiles.slice(-1)
-    revokePreview()
     previewUrl.value = selectedFile.value ? URL.createObjectURL(selectedFile.value) : ''
+    resultUrl.value = ''
 }
 
 const handleFileRemove = () => {
     selectedFile.value = null
     fileList.value = []
-    revokePreview()
     previewUrl.value = ''
+}
+
+const handleFileExceed = (files) => {
+    const file = files?.[0]
+    if (!file) return
+    const upload = uploaderRef.value
+    if (!upload) return
+    if (typeof upload.clearFiles === 'function') {
+        upload.clearFiles()
+    }
+    if (typeof upload.handleStart === 'function') {
+        upload.handleStart(file)
+    }
 }
 
 const onReset = () => {
@@ -288,10 +298,17 @@ const onSubmit = async () => {
     }
 }
 
-watch(() => selectedFile.value, (_, __, onCleanup) => {
-    onCleanup(() => revokePreview())
+watch(previewUrl, (_, oldUrl) => {
+    if (oldUrl && oldUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(oldUrl)
+    }
 })
 
+onBeforeUnmount(() => {
+    if (previewUrl.value && previewUrl.value.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl.value)
+    }
+})
 
 onMounted(() => {
     fetchPromptCategories()
