@@ -23,7 +23,9 @@
                                         <el-option v-for="item in promptCategories" :key="item.id"
                                             :label="item.categoryName" :value="item.id">
                                             <div class="category-option">
-                                                <span class="category-option__name" :title="item.categoryName">{{ item.categoryName }}</span>
+                                                <span class="category-option__name" :title="item.categoryName">{{
+                                                    item.categoryName
+                                                    }}</span>
                                                 <span class="category-option__count">{{ item.promptCount ?? 0 }}
                                                     个模版</span>
                                             </div>
@@ -68,7 +70,7 @@
                                         </template>
                                     </el-upload>
                                 </el-form-item>
-                                <el-form-item>
+                                <el-form-item class="button-group">
                                     <el-button type="primary" size="large" :disabled="!canSubmit || submitting"
                                         :loading="submitting" @click="onSubmit">提交</el-button>
                                     <el-button @click="onReset" :disabled="submitting">重置</el-button>
@@ -530,12 +532,29 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-    .page-container { padding: 10px; }
-    .content { gap: 16px; }
-    .form { padding: 10px; }
-    .card { border-radius: 10px; }
-    .title { gap: 8px; }
-    .subtitle { font-size: 11px; }
+    .page-container {
+        padding: 10px;
+    }
+
+    .content {
+        gap: 16px;
+    }
+
+    .form {
+        padding: 10px;
+    }
+
+    .card {
+        border-radius: 10px;
+    }
+
+    .title {
+        gap: 8px;
+    }
+
+    .subtitle {
+        font-size: 11px;
+    }
 
     .unified-form :deep(.el-form-item) {
         flex-direction: column;
@@ -559,6 +578,18 @@ onMounted(() => {
         gap: 8px;
     }
 
+    /* 按钮组在手机端保持横向排列 */
+    .unified-form .button-group :deep(.el-form-item__content) {
+        flex-direction: row !important;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .unified-form .button-group :deep(.el-button) {
+        flex: 1;
+        min-width: 0;
+    }
+
     .unified-form :deep(.el-select),
     .unified-form :deep(.el-input),
     .unified-form :deep(.el-textarea),
@@ -567,20 +598,47 @@ onMounted(() => {
     }
 
     /* 紧凑化输入高度 */
-    .unified-form :deep(.el-input__wrapper) { padding: 0 10px; }
-    .unified-form :deep(.el-button--large) { --el-button-size-height: 36px; }
-    .unified-form :deep(.el-textarea__inner) { min-height: 110px; }
+    .unified-form :deep(.el-input__wrapper) {
+        padding: 0 10px;
+    }
 
-    .form-section { margin-bottom: 14px; }
-    .form-section:not(:last-child) { padding-bottom: 12px; }
-    .section-title { margin-bottom: 8px; font-size: 13px; }
+    .unified-form :deep(.el-button--large) {
+        --el-button-size-height: 36px;
+    }
 
-    .preview-image { height: 42vh; }
+    .unified-form :deep(.el-textarea__inner) {
+        min-height: 110px;
+    }
+
+    .form-section {
+        margin-bottom: 14px;
+    }
+
+    .form-section:not(:last-child) {
+        padding-bottom: 12px;
+    }
+
+    .section-title {
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+
+    .preview-image {
+        height: 42vh;
+    }
 }
 
 @media (max-width: 520px) {
-    .subtitle { display: none; }
-    .preview-title { padding: 8px 10px; }
-    .preview-body { padding: 10px; }
+    .subtitle {
+        display: none;
+    }
+
+    .preview-title {
+        padding: 8px 10px;
+    }
+
+    .preview-body {
+        padding: 10px;
+    }
 }
 </style>
