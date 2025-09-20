@@ -381,8 +381,12 @@ const submitCategory = async () => {
     try {
         await categoryFormRef.value.validate();
         categorySubmitting.value = true;
-        const payload = { categoryName: categoryForm.value.categoryName?.trim() };
-        if (categoryForm.value.id) {
+        const isEdit = Boolean(categoryForm.value.id);
+        const payload = {
+            categoryName: categoryForm.value.categoryName?.trim(),
+            ...(isEdit ? { id: categoryForm.value.id } : {}),
+        };
+        if (isEdit) {
             await updatePromptCategoryService(categoryForm.value.id, payload);
         } else {
             await createPromptCategoryService(payload);
@@ -440,11 +444,13 @@ const submitPrompt = async () => {
     try {
         await promptFormRef.value.validate();
         promptSubmitting.value = true;
+        const isEdit = Boolean(promptForm.value.id);
         const payload = {
             content: promptForm.value.content?.trim(),
             categoryId: promptForm.value.categoryId,
+            ...(isEdit ? { id: promptForm.value.id } : {}),
         };
-        if (promptForm.value.id) {
+        if (isEdit) {
             await updateSavedPromptService(promptForm.value.id, payload);
         } else {
             await createSavedPromptService(payload);
