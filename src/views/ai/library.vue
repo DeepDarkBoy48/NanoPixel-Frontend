@@ -45,10 +45,26 @@
                         </el-button>
                         <el-button size="small" class="detail-btn" @click.stop="goToDetail(item)">查看详情</el-button>
                     </div>
-                    <div class="card-media" :class="{ switching: item._switching }">
+                    <div
+                        class="card-media"
+                        :class="{ switching: item._switching }"
+                        @click="goToDetail(item)"
+                        role="button"
+                        :aria-label="`查看 ${item.username || item.userName || ''} 的作品详情`"
+                        tabindex="0"
+                        @keydown.enter.prevent="goToDetail(item)"
+                        @keydown.space.prevent="goToDetail(item)"
+                    >
                         <span v-if="isVideo(item._displayUrl)" class="badge">视频</span>
-                        <video v-if="isVideo(item._displayUrl)" :src="item._displayUrl" autoplay loop muted playsinline
-                            class="media"></video>
+                        <video
+                            v-if="isVideo(item._displayUrl)"
+                            :src="item._displayUrl"
+                            autoplay
+                            loop
+                            muted
+                            playsinline
+                            class="media"
+                        ></video>
                         <el-image v-else :src="item._displayUrl" fit="cover" class="media" lazy />
                     </div>
                     <div class="card-body">
@@ -619,6 +635,8 @@ onMounted(() => {
     position: relative;
     overflow: hidden;
     /* No border needed here, card has border */
+    cursor: pointer;
+    outline: none;
 }
 
 .card-media::after {
@@ -638,6 +656,10 @@ onMounted(() => {
     transition: opacity 0.3s ease;
     pointer-events: none;
     z-index: 2;
+}
+
+.card-media:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--el-color-primary) 45%, transparent);
 }
 
 .card:hover .card-media::after {
