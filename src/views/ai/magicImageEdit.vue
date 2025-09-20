@@ -139,7 +139,7 @@ const promptDropdownOptions = computed(() => {
 
 const buildPromptLabel = (text = '') => {
     const plain = String(text)
-    return plain.length > 40 ? `${plain.slice(0, 40)}…` : plain
+    return plain.length > 20 ? `${plain.slice(0, 20)}…` : plain
 }
 
 const fetchPromptOptions = async (categoryId) => {
