@@ -77,23 +77,42 @@
                                         placeholder="请选择上方模版/预设，或直接在此处输入提示词" clearable />
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-upload ref="uploaderRef" class="uploader" :auto-upload="false" :limit="1"
-                                        :show-file-list="true" :on-change="handleFileChange"
-                                        :on-remove="handleFileRemove" :on-exceed="handleFileExceed"
-                                        :file-list="fileList" accept="image/*">
-                                        <el-button type="primary">选择图片</el-button>
-                                        <template #tip>
-                                            <div class="el-upload__tip">仅支持单张图片，建议不超过 10MB</div>
-                                        </template>
-                                    </el-upload>
+                                    <div class="upload-section">
+                                        <el-upload ref="uploaderRef" class="uploader" :auto-upload="false" :limit="1"
+                                            :show-file-list="false" :on-change="handleFileChange"
+                                            :on-remove="handleFileRemove" :on-exceed="handleFileExceed"
+                                            :file-list="fileList" accept="image/*">
+                                            <el-button type="primary" size="large" class="upload-btn">
+                                                <el-icon class="upload-icon">
+                                                    <PictureFilled />
+                                                </el-icon>
+                                                选择图片
+                                            </el-button>
+                                        </el-upload>
+                                        <div v-if="fileList.length" class="uploader-preview" role="list">
+                                            <div class="uploader-preview__item" role="listitem">
+                                                <el-icon class="uploader-preview__icon">
+                                                    <PictureFilled />
+                                                </el-icon>
+                                                <span class="uploader-preview__name">{{ displayFileNameShort }}</span>
+                                                <el-button link type="danger" class="uploader-preview__remove"
+                                                    @click="handleManualRemove">
+                                                    移除
+                                                </el-button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </el-form-item>
                                 <el-form-item class="button-group">
-                                    <el-button type="primary" size="large" :disabled="!canSubmit || submitting"
-                                        :loading="submitting" @click="onSubmit" class="magic-submit-btn">
-                                        <span v-if="!submitting">✨ 开始魔法修图</span>
-                                        <span v-else>🎨 魔法进行中...</span>
-                                    </el-button>
-                                    <el-button @click="onReset" :disabled="submitting" class="reset-btn">重置</el-button>
+                                    <div class="action-buttons">
+                                        <el-button type="primary" size="large" :disabled="!canSubmit || submitting"
+                                            :loading="submitting" @click="onSubmit" class="magic-submit-btn">
+                                            <span v-if="!submitting">✨ 开始魔法修图</span>
+                                            <span v-else>🎨 魔法进行中...</span>
+                                        </el-button>
+                                        <el-button @click="onReset" :disabled="submitting" class="reset-btn"
+                                            size="large">重置</el-button>
+                                    </div>
                                 </el-form-item>
                             </div>
                         </el-form>
@@ -148,6 +167,7 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { PictureFilled } from '@element-plus/icons-vue'
 import { imageEditService, listPromptCategoriesService, listSavedPromptsService } from '@/api/ai'
 
 const guideCollapsed = ref(false)
@@ -281,6 +301,16 @@ const canSubmit = computed(() => {
     return !!selectedFile.value && !!prompt.value.trim()
 })
 
+const displayFileNameShort = computed(() => {
+    const name = selectedFile.value?.name
+    if (!name) return ''
+    const index = name.lastIndexOf('.')
+    const base = index !== -1 ? name.slice(0, index) : name
+    const ext = index !== -1 ? name.slice(index + 1) : ''
+    const truncated = base.slice(0, 10)
+    return ext ? `${truncated}.${ext}` : truncated
+})
+
 const handleFileChange = (uploadFile, uploadFiles) => {
     selectedFile.value = uploadFile?.raw || null
     fileList.value = uploadFiles.slice(-1)
@@ -292,6 +322,14 @@ const handleFileRemove = () => {
     selectedFile.value = null
     fileList.value = []
     previewUrl.value = ''
+}
+
+const handleManualRemove = () => {
+    const upload = uploaderRef.value
+    if (upload && typeof upload.clearFiles === 'function') {
+        upload.clearFiles()
+    }
+    handleFileRemove()
 }
 
 const handleFileExceed = (files) => {
@@ -476,15 +514,19 @@ onMounted(() => {
 }
 
 .unified-form .el-form-item {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.unified-form .el-form-item:last-child {
+    margin-bottom: 0;
 }
 
 .form-section {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .form-section:not(:last-child) {
-    padding-bottom: 20px;
+    padding-bottom: 24px;
     border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
@@ -497,8 +539,137 @@ onMounted(() => {
 }
 
 
-.uploader :deep(.el-upload) {
+/* 上传区域样式 */
+.upload-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.upload-btn {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+/* 光明模式上传按钮 */
+html:not([data-theme="dark"]) .upload-btn {
+    background: linear-gradient(135deg, #2D3748, #4A5568) !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 12px rgba(45, 55, 72, 0.15);
+    color: #FFFFFF !important;
+}
+
+html:not([data-theme="dark"]) .upload-btn:hover {
+    background: linear-gradient(135deg, #1A202C, #2D3748) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(45, 55, 72, 0.25);
+}
+
+/* 黑暗模式上传按钮 */
+html[data-theme="dark"] .upload-btn {
+    background: linear-gradient(135deg, #F7FAFC, #EDF2F7) !important;
+    border: 1px solid #4A5568 !important;
+    box-shadow: 0 4px 12px rgba(247, 250, 252, 0.1);
+    color: #2D3748 !important;
+}
+
+html[data-theme="dark"] .upload-btn:hover {
+    background: linear-gradient(135deg, #FFFFFF, #F7FAFC) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(247, 250, 252, 0.2);
+}
+
+.upload-icon {
     margin-right: 8px;
+}
+
+.uploader :deep(.el-upload) {
+    width: 100%;
+}
+
+.uploader-preview {
+    margin-top: 0;
+}
+
+.uploader-preview__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 8px;
+    background: var(--app-surface);
+}
+
+.uploader-preview__icon {
+    color: var(--el-color-primary);
+}
+
+.uploader-preview__name {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    color: var(--el-text-color-primary);
+}
+
+.uploader-preview__remove {
+    flex-shrink: 0;
+    padding: 0;
+}
+
+/* 按钮组样式 */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.action-buttons .el-button {
+    flex: 1;
+    min-height: 44px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* 重置按钮样式 */
+.reset-btn {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+/* 光明模式重置按钮 */
+html:not([data-theme="dark"]) .reset-btn {
+    background: #F7FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    color: #4A5568 !important;
+    box-shadow: 0 2px 8px rgba(74, 85, 104, 0.1);
+}
+
+html:not([data-theme="dark"]) .reset-btn:hover {
+    background: #EDF2F7 !important;
+    border-color: #CBD5E0 !important;
+    color: #2D3748 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 85, 104, 0.15);
+}
+
+/* 黑暗模式重置按钮 */
+html[data-theme="dark"] .reset-btn {
+    background: #4A5568 !important;
+    border: 1px solid #2D3748 !important;
+    color: #E2E8F0 !important;
+    box-shadow: 0 2px 8px rgba(74, 85, 104, 0.2);
+}
+
+html[data-theme="dark"] .reset-btn:hover {
+    background: #2D3748 !important;
+    border-color: #1A202C !important;
+    color: #F7FAFC !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
 }
 
 .right {
@@ -508,7 +679,7 @@ onMounted(() => {
 .preview-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 20px;
 }
 
 .preview-card {
@@ -546,16 +717,18 @@ onMounted(() => {
 }
 
 .preview-title {
-    padding: 10px 12px;
+    padding: 14px 16px;
     font-weight: 600;
+    font-size: 15px;
     background: var(--app-surface-2);
     border-bottom: 1px solid var(--el-border-color);
+    color: var(--el-text-color-primary);
 }
 
 .preview-body {
     position: relative;
-    padding: 12px;
-    min-height: 280px;
+    padding: 16px;
+    min-height: 300px;
 }
 
 .preview-image {
@@ -905,8 +1078,7 @@ onMounted(() => {
 .magic-submit-btn {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(45deg, #4F46E5, #7C3AED) !important;
-    border: none !important;
+    border-radius: 10px;
     transition: all 0.3s ease !important;
 }
 
@@ -917,7 +1089,7 @@ onMounted(() => {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
     transition: left 0.5s ease;
 }
 
@@ -925,37 +1097,78 @@ onMounted(() => {
     left: 100%;
 }
 
-.magic-submit-btn:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4) !important;
-}
-
 .magic-submit-btn:active {
     transform: scale(0.98) !important;
 }
 
-.magic-submit-btn.is-loading {
-    background: linear-gradient(45deg, #EC4899, #F59E0B) !important;
+/* 光明模式魔法按钮 */
+html:not([data-theme="dark"]) .magic-submit-btn {
+    background: linear-gradient(135deg, #6B46C1, #8B5CF6) !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 12px rgba(107, 70, 193, 0.2);
+    color: #FFFFFF !important;
+}
+
+html:not([data-theme="dark"]) .magic-submit-btn:hover {
+    background: linear-gradient(135deg, #553C9A, #6B46C1) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(107, 70, 193, 0.3) !important;
+}
+
+html:not([data-theme="dark"]) .magic-submit-btn.is-loading {
+    background: linear-gradient(135deg, #D69E2E, #ED8936) !important;
     animation: button-pulse 1.5s ease-in-out infinite !important;
 }
 
+/* 黑暗模式魔法按钮 */
+html[data-theme="dark"] .magic-submit-btn {
+    background: linear-gradient(135deg, #E6FFFA, #B2F5EA) !important;
+    border: 1px solid #4A5568 !important;
+    box-shadow: 0 4px 12px rgba(230, 255, 250, 0.1);
+    color: #2D3748 !important;
+}
+
+html[data-theme="dark"] .magic-submit-btn:hover {
+    background: linear-gradient(135deg, #FFFFFF, #E6FFFA) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(230, 255, 250, 0.2) !important;
+}
+
+html[data-theme="dark"] .magic-submit-btn.is-loading {
+    background: linear-gradient(135deg, #FFF5F5, #FED7D7) !important;
+    animation: button-pulse 1.5s ease-in-out infinite !important;
+}
+
+/* 光明模式动画 */
 @keyframes button-pulse {
 
     0%,
     100% {
-        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+        box-shadow: 0 0 0 0 rgba(214, 158, 46, 0.7);
     }
 
     50% {
-        box-shadow: 0 0 0 10px rgba(236, 72, 153, 0);
+        box-shadow: 0 0 0 10px rgba(214, 158, 46, 0);
     }
 }
 
-/* 重置按钮样式 */
-.reset-btn:hover {
-    transform: translateY(-1px);
-    transition: all 0.3s ease;
+/* 黑暗模式动画 */
+html[data-theme="dark"] .magic-submit-btn.is-loading {
+    animation: button-pulse-dark 1.5s ease-in-out infinite !important;
 }
+
+@keyframes button-pulse-dark {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(254, 215, 215, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 0 10px rgba(254, 215, 215, 0);
+    }
+}
+
 
 
 /* 响应式 */
@@ -1030,14 +1243,30 @@ onMounted(() => {
         gap: 8px;
     }
 
-    /* 按钮组在手机端保持横向排列 */
-    .unified-form .button-group :deep(.el-form-item__content) {
-        flex-direction: row !important;
-        align-items: center;
+    /* 上传区域移动端优化 */
+    .upload-section {
         gap: 8px;
     }
 
-    .unified-form .button-group :deep(.el-button) {
+    .upload-btn {
+        min-height: 40px;
+        font-size: 14px;
+    }
+
+    /* 按钮组在手机端保持横向排列 */
+    .unified-form .button-group :deep(.el-form-item__content) {
+        flex-direction: row !important;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .action-buttons {
+        gap: 8px;
+    }
+
+    .action-buttons .el-button {
+        min-height: 40px;
+        font-size: 14px;
         flex: 1;
         min-width: 0;
     }
@@ -1086,11 +1315,17 @@ onMounted(() => {
     }
 
     .preview-title {
-        padding: 8px 10px;
+        padding: 12px 14px;
+        font-size: 14px;
     }
 
     .preview-body {
-        padding: 10px;
+        padding: 14px;
+        min-height: 250px;
+    }
+
+    .preview-grid {
+        gap: 12px;
     }
 }
 </style>
