@@ -1,6 +1,6 @@
 <template>
     <div class="page-container">
-        <div class="guide-banner" :class="{ 'is-collapsed': guideCollapsed }">
+        <!-- <div class="guide-banner" :class="{ 'is-collapsed': guideCollapsed }">
             <span class="guide-badge">提示</span>
             <div class="guide-content">
                 <div class="guide-title">如何使用魔法修图</div>
@@ -15,13 +15,13 @@
                 <el-button size="small" link @click="guideCollapsed = !guideCollapsed">{{ guideCollapsed ? '展开提示' :
                     '收起提示' }}</el-button>
             </div>
-        </div>
+        </div> -->
         <el-card class="card" shadow="never">
             <template #header>
                 <div class="header">
                     <div class="title">
                         <span>魔法修图</span>
-                        <span class="subtitle">智能编辑 · 更清晰 · 去背景</span>
+                        <span class="subtitle">生成的图片会保存到「我的图集」，可随时发布到灵感库。</span>
                     </div>
                 </div>
             </template>
@@ -31,7 +31,7 @@
                     <div class="unified-form form">
                         <el-form>
                             <div class="form-section">
-                                <h4 class="section-title">模板选择（可选）</h4>
+                                <h4 class="section-title">模板选择（可选，提示词管理页面中可自定义模版）</h4>
                                 <el-form-item>
                                     <el-select v-model="selectedPromptCategoryId" placeholder="请选择分类"
                                         style="width: 100%" size="large" :loading="promptCategoriesLoading"
@@ -41,7 +41,7 @@
                                             <div class="category-option">
                                                 <span class="category-option__name" :title="item.categoryName">{{
                                                     item.categoryName
-                                                    }}</span>
+                                                }}</span>
                                                 <span class="category-option__count">{{ item.promptCount ?? 0 }}
                                                     个模版</span>
                                             </div>
@@ -64,7 +64,7 @@
                             </div>
 
                             <div class="form-section">
-                                <h4 class="section-title">参数配置</h4>
+                                <h4 class="section-title">选择模型并输入提示词（必填）</h4>
                                 <el-form-item>
                                     <el-select v-model="selectedModel" placeholder="选择模型" size="large"
                                         style="width: 100%">

@@ -292,7 +292,7 @@ const activeMenu = computed(() => {
                         <el-icon>
                             <EditPen />
                         </el-icon>
-                        <span class="menu-label">Prompt管理</span>
+                        <span class="menu-label">提示词管理</span>
                     </el-menu-item>
                     <!-- <el-menu-item index="/ai/canvas">
                         <el-icon>
