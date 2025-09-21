@@ -1,5 +1,21 @@
 <template>
     <div class="page-container">
+        <div class="guide-banner" :class="{ 'is-collapsed': guideCollapsed }">
+            <span class="guide-badge">提示</span>
+            <div class="guide-content">
+                <div class="guide-title">如何使用魔法修图</div>
+                <ul class="guide-steps">
+                    <li>提交后通常 20~40 秒生成结果，期间请保持页面打开。</li>
+                    <li>生成的图片会保存到「我的作品」，可随时发布到灵感库。</li>
+                    <li>模版内容可去prompt管理页面中自定义。</li>
+                </ul>
+            </div>
+            <div class="guide-actions">
+                <el-button size="small" type="primary" plain @click="goToHistory">查看我的作品</el-button>
+                <el-button size="small" link @click="guideCollapsed = !guideCollapsed">{{ guideCollapsed ? '展开提示' :
+                    '收起提示' }}</el-button>
+            </div>
+        </div>
         <el-card class="card" shadow="never">
             <template #header>
                 <div class="header">
@@ -15,7 +31,7 @@
                     <div class="unified-form form">
                         <el-form>
                             <div class="form-section">
-                                <h4 class="section-title">模板选择</h4>
+                                <h4 class="section-title">模板选择（可选）</h4>
                                 <el-form-item>
                                     <el-select v-model="selectedPromptCategoryId" placeholder="请选择分类"
                                         style="width: 100%" size="large" :loading="promptCategoriesLoading"
@@ -73,8 +89,11 @@
                                 </el-form-item>
                                 <el-form-item class="button-group">
                                     <el-button type="primary" size="large" :disabled="!canSubmit || submitting"
-                                        :loading="submitting" @click="onSubmit">提交</el-button>
-                                    <el-button @click="onReset" :disabled="submitting">重置</el-button>
+                                        :loading="submitting" @click="onSubmit" class="magic-submit-btn">
+                                        <span v-if="!submitting">✨ 开始魔法修图</span>
+                                        <span v-else>🎨 魔法进行中...</span>
+                                    </el-button>
+                                    <el-button @click="onReset" :disabled="submitting" class="reset-btn">重置</el-button>
                                 </el-form-item>
                             </div>
                         </el-form>
@@ -95,13 +114,25 @@
                             <div class="preview-title">生成结果</div>
                             <div class="preview-body">
                                 <el-empty v-if="!resultUrl" description="提交后查看生成结果" />
-                                <el-image v-if="resultUrl" :src="resultUrl" fit="contain" class="preview-image"
-                                    :preview-src-list="[resultUrl]" preview-teleported hide-on-click-modal />
+                                <el-image v-if="resultUrl" :src="resultUrl" fit="contain"
+                                    class="preview-image result-image-animate" :preview-src-list="[resultUrl]"
+                                    preview-teleported hide-on-click-modal />
                                 <div v-if="submitting" class="generation-loading">
-                                    <div class="generation-spinner" aria-hidden="true"></div>
+                                    <!-- 多层炫酷加载动画 -->
+                                    <div class="magic-loader">
+                                        <div class="loader-outer-ring"></div>
+                                        <div class="loader-middle-ring"></div>
+                                        <div class="loader-inner-core"></div>
+                                        <div class="loader-particles">
+                                            <span v-for="i in 8" :key="i" class="particle" :style="`--i: ${i}`"></span>
+                                        </div>
+                                    </div>
                                     <div class="generation-text" aria-live="polite">
-                                        <strong>正在生成…</strong>
-                                        <span>预计耗时约30秒，请耐心等待</span>
+                                        <strong class="pulsing-text">✨ 魔法修图中...</strong>
+                                        <span class="loading-dots">预计耗时约30秒，请耐心等待</span>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -115,10 +146,18 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { imageEditService, listPromptCategoriesService, listSavedPromptsService } from '@/api/ai'
 
+const guideCollapsed = ref(false)
 const prompt = ref('')
+
+const router = useRouter()
+
+const goToHistory = () => {
+    router.push('/ai/magicImageEdit/history')
+}
 
 // Prompt 分类与模版
 const promptCategories = ref([])
@@ -321,6 +360,73 @@ onMounted(() => {
     box-sizing: border-box;
 }
 
+.guide-banner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid var(--el-border-color-lighter);
+    background: color-mix(in srgb, var(--el-color-primary-light-9) 70%, #fff 30%);
+    border-left: 4px solid var(--el-color-primary-light-5);
+    border-radius: 12px;
+}
+
+.guide-badge {
+    font-size: 12px;
+    color: #fff;
+    background: var(--el-color-primary);
+    border-radius: 6px;
+    padding: 2px 8px;
+}
+
+.guide-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.guide-title {
+    font-weight: 600;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.guide-steps {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--el-text-color-secondary);
+    line-height: 1.6;
+    list-style: disc;
+}
+
+.guide-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.guide-banner.is-collapsed .guide-content {
+    display: none;
+}
+
+.guide-banner.is-collapsed {
+    background: color-mix(in srgb, var(--app-surface-2, #f6f7f9) 85%, #fff 15%);
+}
+
+@media (max-width: 576px) {
+    .guide-banner {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+    }
+
+    .guide-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        margin-top: 6px;
+    }
+}
+
 .card {
     width: 100%;
     border-radius: 12px;
@@ -411,6 +517,32 @@ onMounted(() => {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.preview-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(64, 158, 255, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.preview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: rgba(64, 158, 255, 0.3);
+}
+
+.preview-card:hover::before {
+    opacity: 1;
 }
 
 .preview-title {
@@ -432,11 +564,25 @@ onMounted(() => {
     max-height: 70vh;
     display: block;
     border-radius: 6px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.preview-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* ensure inner img fits container properly */
 .preview-image :deep(img) {
     object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.preview-image:hover :deep(img) {
+    filter: brightness(1.05) contrast(1.05);
 }
 
 
@@ -479,6 +625,7 @@ onMounted(() => {
     justify-content: center;
 }
 
+/* 炫酷加载动画效果 */
 .generation-loading {
     position: absolute;
     inset: 12px;
@@ -486,40 +633,328 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(64, 158, 255, 0.25);
-    border-radius: 8px;
-    backdrop-filter: blur(2px);
+    gap: 20px;
+    background: linear-gradient(135deg,
+            rgba(64, 158, 255, 0.1) 0%,
+            rgba(147, 51, 234, 0.1) 50%,
+            rgba(245, 101, 101, 0.1) 100%);
+    border: 2px solid rgba(64, 158, 255, 0.3);
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    box-shadow:
+        0 8px 32px rgba(64, 158, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     z-index: 5;
+    animation: loading-glow 2s ease-in-out infinite alternate;
 }
 
-.generation-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(64, 158, 255, 0.2);
-    border-top-color: var(--el-color-primary);
+@keyframes loading-glow {
+    0% {
+        box-shadow:
+            0 8px 32px rgba(64, 158, 255, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    100% {
+        box-shadow:
+            0 12px 40px rgba(64, 158, 255, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+}
+
+/* 魔法加载器 */
+.magic-loader {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader-outer-ring {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 3px solid transparent;
+    border-top: 3px solid #4F46E5;
+    border-right: 3px solid #7C3AED;
     border-radius: 50%;
-    animation: generation-spin 0.9s linear infinite;
+    animation: magic-spin-outer 2s linear infinite;
 }
 
+.loader-middle-ring {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border: 2px solid transparent;
+    border-left: 2px solid #EC4899;
+    border-bottom: 2px solid #F59E0B;
+    border-radius: 50%;
+    animation: magic-spin-middle 1.5s linear infinite reverse;
+}
+
+.loader-inner-core {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, #4F46E5, #7C3AED, #EC4899, #F59E0B);
+    border-radius: 50%;
+    animation: magic-pulse 1s ease-in-out infinite alternate;
+}
+
+.loader-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.particle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(45deg, #4F46E5, #EC4899);
+    border-radius: 50%;
+    transform-origin: 0 0;
+    animation: magic-particles 2s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.2s);
+}
+
+@keyframes magic-spin-outer {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes magic-spin-middle {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+@keyframes magic-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
+    }
+
+    100% {
+        transform: scale(1.2);
+        box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+    }
+}
+
+@keyframes magic-particles {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateY(-30px) scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translateY(-50px) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 加载文字效果 */
 .generation-text {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     font-size: 14px;
     color: var(--el-text-color-secondary);
 }
 
-.generation-text strong {
-    color: var(--el-text-color-primary);
+.pulsing-text {
+    color: #4F46E5;
+    font-size: 16px;
+    font-weight: 600;
+    animation: text-pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes generation-spin {
-    to {
-        transform: rotate(360deg);
+.loading-dots {
+    position: relative;
+    animation: loading-dots-animation 1.5s ease-in-out infinite;
+}
+
+.loading-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes text-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        text-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
     }
+
+    50% {
+        transform: scale(1.05);
+        text-shadow: 0 0 20px rgba(79, 70, 229, 0.6);
+    }
+}
+
+@keyframes loading-dots-animation {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes dots {
+
+    0%,
+    20% {
+        content: '';
+    }
+
+    40% {
+        content: '.';
+    }
+
+    60% {
+        content: '..';
+    }
+
+    80%,
+    100% {
+        content: '...';
+    }
+}
+
+/* 进度条 */
+.progress-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4F46E5, #7C3AED, #EC4899, #F59E0B);
+    background-size: 200% 100%;
+    border-radius: 2px;
+    animation: progress-animation 3s ease-in-out infinite;
+}
+
+@keyframes progress-animation {
+    0% {
+        transform: translateX(-100%);
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        transform: translateX(100%);
+        background-position: 0% 50%;
+    }
+}
+
+/* 生成结果图片动画 */
+.result-image-animate {
+    animation: result-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes result-appear {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-10deg);
+        filter: blur(10px);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1) rotate(2deg);
+        filter: blur(2px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+        filter: blur(0px);
+    }
+}
+
+/* 魔法提交按钮样式 */
+.magic-submit-btn {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #4F46E5, #7C3AED) !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.magic-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.magic-submit-btn:hover::before {
+    left: 100%;
+}
+
+.magic-submit-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4) !important;
+}
+
+.magic-submit-btn:active {
+    transform: scale(0.98) !important;
+}
+
+.magic-submit-btn.is-loading {
+    background: linear-gradient(45deg, #EC4899, #F59E0B) !important;
+    animation: button-pulse 1.5s ease-in-out infinite !important;
+}
+
+@keyframes button-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 0 10px rgba(236, 72, 153, 0);
+    }
+}
+
+/* 重置按钮样式 */
+.reset-btn:hover {
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
 }
 
 

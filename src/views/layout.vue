@@ -175,7 +175,7 @@ const activeMenu = computed(() => {
                         <el-icon>
                             <EditPen />
                         </el-icon>
-                        <span class="menu-label">Prompt管理</span>
+                        <span class="menu-label">提示词管理</span>
                     </el-menu-item>
                     <!-- <el-menu-item index="/ai/canvas">
                         <el-icon>
@@ -375,12 +375,8 @@ const activeMenu = computed(() => {
             <!-- 头部区域 -->
             <el-header>
                 <div class="header-left">
-                    <el-icon
-                        @click="handleMenuClick"
-                        class="header-icon"
-                        role="button"
-                        :aria-label="isMobile ? (drawerVisible ? '关闭菜单' : '打开菜单') : (isCollapse ? '展开侧边栏' : '折叠侧边栏')"
-                    >
+                    <el-icon @click="handleMenuClick" class="header-icon" role="button"
+                        :aria-label="isMobile ? (drawerVisible ? '关闭菜单' : '打开菜单') : (isCollapse ? '展开侧边栏' : '折叠侧边栏')">
                         <template v-if="isMobile">
                             <span class="hamburger-icon" :class="{ 'is-open': drawerVisible }"></span>
                         </template>
@@ -578,8 +574,13 @@ const activeMenu = computed(() => {
                     border-radius: 2px;
                 }
 
-                .hamburger-icon::before { top: -6px; }
-                .hamburger-icon::after { top: 6px; }
+                .hamburger-icon::before {
+                    top: -6px;
+                }
+
+                .hamburger-icon::after {
+                    top: 6px;
+                }
             }
         }
 

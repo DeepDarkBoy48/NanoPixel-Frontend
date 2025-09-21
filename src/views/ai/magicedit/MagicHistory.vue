@@ -1,6 +1,21 @@
 <template>
   <div>
     <div class="history-page">
+      <div class="guide-banner" :class="{ 'is-collapsed': guideCollapsed }">
+        <span class="guide-badge">提示</span>
+        <div class="guide-content">
+          <div class="guide-title">快速了解作品与灵感库</div>
+          <ul class="guide-steps">
+            <li>点击作品右侧的发布开关即可同步到灵感库展示给更多人。</li>
+            <li>点击作品图片或详情按钮可以打开抽屉查看大图与提示词。</li>
+          </ul>
+        </div>
+        <div class="guide-actions">
+          <el-button size="small" type="primary" plain @click="goToInspiration">打开灵感库</el-button>
+          <el-button size="small" link @click="guideCollapsed = !guideCollapsed">{{ guideCollapsed ? '展开提示' : '收起提示'
+            }}</el-button>
+        </div>
+      </div>
       <div class="list-panel">
         <div class="toolbar">
           <h2 class="title">我的作品</h2>
@@ -40,7 +55,8 @@
           <div class="list-container">
             <div class="list-item" :class="{ selected: item.id === selectedItem?.id }" v-for="item in mediaList"
               :key="item.id ?? item.createtime">
-              <div class="list-thumb-wrap">
+              <div class="list-thumb-wrap" role="button" tabindex="0" @click="openDetails(item)"
+                @keydown.enter.prevent="openDetails(item)" @keydown.space.prevent="openDetails(item)">
                 <el-image :src="item._displayUrl" fit="cover" class="list-thumb" lazy />
               </div>
               <div class="list-content">
@@ -48,7 +64,7 @@
                 <div class="meta">
                   <div class="meta-left">
                     <el-tag size="small" :type="item.isPublic ? 'success' : 'info'" effect="plain">
-                      {{ item.isPublic ? '公开' : '私密' }}
+                      {{ item.isPublic ? '已发布·灵感库' : '未发布' }}
                     </el-tag>
                     <el-tag v-if="item.model" size="small" type="info" effect="plain" class="model-tag">
                       {{ item.model }}
@@ -56,7 +72,9 @@
                   </div>
                   <div class="meta-right">
                     <span class="review-count" title="评论数" @click.stop="openDetails(item)" role="button">
-                      <el-icon class="review-icon"><ChatDotRound /></el-icon>
+                      <el-icon class="review-icon">
+                        <ChatDotRound />
+                      </el-icon>
                       {{ item.reviewcount ?? 0 }}
                       <span v-if="(item.reviewcount ?? 0) > 5" class="hot-flag" aria-label="热议" title="热议">🔥</span>
                     </span>
@@ -64,15 +82,11 @@
                   </div>
                 </div>
                 <div class="list-actions">
-                  <el-switch
-                    :model-value="item.isPublic"
-                    inline-prompt
-                    size="small"
-                    active-text="公开"
-                    inactive-text="私密"
-                    :disabled="item._updating"
-                    @change="(val) => handleItemPublicChange(item, val)"
-                  />
+                  <div class="publish-toggle">
+                    <span>发布到灵感库</span>
+                    <el-switch :model-value="item.isPublic" inline-prompt size="small" active-text="是" inactive-text="否"
+                      :disabled="item._updating" @change="(val) => handleItemPublicChange(item, val)" />
+                  </div>
                   <el-button size="small" type="primary" plain @click="openDetails(item)">查看详情</el-button>
                 </div>
               </div>
@@ -181,9 +195,9 @@
           </section>
 
           <section class="publish-section">
-            <div class="publish-label">发布状态</div>
-            <el-switch v-model="selectedPublic" :active-text="'公开'" :inactive-text="'私密'" :loading="publishing"
-              @change="onTogglePublic" />
+            <div class="publish-label">发布到灵感库</div>
+            <el-switch v-model="selectedPublic" inline-prompt :active-text="'是'" :inactive-text="'否'"
+              :loading="publishing" @change="onTogglePublic" />
           </section>
         </div>
       </div>
@@ -193,11 +207,13 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getUserLibraryService, setMediaPublicService, getMediaByIdService } from '@/api/ai.js'
 import { formatDate } from '@/utils/format'
 import { ChatDotRound } from '@element-plus/icons-vue'
 
+const guideCollapsed = ref(false)
 const mediaList = ref([])
 const loading = ref(false)
 
@@ -214,6 +230,12 @@ const copying = ref(false)
 const isMobile = ref(false)
 const detailsDrawer = ref(false)
 const drawerSize = computed(() => (isMobile.value ? '95%' : '960px'))
+
+const router = useRouter()
+
+const goToInspiration = () => {
+  router.push('/ai/library')
+}
 
 const checkIsMobile = () => {
   isMobile.value = window.innerWidth < 768
@@ -329,8 +351,10 @@ const onTogglePublic = async (val) => {
     }
     const idx = mediaList.value.findIndex(m => m.id === drawerDetail.value.id)
     if (idx > -1) mediaList.value[idx].isPublic = !!val
+    ElMessage.success(val ? '已发布到灵感库' : '已取消灵感库发布')
   } catch (e) {
     selectedPublic.value = !val
+    ElMessage.error('更新发布状态失败')
   } finally {
     publishing.value = false
   }
@@ -353,9 +377,9 @@ const handleItemPublicChange = async (item, nextVal) => {
       drawerDetail.value.isPublic = target
       selectedPublic.value = target
     }
-    ElMessage.success(`已设置为${target ? '公开' : '私密'}`)
+    ElMessage.success(target ? '已发布到灵感库' : '已取消灵感库发布')
   } catch (e) {
-    ElMessage.error('更新公开状态失败')
+    ElMessage.error('更新发布状态失败')
   } finally {
     item._updating = false
   }
@@ -413,6 +437,72 @@ onBeforeUnmount(() => {
   gap: 12px;
 }
 
+.guide-banner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--el-border-color-lighter);
+  background: color-mix(in srgb, var(--el-color-primary-light-9) 70%, #fff 30%);
+  border-left: 4px solid var(--el-color-primary-light-5);
+  border-radius: 12px;
+}
+
+.guide-badge {
+  font-size: 12px;
+  color: #fff;
+  background: var(--el-color-primary);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guide-title {
+  font-weight: 600;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.guide-steps {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--el-text-color-secondary);
+  list-style: disc;
+  line-height: 1.6;
+}
+
+.guide-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.guide-banner.is-collapsed .guide-content {
+  display: none;
+}
+
+.guide-banner.is-collapsed {
+  background: color-mix(in srgb, var(--app-surface-2, #f6f7f9) 85%, #fff 15%);
+}
+
+@media (max-width: 576px) {
+  .guide-banner {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .guide-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+}
+
 /* 防止列表在小屏时出现横向溢出被裁切 */
 .list-panel {
   min-width: 0;
@@ -462,6 +552,12 @@ onBeforeUnmount(() => {
 
 .list-thumb-wrap {
   position: relative;
+  cursor: pointer;
+}
+
+.list-thumb-wrap:focus-visible {
+  outline: 2px solid var(--el-color-primary);
+  outline-offset: 2px;
 }
 
 .list-thumb {
@@ -509,6 +605,14 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.publish-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 /* 让右侧文字列在 grid 中可以正确缩小，不产生横向溢出 */

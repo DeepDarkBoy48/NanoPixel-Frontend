@@ -1,37 +1,34 @@
 <template>
     <div class="prompt-manager-page">
-        <div class="page-header">
-            <div class="page-header__row">
+
+        <!-- <div class="page-header__row">
                 <div class="page-header__titles">
                     <h2 class="page-title">Prompt 管理</h2>
                     <p class="page-subtitle">维护提示词与分类，支持增删改查</p>
                 </div>
-                <div class="page-header__actions">
-                    <el-button :icon="Refresh" @click="refreshAll" :loading="categoryLoading || promptsLoading">
-                        刷新
-                    </el-button>
-                </div>
-            </div>
+                
+            </div> -->
 
-            <!-- 使用指引：并入顶部卡片（始终显示） -->
-            <div class="guide-banner" :class="{ 'is-collapsed': guideCollapsed }">
-                <span class="guide-badge">指引</span>
-                <div class="guide-content">
-                    <div class="guide-title">先创建分类，再在该分类下编写一条条 Prompt。</div>
-                    <ul class="guide-steps">
-                        <li>点击「新建分类」创建一个分类；</li>
-                        <li>在左侧选择分类；</li>
-                        <li>右侧点击「新建 Prompt」填写提示词。</li>
-                    </ul>
-                </div>
-                <div class="guide-actions">
-                    <el-button v-show="!guideCollapsed" type="primary" size="small" :icon="Plus"
-                        @click="openCategoryDialog()">立即新建分类</el-button>
-                    <el-button size="small" link @click="guideCollapsed = !guideCollapsed">{{ guideCollapsed ? '展开' :
-                        '收起' }}</el-button>
-                </div>
+
+        <!-- 使用指引：并入顶部卡片（始终显示） -->
+        <div class="guide-banner" :class="{ 'is-collapsed': guideCollapsed }">
+            <span class="guide-badge">指引</span>
+            <div class="guide-content">
+                <div class="guide-title">先创建分类，再在该分类下编写一条条 Prompt。</div>
+                <ul class="guide-steps">
+                    <li>点击「新建分类」创建一个分类；</li>
+                    <li>在左侧选择分类；</li>
+                    <li>右侧点击「新建 Prompt」填写提示词。</li>
+                </ul>
+            </div>
+            <div class="guide-actions">
+                <el-button v-show="!guideCollapsed" type="primary" size="small" :icon="Plus"
+                    @click="openCategoryDialog()">立即新建分类</el-button>
+                <el-button size="small" link @click="guideCollapsed = !guideCollapsed">{{ guideCollapsed ? '展开' :
+                    '收起' }}</el-button>
             </div>
         </div>
+
 
         <el-row :gutter="16" class="content-row">
             <el-col :xs="24" :md="10">
@@ -153,14 +150,11 @@
             <el-form ref="promptFormRef" :model="promptForm" :rules="promptRules" label-width="90px">
                 <el-form-item label="所属分类" prop="categoryId">
                     <el-select v-model="promptForm.categoryId" placeholder="请选择分类" clearable class="category-select">
-                        <el-option
-                            v-for="item in categories"
-                            :key="item.id"
-                            :label="item.categoryName"
-                            :value="item.id"
-                        >
+                        <el-option v-for="item in categories" :key="item.id" :label="item.categoryName"
+                            :value="item.id">
                             <div class="select-option">
-                                <span class="select-option__name" :title="item.categoryName">{{ item.categoryName }}</span>
+                                <span class="select-option__name" :title="item.categoryName">{{ item.categoryName
+                                }}</span>
                                 <span class="select-option__count">{{ item.promptCount ?? 0 }} 个模版</span>
                             </div>
                         </el-option>

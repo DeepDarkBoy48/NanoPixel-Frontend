@@ -56,12 +56,12 @@ const connectWs = () => {
     isInitializing.value = true
 
     // 本地开发环境，直接连接后端
-    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = window.location.host;
-    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    // const host = window.location.host;
+    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -316,8 +316,30 @@ const sendMessage = () => {
     backdrop-filter: blur(20px);
     background: var(--chat-surface);
     border: 1px solid var(--chat-border);
-    border-radius: 0;
+    border-radius: 16px;
     box-shadow: 0 20px 80px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 渐变描边美化容器边框 */
+.chat-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.6),
+            rgba(79, 172, 254, 0.3),
+            rgba(139, 92, 246, 0.3),
+            rgba(255, 255, 255, 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .connection-status {
@@ -746,7 +768,7 @@ const sendMessage = () => {
 
 
 .bubble {
-    max-width: 80%;
+    max-width: 70%;
     border-radius: 20px;
     padding: 16px 20px;
     word-break: break-word;
@@ -816,6 +838,7 @@ const sendMessage = () => {
         mask-composite: exclude;
         opacity: 0.7;
         animation: selfBorderGlow 2s ease-in-out infinite alternate;
+        pointer-events: none;
     }
 
     // 内发光效果
@@ -863,6 +886,7 @@ const sendMessage = () => {
         mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         mask-composite: exclude;
         opacity: 0.6;
+        pointer-events: none;
     }
 }
 
@@ -1134,6 +1158,11 @@ const sendMessage = () => {
     .chat-container {
         border-radius: 0;
         border: none;
+        
+        /* 移动端不需要外层渐变描边 */
+        &::before {
+            display: none;
+        }
         height: 100vh;
         min-height: 500px;
     }
@@ -1177,7 +1206,7 @@ const sendMessage = () => {
         }
 
         .bubble {
-            max-width: 90%;
+            max-width: 88%;
             padding: 12px 14px;
             border-radius: 16px;
         }
@@ -1230,6 +1259,19 @@ const sendMessage = () => {
             font-size: 14px;
         }
     }
+}
+
+/* 强制允许聊天内容文本可选择（避免外层样式影响） */
+.message-list-scrollbar,
+.message-list-scrollbar :deep(.el-scrollbar__wrap),
+.message-list-scrollbar :deep(.el-scrollbar__view),
+.message-row,
+.bubble,
+.bubble .content {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 // 黑暗模式样式增强
