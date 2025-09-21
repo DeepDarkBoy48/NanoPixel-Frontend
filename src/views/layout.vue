@@ -513,8 +513,6 @@ const activeMenu = computed(() => {
 
         @media (max-width: 768px) {
             padding: 8px;
-            /* 将底部安全区并入滚动容器，避免始终露出空白 */
-            padding-bottom: calc(8px + env(safe-area-inset-bottom));
         }
     }
 
@@ -669,8 +667,9 @@ const activeMenu = computed(() => {
         overflow: hidden;
         /* 禁止整体横向滚动 */
         background: var(--app-main-bg);
-        /* 适配 iOS 安全区域：顶部交由 header 处理；
-           底部安全区转移到 .el-main，避免始终露出一块空白。 */
+        /* 适配 iOS 安全区域 */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
         padding-left: env(safe-area-inset-left);
         padding-right: env(safe-area-inset-right);
         box-sizing: border-box;
@@ -678,9 +677,7 @@ const activeMenu = computed(() => {
 
     .layout-container .el-header {
         position: sticky;
-        /* 头部自己承担顶部安全区内边距，避免双倍空白 */
-        top: 0;
-        padding-top: env(safe-area-inset-top);
+        top: env(safe-area-inset-top);
         z-index: 100;
         background: var(--app-header-bg);
     }
