@@ -2,6 +2,7 @@
 import { ChatDotRound } from '@element-plus/icons-vue'
 
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { ElImageViewer } from 'element-plus'
 import MarkdownIt from 'markdown-it'
 import DOMPurify from 'dompurify'
 // 导入用户信息存储
@@ -20,6 +21,38 @@ let ws = null;
 let heartbeatInterval = null;
 // El-scrollbar 组件引用
 const scrollbarRef = ref(null)
+
+// 深度搜索开关
+const deepSearch = ref(false)
+
+// 图片预览（点击放大）相关状态
+const imagePreviewVisible = ref(false)
+const imagePreviewUrls = ref([])
+const imagePreviewIndex = ref(0)
+
+const openImagePreview = (urls = [], index = 0) => {
+    if (!Array.isArray(urls) || urls.length === 0) return
+    imagePreviewUrls.value = urls
+    imagePreviewIndex.value = Math.max(0, Math.min(index, urls.length - 1))
+    imagePreviewVisible.value = true
+}
+
+const closeImagePreview = () => {
+    imagePreviewVisible.value = false
+}
+
+// 事件委托：捕获内容区 img 点击，打开预览
+const handleContentClick = (e) => {
+    const target = e.target
+    if (!target || target.tagName?.toLowerCase() !== 'img') return
+
+    // 找到同一条消息气泡中的所有图片，构建预览列表
+    const bubbleContent = target.closest('.bubble .content')
+    const imgs = bubbleContent ? Array.from(bubbleContent.querySelectorAll('img')) : [target]
+    const urls = imgs.map((img) => img.getAttribute('src')).filter(Boolean)
+    const index = imgs.findIndex((img) => img === target)
+    openImagePreview(urls, index >= 0 ? index : 0)
+}
 
 // 获取当前用户昵称，用于判断消息归属
 const currentUserName = computed(() => userInfo?.info?.nickname || '我')
@@ -56,12 +89,12 @@ const connectWs = () => {
     isInitializing.value = true
 
     // 本地开发环境，直接连接后端
-    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = window.location.host;
-    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    // const host = window.location.host;
+    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -129,6 +162,14 @@ onMounted(() => {
     } else {
         isInitializing.value = false
     }
+
+    // 绑定点击事件委托到滚动容器
+    nextTick(() => {
+        const wrap = scrollbarRef.value?.wrapRef
+        if (wrap) {
+            wrap.addEventListener('click', handleContentClick)
+        }
+    })
 })
 
 // 当用户信息在挂载后才可用时，等待 ID 后再发起连接
@@ -151,17 +192,38 @@ onBeforeUnmount(() => {
         clearInterval(heartbeatInterval)
         heartbeatInterval = null
     }
+
+    // 移除图片点击事件
+    const wrap = scrollbarRef.value?.wrapRef
+    if (wrap) {
+        wrap.removeEventListener('click', handleContentClick)
+    }
 })
 
 const sendMessage = () => {
-    if (!currentMessage.value.trim()) return
+    const raw = currentMessage.value.trim()
+    if (!raw) return
+
+    // 深度搜索开关：自动在消息前加上前缀
+    let textToSend = raw
+    if (deepSearch.value && !/^请搜索[:：]/.test(textToSend)) {
+        textToSend = `请搜索：${textToSend}`
+    }
 
     if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(currentMessage.value)
+        ws.send(textToSend)
         // 发送的消息会通过 WebSocket 回来，不需要手动添加到列表
         currentMessage.value = ''
     } else {
         console.log('连接未建立');
+    }
+}
+
+// 在输入框中按下回车发送，Shift+Enter 换行；中文输入法合成中不触发
+const handleInputKeydown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+        e.preventDefault()
+        sendMessage()
     }
 }
 </script>
@@ -217,14 +279,26 @@ const sendMessage = () => {
             </el-scrollbar>
 
             <div class="input-area">
-                <el-input v-model="currentMessage" class="msg-input" type="textarea" placeholder="输入消息，支持 @指令 ……"
-                    :autosize="{ minRows: 2, maxRows: 6 }" />
+                <el-input
+                    v-model="currentMessage"
+                    class="msg-input"
+                    type="textarea"
+                    placeholder="输入消息"
+                    :autosize="{ minRows: 2, maxRows: 6 }"
+                    @keydown="handleInputKeydown"
+                />
                 <div class="input-actions">
-                    <el-button type="primary" @click="sendMessage" @keyup.enter="sendMessage">发送</el-button>
+                    <el-switch v-model="deepSearch" class="deep-search-switch" inline-prompt active-text="网络搜索"
+                        inactive-text="网络搜索" />
+                    <el-button type="primary" @click="sendMessage">发送</el-button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- 图片预览（点击放大） -->
+    <ElImageViewer v-if="imagePreviewVisible" :url-list="imagePreviewUrls" :initial-index="imagePreviewIndex"
+        hide-on-click-modal teleported @close="closeImagePreview" />
 </template>
 
 
@@ -796,6 +870,20 @@ const sendMessage = () => {
             }
         }
 
+        // 图片样式：限制尺寸并自适应容器
+        :deep(img) {
+            display: block;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            max-height: 380px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin: 8px auto;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            cursor: zoom-in;
+        }
+
         :deep(code) {
             background: rgba(0, 0, 0, 0.1);
             padding: 2px 6px;
@@ -1064,16 +1152,35 @@ const sendMessage = () => {
 
 .input-actions {
     display: flex;
+    flex-direction: column;
     gap: 8px;
+    min-width: 120px;
+
+    .deep-search-switch {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        :deep(.el-switch__core) {
+            box-shadow: 0 2px 8px rgba(64, 158, 255, 0.25);
+        }
+
+        // 提高开关内文字对比度
+        :deep(.el-switch__core .el-switch__inner) {
+            color: #000 !important;
+            font-weight: 600;
+        }
+    }
 
     .el-button {
         border-radius: 12px;
-        padding: 12px 24px;
+        padding: 12px 20px;
         font-weight: 600;
         background: linear-gradient(135deg, var(--el-color-primary) 0%, #1d4ed8 100%);
         border: none;
         box-shadow: 0 4px 16px rgba(64, 158, 255, 0.3);
         transition: all 0.3s ease;
+        width: 100%;
 
         &:hover {
             transform: translateY(-2px);
@@ -1211,6 +1318,11 @@ const sendMessage = () => {
             padding: 12px 14px;
             border-radius: 16px;
         }
+
+        // 移动端进一步收敛图片高度
+        .bubble .content :deep(img) {
+            max-height: 260px;
+        }
     }
 
     .input-area {
@@ -1222,9 +1334,13 @@ const sendMessage = () => {
             padding: 8px 12px;
         }
 
-        .input-actions .el-button {
-            padding: 8px 16px;
-            border-radius: 10px;
+        .input-actions {
+            min-width: 100px;
+
+            .el-button {
+                padding: 8px 16px;
+                border-radius: 10px;
+            }
         }
     }
 

@@ -41,7 +41,7 @@
                                             <div class="category-option">
                                                 <span class="category-option__name" :title="item.categoryName">{{
                                                     item.categoryName
-                                                }}</span>
+                                                    }}</span>
                                                 <span class="category-option__count">{{ item.promptCount ?? 0 }}
                                                     个模版</span>
                                             </div>
