@@ -11,6 +11,8 @@ import useUserInfoStore from '@/store/userInfo'
 const messageList = ref([])
 //用于储存当前输入的消息
 const currentMessage = ref('')
+// AI 是否处于思考状态
+const isAiThinking = ref(false)
 //用于储存用户信息
 const userInfo = useUserInfoStore();
 // 加载状态：简单的加载动画控制
@@ -64,6 +66,9 @@ const getMessageType = (from) => {
     return 'other'
 }
 
+// 判断是否由 AI 相关消息发出的辅助方法
+const isAiSender = (from) => from === 'AI' || from === 'Think'
+
 // Markdown 渲染器
 const markdown = new MarkdownIt({
     html: false,
@@ -73,7 +78,7 @@ const markdown = new MarkdownIt({
 
 const renderMessageHtml = (msg) => {
     const text = typeof msg?.message === 'string' ? msg.message : ''
-    if (getMessageType(msg.from) === 'system' || msg.from === 'AI') {
+    if (getMessageType(msg.from) === 'system' || isAiSender(msg.from)) {
         // 系统消息按 Markdown 渲染，并做 XSS 清洗
         return DOMPurify.sanitize(markdown.render(text))
     }
@@ -89,12 +94,12 @@ const connectWs = () => {
     isInitializing.value = true
 
     // 本地开发环境，直接连接后端
-    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
-    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    // const host = window.location.host;
-    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = window.location.host;
+    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -120,7 +125,24 @@ const connectWs = () => {
                 return
             }
 
-            messageList.value.push(message)
+            if (message.from === 'AI') {
+                // 移除正在思考中的占位气泡
+                messageList.value = messageList.value.filter((item) => item.from !== 'Think')
+                isAiThinking.value = false
+            }
+
+            if (message.from === 'Think') {
+                // 只保留一条最新的思考提示
+                const existingIndex = messageList.value.findIndex((item) => item.from === 'Think')
+                if (existingIndex !== -1) {
+                    messageList.value.splice(existingIndex, 1, message)
+                } else {
+                    messageList.value.push(message)
+                }
+                isAiThinking.value = true
+            } else {
+                messageList.value.push(message)
+            }
 
             // 第一次收到消息时结束加载
             if (isInitializing.value) {
@@ -147,11 +169,13 @@ const connectWs = () => {
         heartbeatInterval = null
         ws = null
         isInitializing.value = false
+        isAiThinking.value = false
     }
 
     ws.onerror = (error) => {
         console.error('WebSocket连接错误:', error);
         isInitializing.value = false
+        isAiThinking.value = false
     }
 }
 
@@ -201,6 +225,10 @@ onBeforeUnmount(() => {
 })
 
 const sendMessage = () => {
+    if (isAiThinking.value) {
+        return
+    }
+
     const raw = currentMessage.value.trim()
     if (!raw) return
 
@@ -223,6 +251,9 @@ const sendMessage = () => {
 const handleInputKeydown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
         e.preventDefault()
+        if (isAiThinking.value) {
+            return
+        }
         sendMessage()
     }
 }
@@ -247,8 +278,9 @@ const handleInputKeydown = (e) => {
 
                     <!-- 头像显示在上方 -->
                     <div class="avatar-wrapper">
-                        <el-avatar class="avatar" :class="{ 'ai': msg.from === 'AI', 'system': msg.from === 'server' }"
-                            size="default" :src="getMessageType(msg.from) === 'self' ? userInfo.info.userPic : ''">
+                        <el-avatar class="avatar"
+                            :class="{ 'ai': isAiSender(msg.from), 'system': msg.from === 'server' }" size="default"
+                            :src="getMessageType(msg.from) === 'self' ? userInfo.info.userPic : ''">
                             {{ msg.from === 'server' ? '系' : (msg.from === 'AI' ? 'AI' : msg.from.charAt(0)) }}
                         </el-avatar>
                         <span class="user-name">{{ msg.from === 'server' ? '系统' : msg.from }}</span>
@@ -256,7 +288,7 @@ const handleInputKeydown = (e) => {
 
                     <!-- 消息气泡显示在下方 -->
                     <div class="bubble"
-                        :class="{ 'ai': msg.from === 'AI', 'system': msg.from === 'server', 'self': getMessageType(msg.from) === 'self' }">
+                        :class="{ 'ai': isAiSender(msg.from), 'system': msg.from === 'server', 'self': getMessageType(msg.from) === 'self' }">
                         <div class="content" v-html="renderMessageHtml(msg)"></div>
                     </div>
                 </div>
@@ -279,18 +311,12 @@ const handleInputKeydown = (e) => {
             </el-scrollbar>
 
             <div class="input-area">
-                <el-input
-                    v-model="currentMessage"
-                    class="msg-input"
-                    type="textarea"
-                    placeholder="输入消息"
-                    :autosize="{ minRows: 2, maxRows: 6 }"
-                    @keydown="handleInputKeydown"
-                />
+                <el-input v-model="currentMessage" class="msg-input" type="textarea" placeholder="输入消息"
+                    :autosize="{ minRows: 2, maxRows: 6 }" @keydown="handleInputKeydown" />
                 <div class="input-actions">
                     <el-switch v-model="deepSearch" class="deep-search-switch" inline-prompt active-text="网络搜索"
                         inactive-text="网络搜索" />
-                    <el-button type="primary" @click="sendMessage">发送</el-button>
+                    <el-button type="primary" :disabled="isAiThinking" @click="sendMessage">发送</el-button>
                 </div>
             </div>
         </div>

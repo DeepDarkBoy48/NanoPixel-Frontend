@@ -3,12 +3,12 @@
         <div class="toolbar">
             <h2 class="title">灵感库</h2>
             <div class="gallery-tip">
-                <div class="tip-content">
+                <!-- <div class="tip-content">
                     <span class="tip-text">去"我的图集"公开作品，让更多人发现你的创意</span>
                     <el-button type="primary" size="small" class="gallery-btn" @click="goToGallery">
                         前往图集
                     </el-button>
-                </div>
+                </div> -->
             </div>
             <div class="actions">
                 <el-button-group class="sort-group">
