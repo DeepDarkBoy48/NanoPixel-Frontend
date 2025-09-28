@@ -201,12 +201,12 @@ const connectWs = () => {
     isInitializing.value = true
 
     // 本地开发环境，直接连接后端
-    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
-    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    // const host = window.location.host;
-    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = window.location.host;
+    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -1082,12 +1082,12 @@ const clearChatMemory = async () => {
         :deep(table) {
             width: 100%;
             min-width: min(520px, 100%); // 保持桌面完整列宽，小屏自动收敛
-            display: block;              // 允许横向滚动
+            display: block; // 允许横向滚动
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             border-collapse: collapse;
             border-spacing: 0;
-            table-layout: fixed;         // 防止列过度挤压，便于换行
+            table-layout: fixed; // 防止列过度挤压，便于换行
             margin: 8px 0;
             border: 1px solid var(--chat-table-border);
             border-radius: 12px;
@@ -1097,7 +1097,7 @@ const clearChatMemory = async () => {
 
         :deep(thead) {
             position: sticky;
-            top: 0;                      // 若出现滚动，表头更易辨认
+            top: 0; // 若出现滚动，表头更易辨认
             background: var(--chat-table-header);
             backdrop-filter: blur(10px);
             z-index: 1;
@@ -2121,18 +2121,18 @@ const clearChatMemory = async () => {
     // 表格在黑暗模式下的可读性优化
     .bubble .content :deep(table) {
         background: var(--chat-table-surface);
-    border-color: var(--chat-table-border);
-    box-shadow: 0 14px 30px rgba(8, 47, 73, 0.35);
-}
+        border-color: var(--chat-table-border);
+        box-shadow: 0 14px 30px rgba(8, 47, 73, 0.35);
+    }
 
-.bubble .content :deep(th),
-.bubble .content :deep(td) {
-    border-color: var(--chat-table-border);
-    color: var(--chat-text);
-}
+    .bubble .content :deep(th),
+    .bubble .content :deep(td) {
+        border-color: var(--chat-table-border);
+        color: var(--chat-text);
+    }
 
-.bubble .content :deep(tr:nth-child(odd) td) {
-    background: var(--chat-table-zebra);
-}
+    .bubble .content :deep(tr:nth-child(odd) td) {
+        background: var(--chat-table-zebra);
+    }
 }
 </style>
