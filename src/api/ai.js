@@ -84,3 +84,8 @@ export const addReviewService = (payload) => {
 export const deleteReviewService = (id) => {
     return request.delete(`review/${id}`);
 };
+
+// 清空聊天记忆
+export const clearChatMemoryService = () => {
+    return request.post("chatroom/clear");
+};

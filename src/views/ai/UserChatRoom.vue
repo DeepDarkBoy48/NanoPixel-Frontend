@@ -1,10 +1,11 @@
 <script setup>
-import { ChatDotRound } from '@element-plus/icons-vue'
+import { ChatDotRound, ArrowDown } from '@element-plus/icons-vue'
 
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
-import { ElImageViewer } from 'element-plus'
+import { ElImageViewer, ElMessage } from 'element-plus'
 import MarkdownIt from 'markdown-it'
 import DOMPurify from 'dompurify'
+import { clearChatMemoryService } from '@/api/ai'
 // 导入用户信息存储
 import useUserInfoStore from '@/store/userInfo'
 //用于储存消息列表
@@ -13,10 +14,14 @@ const messageList = ref([])
 const currentMessage = ref('')
 // AI 是否处于思考状态
 const isAiThinking = ref(false)
+// 清除聊天记录请求状态
+const isClearingChat = ref(false)
 //用于储存用户信息
 const userInfo = useUserInfoStore();
 // 加载状态：简单的加载动画控制
 const isInitializing = ref(true)
+// 存储每条消息的思考内容展开状态
+const thinkingExpandedStates = ref(new Map())
 //用于储存WebSocket连接
 let ws = null;
 // 心跳定时器
@@ -76,14 +81,116 @@ const markdown = new MarkdownIt({
     breaks: true
 })
 
+// 解析消息内容，分离正文和思考内容
+const parseMessageContent = (text) => {
+    if (typeof text !== 'string') return { content: '', thinking: '' }
+
+    // 匹配 <think>内容</think> 或 <think>内容<think> 格式
+    const thinkingRegex = /<think>([\s\S]*?)(?:<\/think>|<think>)/g
+    const thinkingMatches = []
+    let match
+
+    while ((match = thinkingRegex.exec(text)) !== null) {
+        thinkingMatches.push(match[1].trim())
+    }
+
+    // 移除思考内容标签，获取正文
+    const content = text.replace(/<think>[\s\S]*?(?:<\/think>|<think>)/g, '').trim()
+
+    return {
+        content: content,
+        thinking: thinkingMatches.join('\n\n') // 如果有多个思考块，用换行连接
+    }
+}
+
 const renderMessageHtml = (msg) => {
     const text = typeof msg?.message === 'string' ? msg.message : ''
-    if (getMessageType(msg.from) === 'system' || isAiSender(msg.from)) {
+
+    // 如果是AI消息，解析思考内容
+    if (isAiSender(msg.from)) {
+        const parsed = parseMessageContent(text)
+        // 只渲染正文部分
+        return DOMPurify.sanitize(markdown.render(parsed.content))
+    }
+
+    if (getMessageType(msg.from) === 'system') {
         // 系统消息按 Markdown 渲染，并做 XSS 清洗
         return DOMPurify.sanitize(markdown.render(text))
     }
     // 其他消息如果本身包含 HTML，仅做清洗；保持现有行为
     return DOMPurify.sanitize(text)
+}
+
+// 获取消息的思考内容
+const getThinkingContent = (msg) => {
+    if (!isAiSender(msg.from)) return ''
+    const text = typeof msg?.message === 'string' ? msg.message : ''
+    const parsed = parseMessageContent(text)
+    return parsed.thinking
+}
+
+// 切换思考内容展开状态
+const toggleThinking = (msgIndex) => {
+    const current = thinkingExpandedStates.value.get(msgIndex) || false
+    const nextState = !current
+    thinkingExpandedStates.value.set(msgIndex, nextState)
+
+    if (nextState) {
+        nextTick(() => {
+            enhanceResponsiveTables()
+        })
+    }
+}
+
+// 获取思考内容展开状态
+const isThinkingExpanded = (msgIndex) => {
+    return thinkingExpandedStates.value.get(msgIndex) || false
+}
+
+// 渲染思考内容为HTML
+const renderThinkingHtml = (msg) => {
+    const thinkingText = getThinkingContent(msg)
+    if (!thinkingText) return ''
+    return DOMPurify.sanitize(markdown.render(thinkingText))
+}
+
+// 为表格单元格添加 data-label 属性，便于移动端展示
+const enhanceResponsiveTables = () => {
+    const wrap = scrollbarRef.value?.wrapRef
+    if (!wrap) return
+
+    const tables = wrap.querySelectorAll('.bubble .content table, .thinking-content table')
+    tables.forEach((table) => {
+        if (!(table instanceof HTMLElement)) return
+        if (table.dataset.mobileEnhanced === 'true') return
+
+        const headerCells = Array.from(table.querySelectorAll('thead th'))
+        let headerTexts = headerCells.map((th) => th.textContent?.trim() || '')
+
+        if (!headerTexts.length) {
+            const firstRowCells = Array.from(
+                table.querySelectorAll('tbody tr:first-child th, tbody tr:first-child td')
+            )
+            headerTexts = firstRowCells.map((cell) => cell.textContent?.trim() || '')
+        }
+
+        if (!headerTexts.length) {
+            table.dataset.mobileEnhanced = 'true'
+            return
+        }
+
+        const bodyRows = Array.from(table.querySelectorAll('tbody tr'))
+        bodyRows.forEach((row) => {
+            Array.from(row.children).forEach((cell, index) => {
+                if (!(cell instanceof HTMLElement)) return
+                const label = headerTexts[index] || headerTexts[headerTexts.length - 1] || ''
+                if (!label || cell.hasAttribute('data-label')) return
+                cell.setAttribute('data-label', label)
+            })
+        })
+
+        table.dataset.mobileEnhanced = 'true'
+    })
 }
 
 
@@ -94,12 +201,12 @@ const connectWs = () => {
     isInitializing.value = true
 
     // 本地开发环境，直接连接后端
-    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = window.location.host;
-    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    // const host = window.location.host;
+    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -157,6 +264,7 @@ const connectWs = () => {
                         scrollContainer.scrollTop = scrollContainer.scrollHeight
                     }
                 }
+                enhanceResponsiveTables()
             })
         } catch (error) {
             console.error('解析消息失败:', error)
@@ -193,6 +301,7 @@ onMounted(() => {
         if (wrap) {
             wrap.addEventListener('click', handleContentClick)
         }
+        enhanceResponsiveTables()
     })
 })
 
@@ -257,6 +366,39 @@ const handleInputKeydown = (e) => {
         sendMessage()
     }
 }
+
+const clearChatMemory = async () => {
+    if (isClearingChat.value) return
+
+    isClearingChat.value = true
+    try {
+        const response = await clearChatMemoryService()
+        const message = typeof response?.data === 'string' ? response.data.trim() : response?.message
+        const displayText = message || '记忆已清空'
+
+        // 追加一条系统提示消息
+        messageList.value.push({
+            from: 'server',
+            message: displayText,
+            timestamp: Date.now()
+        })
+
+        nextTick(() => {
+            const scrollContainer = scrollbarRef.value?.wrapRef
+            if (scrollContainer) {
+                scrollContainer.scrollTop = scrollContainer.scrollHeight
+            }
+            enhanceResponsiveTables()
+        })
+
+        ElMessage.success(displayText)
+    } catch (error) {
+        console.error('清除聊天记忆失败:', error)
+        ElMessage.error('清除聊天记忆失败，请稍后重试')
+    } finally {
+        isClearingChat.value = false
+    }
+}
 </script>
 
 <template>
@@ -268,6 +410,8 @@ const handleInputKeydown = (e) => {
                     <div class="online-dot"></div>
                     <span>在线</span>
                 </div>
+                <el-button class="clear-chat-btn" type="warning" plain size="small" :loading="isClearingChat"
+                    :disabled="isClearingChat" @click="clearChatMemory">清空记忆</el-button>
             </div>
 
             <!-- 滚动容器 -->
@@ -289,6 +433,23 @@ const handleInputKeydown = (e) => {
                     <!-- 消息气泡显示在下方 -->
                     <div class="bubble"
                         :class="{ 'ai': isAiSender(msg.from), 'system': msg.from === 'server', 'self': getMessageType(msg.from) === 'self' }">
+
+                        <!-- AI消息的思考内容展示（移到正文上方） -->
+                        <div v-if="isAiSender(msg.from) && getThinkingContent(msg)" class="thinking-section">
+                            <!-- 思考内容控制按钮 -->
+                            <div class="thinking-toggle" @click="toggleThinking(index)">
+                                <span class="thinking-label">Show thinking</span>
+                                <el-icon class="thinking-icon" :class="{ 'expanded': isThinkingExpanded(index) }">
+                                    <ArrowDown />
+                                </el-icon>
+                            </div>
+
+                            <!-- 思考内容区域 -->
+                            <div v-if="isThinkingExpanded(index)" class="thinking-content">
+                                <div v-html="renderThinkingHtml(msg)"></div>
+                            </div>
+                        </div>
+
                         <div class="content" v-html="renderMessageHtml(msg)"></div>
                     </div>
                 </div>
@@ -362,6 +523,13 @@ const handleInputKeydown = (e) => {
     --system-border: rgba(255, 236, 210, 0.3);
     --system-text: #0f172a;
     --system-glow: 0 8px 32px rgba(255, 236, 210, 0.2);
+
+    // 表格主题色
+    --chat-table-surface: rgba(255, 255, 255, 0.85);
+    --chat-table-header: rgba(247, 249, 255, 0.94);
+    --chat-table-border: rgba(15, 23, 42, 0.12);
+    --chat-table-zebra: rgba(15, 23, 42, 0.05);
+    --chat-table-label: rgba(71, 85, 105, 0.85);
 }
 
 .dark {
@@ -395,6 +563,13 @@ const handleInputKeydown = (e) => {
     --system-border: rgba(245, 158, 11, 0.4);
     --system-text: #ffffff;
     --system-glow: 0 0 20px rgba(245, 158, 11, 0.3), 0 8px 32px rgba(245, 158, 11, 0.2);
+
+    // 表格主题色（暗色）
+    --chat-table-surface: rgba(30, 41, 59, 0.82);
+    --chat-table-header: rgba(51, 65, 85, 0.9);
+    --chat-table-border: rgba(100, 116, 139, 0.35);
+    --chat-table-zebra: rgba(148, 163, 184, 0.14);
+    --chat-table-label: rgba(191, 219, 254, 0.8);
 }
 
 .chat-room {
@@ -447,6 +622,9 @@ const handleInputKeydown = (e) => {
     top: 16px;
     right: 20px;
     z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
     .status-indicator {
         display: flex;
@@ -470,6 +648,10 @@ const handleInputKeydown = (e) => {
             color: #22c55e;
         }
     }
+}
+
+.clear-chat-btn {
+    font-size: 12px;
 }
 
 .pulse-dot {
@@ -896,6 +1078,54 @@ const handleInputKeydown = (e) => {
             }
         }
 
+        // 表格样式：在消息气泡内更好地显示 Markdown 表格
+        :deep(table) {
+            width: 100%;
+            min-width: min(520px, 100%); // 保持桌面完整列宽，小屏自动收敛
+            display: block;              // 允许横向滚动
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-collapse: collapse;
+            border-spacing: 0;
+            table-layout: fixed;         // 防止列过度挤压，便于换行
+            margin: 8px 0;
+            border: 1px solid var(--chat-table-border);
+            border-radius: 12px;
+            background: var(--chat-table-surface);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        :deep(thead) {
+            position: sticky;
+            top: 0;                      // 若出现滚动，表头更易辨认
+            background: var(--chat-table-header);
+            backdrop-filter: blur(10px);
+            z-index: 1;
+        }
+
+        :deep(th),
+        :deep(td) {
+            padding: 8px 10px;
+            border: 1px solid var(--chat-table-border);
+            text-align: left;
+            vertical-align: top;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            white-space: normal;
+            line-height: 1.5;
+            font-size: 14px;
+            background: transparent;
+            color: var(--chat-text);
+        }
+
+        :deep(th) {
+            font-weight: 600;
+        }
+
+        :deep(tr:nth-child(odd) td) {
+            background: var(--chat-table-zebra);
+        }
+
         // 图片样式：限制尺寸并自适应容器
         :deep(img) {
             display: block;
@@ -925,6 +1155,162 @@ const handleInputKeydown = (e) => {
             overflow-x: auto;
             margin: 8px 0;
         }
+    }
+}
+
+// 思考内容样式
+.thinking-section {
+    margin-bottom: 12px;
+    border: 2px solid rgba(79, 172, 254, 0.4);
+    border-radius: 10px;
+    background: rgba(79, 172, 254, 0.05);
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+        border-color: rgba(79, 172, 254, 0.6);
+        background: rgba(79, 172, 254, 0.08);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(79, 172, 254, 0.2);
+    }
+}
+
+.thinking-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(139, 92, 246, 0.1));
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(79, 172, 254, 0.2);
+
+    &:hover {
+        background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(139, 92, 246, 0.15));
+    }
+
+    .thinking-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4facfe;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        letter-spacing: 0.5px;
+    }
+
+    .thinking-icon {
+        transition: transform 0.3s ease;
+        font-size: 18px;
+        color: #4facfe;
+        filter: drop-shadow(0 1px 2px rgba(79, 172, 254, 0.3));
+
+        &.expanded {
+            transform: rotate(180deg);
+        }
+    }
+}
+
+.thinking-content {
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.6);
+    animation: thinkingSlideIn 0.3s ease-out;
+    border-top: none;
+
+    // 思考内容中的文本样式
+    :deep(p) {
+        margin: 0 0 8px 0;
+        line-height: 1.6;
+        font-size: 13px;
+        opacity: 0.9;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    :deep(h1),
+    :deep(h2),
+    :deep(h3),
+    :deep(h4),
+    :deep(h5),
+    :deep(h6) {
+        margin: 8px 0 4px 0;
+        font-size: 14px;
+        font-weight: 600;
+        opacity: 0.95;
+    }
+
+    :deep(ul),
+    :deep(ol) {
+        margin: 4px 0;
+        padding-left: 16px;
+
+        li {
+            margin: 2px 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    }
+
+    :deep(code) {
+        background: rgba(0, 0, 0, 0.15);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 12px;
+    }
+
+    :deep(pre) {
+        background: rgba(0, 0, 0, 0.15);
+        padding: 8px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin: 6px 0;
+        font-size: 12px;
+    }
+
+    // 思考内容中的表格样式（与正文保持一致、稍微紧凑）
+    :deep(table) {
+        width: 100%;
+        min-width: min(520px, 100%);
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-collapse: collapse;
+        border-spacing: 0;
+        table-layout: fixed;
+        margin: 6px 0;
+        border: 1px solid var(--chat-table-border);
+        border-radius: 10px;
+        background: var(--chat-table-surface);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    :deep(th),
+    :deep(td) {
+        padding: 6px 8px;
+        border: 1px solid var(--chat-table-border);
+        text-align: left;
+        vertical-align: top;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        white-space: normal;
+        line-height: 1.5;
+        font-size: 12px;
+        background: transparent;
+        color: var(--chat-text);
+    }
+}
+
+@keyframes thinkingSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 1000px;
     }
 }
 
@@ -1349,6 +1735,80 @@ const handleInputKeydown = (e) => {
         .bubble .content :deep(img) {
             max-height: 260px;
         }
+
+        .bubble .content,
+        .thinking-content {
+            :deep(table) {
+                min-width: 100%;
+                display: block;
+                border: none;
+                background: var(--chat-table-surface);
+                box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+                overflow: hidden;
+            }
+
+            :deep(thead) {
+                display: none;
+            }
+
+            :deep(tbody) {
+                display: block;
+            }
+
+            :deep(tr) {
+                display: block;
+                margin-bottom: 10px;
+                border: 1px solid var(--chat-table-border);
+                border-radius: 12px;
+                overflow: hidden;
+                background: var(--chat-table-surface);
+            }
+
+            :deep(tr:last-child) {
+                margin-bottom: 0;
+            }
+
+            :deep(tr:nth-child(odd) td) {
+                background: transparent;
+            }
+
+            :deep(td),
+            :deep(th) {
+                display: flex;
+                align-items: flex-start;
+                gap: 8px;
+                border: none;
+                border-bottom: 1px solid var(--chat-table-border);
+                padding: 10px 14px;
+                font-size: 13px;
+                line-height: 1.6;
+                background: transparent;
+                color: var(--chat-text);
+            }
+
+            :deep(td:last-child),
+            :deep(th:last-child) {
+                border-bottom: none;
+            }
+
+            :deep(td::before),
+            :deep(th::before) {
+                content: attr(data-label);
+                flex: 0 0 110px;
+                max-width: 45%;
+                font-weight: 600;
+                color: var(--chat-table-label);
+                letter-spacing: 0.3px;
+                white-space: normal;
+                line-height: 1.5;
+                font-size: 12px;
+            }
+
+            :deep(td[data-label='']::before),
+            :deep(th[data-label='']::before) {
+                content: '';
+            }
+        }
     }
 
     .input-area {
@@ -1576,5 +2036,103 @@ const handleInputKeydown = (e) => {
             text-shadow: 0 0 8px rgba(6, 182, 212, 0.3) !important;
         }
     }
+
+    // 黑暗模式下的思考内容样式
+    .thinking-section {
+        border-color: rgba(139, 92, 246, 0.6);
+        background: rgba(139, 92, 246, 0.08);
+
+        &:hover {
+            border-color: rgba(139, 92, 246, 0.8);
+            background: rgba(139, 92, 246, 0.12);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+    }
+
+    .thinking-toggle {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.15));
+        border-bottom-color: rgba(139, 92, 246, 0.3);
+
+        &:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(168, 85, 247, 0.2));
+        }
+
+        .thinking-label {
+            color: #c084fc;
+            text-shadow: 0 1px 2px rgba(139, 92, 246, 0.5);
+        }
+
+        .thinking-icon {
+            color: #c084fc;
+            filter: drop-shadow(0 1px 2px rgba(139, 92, 246, 0.5));
+        }
+    }
+
+    .thinking-content {
+        background: rgba(30, 41, 59, 0.7);
+
+        :deep(p) {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        :deep(h1),
+        :deep(h2),
+        :deep(h3),
+        :deep(h4),
+        :deep(h5),
+        :deep(h6) {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        :deep(ul),
+        :deep(ol) {
+            li {
+                color: rgba(255, 255, 255, 0.85);
+            }
+        }
+
+        :deep(code) {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        :deep(pre) {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        // 思考内容中的表格（黑暗模式）
+        :deep(table) {
+            background: var(--chat-table-surface);
+            border-color: var(--chat-table-border);
+        }
+
+        :deep(th),
+        :deep(td) {
+            border-color: var(--chat-table-border);
+            color: rgba(255, 255, 255, 0.93);
+        }
+
+        :deep(tr:nth-child(odd) td) {
+            background: var(--chat-table-zebra);
+        }
+    }
+
+    // 表格在黑暗模式下的可读性优化
+    .bubble .content :deep(table) {
+        background: var(--chat-table-surface);
+    border-color: var(--chat-table-border);
+    box-shadow: 0 14px 30px rgba(8, 47, 73, 0.35);
+}
+
+.bubble .content :deep(th),
+.bubble .content :deep(td) {
+    border-color: var(--chat-table-border);
+    color: var(--chat-text);
+}
+
+.bubble .content :deep(tr:nth-child(odd) td) {
+    background: var(--chat-table-zebra);
+}
 }
 </style>
