@@ -41,7 +41,7 @@
                                             <div class="category-option">
                                                 <span class="category-option__name" :title="item.categoryName">{{
                                                     item.categoryName
-                                                    }}</span>
+                                                }}</span>
                                                 <span class="category-option__count">{{ item.promptCount ?? 0 }}
                                                     个模版</span>
                                             </div>
@@ -293,8 +293,9 @@ const previewUrl = ref('')
 // 模型选择（默认 nanobanana）
 const selectedModel = ref('nanobanana')
 const modelOptions = [
-    { value: 'nanobanana', label: 'NanoBanana（默认）' },
-    { value: 'seedream4', label: 'Seedream4' },
+    { value: 'nanobanana', label: 'NanoBanana' },
+    { value: 'seedream4', label: 'SeeDream4' },
+    { value: 'nanobananaWithChinese', label: 'NanoBanana(强制生成中文)' },
 ]
 
 const canSubmit = computed(() => {

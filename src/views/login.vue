@@ -131,6 +131,7 @@ const goBlog = () => {
           </el-form>
           <!-- 登录表单 -->
           <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="rules">
+            <div class="test-account-tip">测试账号：徐晨阳 密码：123456</div>
             <el-form-item prop="username">
               <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
             </el-form-item>
@@ -253,6 +254,18 @@ const goBlog = () => {
   line-height: 1.5;
 }
 
+.test-account-tip {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 152, 0, 0.16);
+  border: 1px solid rgba(255, 152, 0, 0.45);
+  color: #ffa726;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
 .form-title {
   color: #fff;
   text-align: center;
@@ -367,6 +380,11 @@ const goBlog = () => {
   .site-description {
     font-size: 0.9rem;
     margin-bottom: 10px;
+  }
+
+  .test-account-tip {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
   }
 
   .site-info {
