@@ -131,7 +131,7 @@ const goBlog = () => {
           </el-form>
           <!-- 登录表单 -->
           <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="rules">
-            <div class="test-account-tip">测试账号：徐晨阳 密码：123456</div>
+            <div class="test-account-tip">测试账号：徐晨阳2025 密码：123456</div>
             <el-form-item prop="username">
               <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
             </el-form-item>
