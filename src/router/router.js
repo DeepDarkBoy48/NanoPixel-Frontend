@@ -16,6 +16,7 @@ import MagicHistory from "@/views/ai/magicedit/MagicHistory.vue";
 import canvasVue from "@/views/ai/canvas.vue";
 import LibraryDetail from "@/views/ai/libraryDetail.vue";
 import promptManagerVue from "@/views/ai/promptManager.vue";
+import embedVue from "@/views/ai/embed.vue";
 
 // 路由配置说明：
 // - 根路径使用 Layout 作为统一布局容器，所有业务页面作为其子路由渲染在 <router-view/>
@@ -53,6 +54,9 @@ const routes = [
 
       // AI 模块：Canvas
       { path: "/ai/canvas", component: canvasVue },
+
+      // AI 模块：Embed
+      { path: "/ai/embed", component: embedVue },
     ],
   },
   { path: "/blog", component: BlogVue },

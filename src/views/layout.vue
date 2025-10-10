@@ -26,6 +26,7 @@ const userInfoStore = useUserInfoStore();
 const isCollapse = ref(false)
 const isMobile = ref(false)
 const drawerVisible = ref(false)
+const defaultOpenedMenus = ['/ai', '/ai2']
 
 const checkIsMobile = () => {
     isMobile.value = window.innerWidth < 768
@@ -134,7 +135,7 @@ const activeMenu = computed(() => {
         <el-aside v-if="!isMobile" :width="isCollapse ? '64px' : '200px'">
             <div class="el-aside__logo"></div>
             <!-- 菜单 -->
-            <el-menu :default-active="activeMenu" :active-text-color="'var(--app-primary)'"
+            <el-menu :default-active="activeMenu" :default-openeds="defaultOpenedMenus" :active-text-color="'var(--app-primary)'"
                 :background-color="'var(--app-sider-bg)'" :text-color="'var(--app-sider-text)'" router
                 :collapse="isCollapse" :collapse-transition="false">
 
@@ -146,7 +147,7 @@ const activeMenu = computed(() => {
                         <el-icon>
                             <MagicStick />
                         </el-icon>
-                        <span>AI创作</span>
+                        <span>AI绘图</span>
                     </template>
 
                     <el-menu-item index="/ai/magicImageEdit">
@@ -156,14 +157,6 @@ const activeMenu = computed(() => {
                         <span class="menu-label">魔法修图</span>
                         <span class="hot-badge">🔥 HOT</span>
                     </el-menu-item>
-
-                    <el-menu-item index="/ai/magicImageEdit/history">
-                        <el-icon>
-                            <Picture />
-                        </el-icon>
-                        <span class="menu-label">我的图集</span>
-                    </el-menu-item>
-
                     <el-menu-item index="/ai/library">
                         <el-icon>
                             <Promotion />
@@ -171,48 +164,45 @@ const activeMenu = computed(() => {
                         <span class="menu-label">灵感广场</span>
                         <span class="hot-badge">🔥 HOT</span>
                     </el-menu-item>
+
+                    <el-menu-item index="/ai/magicImageEdit/history">
+                        <el-icon>
+                            <Picture />
+                        </el-icon>
+                        <span class="menu-label">我的图集</span>
+                    </el-menu-item>
                     <el-menu-item index="/ai/prompt">
                         <el-icon>
                             <EditPen />
                         </el-icon>
                         <span class="menu-label">提示词管理</span>
                     </el-menu-item>
-                    <!-- <el-menu-item index="/ai/canvas">
+                </el-sub-menu>
+
+
+
+                <el-sub-menu index="/ai2">
+                    <template #title>
                         <el-icon>
-                            <ChatLineRound />
+                            <MagicStick />
                         </el-icon>
-                        <span>Canvas</span>
-                    </el-menu-item> -->
+                        <span>AI知识库</span>
+                    </template>
                     <el-menu-item index="/ai/chatRoom">
                         <el-icon>
                             <ChatLineRound />
                         </el-icon>
-                        <span class="menu-label">智能对话</span>
+                        <span class="menu-label">AI对话</span>
+                        <span class="hot-badge">🔥 HOT</span>
                     </el-menu-item>
+                    <el-menu-item index="/ai/embed">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span class="menu-label">知识库</span>
+                    </el-menu-item>
+
                 </el-sub-menu>
-
-                <!-- <el-sub-menu index="/article">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>文章中心</span>
-                    </template>
-                    <el-menu-item index="/article/category">
-                        <el-icon>
-                            <Management />
-                        </el-icon>
-                        <span>文章分类</span>
-                    </el-menu-item>
-
-                    <el-menu-item index="/article/manage">
-                        <el-icon>
-                            <Promotion />
-                        </el-icon>
-                        <span>文章管理</span>
-                    </el-menu-item>
-                </el-sub-menu> -->
-
 
                 <el-sub-menu index="/user">
                     <template #title>
@@ -250,65 +240,7 @@ const activeMenu = computed(() => {
                         <span>我的评论</span>
                     </el-menu-item>
                 </el-sub-menu>
-            </el-menu>
-        </el-aside>
-
-        <!-- 抽屉菜单 (移动端) -->
-        <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="200px" :with-header="false"
-            class="mobile-drawer">
-            <div class="el-aside__logo"></div>
-            <el-menu :default-active="activeMenu" :active-text-color="'var(--app-primary)'"
-                :background-color="'var(--app-sider-bg)'" :text-color="'var(--app-sider-text)'" router
-                @select="drawerVisible = false">
-                <el-sub-menu index="/ai">
-                    <template #title>
-                        <el-icon>
-                            <MagicStick />
-                        </el-icon>
-                        <span>AI创作</span>
-                    </template>
-
-                    <el-menu-item index="/ai/magicImageEdit">
-                        <el-icon>
-                            <Crop />
-                        </el-icon>
-                        <span class="menu-label">魔法修图</span>
-                        <span class="hot-badge">🔥 HOT</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/magicImageEdit/history">
-                        <el-icon>
-                            <Picture />
-                        </el-icon>
-                        <span class="menu-label">我的图集</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/library">
-                        <el-icon>
-                            <Promotion />
-                        </el-icon>
-                        <span class="menu-label">灵感广场</span>
-                        <span class="hot-badge">🔥 HOT</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/prompt">
-                        <el-icon>
-                            <EditPen />
-                        </el-icon>
-                        <span class="menu-label">提示词管理</span>
-                    </el-menu-item>
-                    <!-- <el-menu-item index="/ai/canvas">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span>Canvas</span>
-                    </el-menu-item> -->
-                    <el-menu-item index="/ai/chatRoom">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span class="menu-label">智能对话</span>
-                    </el-menu-item>
-                </el-sub-menu>
-                <!-- 
-                <el-sub-menu index="/article">
+                <!-- <el-sub-menu index="/article">
                     <template #title>
                         <el-icon>
                             <UserFilled />
@@ -321,6 +253,7 @@ const activeMenu = computed(() => {
                         </el-icon>
                         <span>文章分类</span>
                     </el-menu-item>
+
                     <el-menu-item index="/article/manage">
                         <el-icon>
                             <Promotion />
@@ -328,6 +261,77 @@ const activeMenu = computed(() => {
                         <span>文章管理</span>
                     </el-menu-item>
                 </el-sub-menu> -->
+            </el-menu>
+        </el-aside>
+
+        <!-- 抽屉菜单 (移动端) -->
+        <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="200px" :with-header="false"
+            class="mobile-drawer">
+            <div class="el-aside__logo"></div>
+            <el-menu :default-active="activeMenu" :default-openeds="defaultOpenedMenus" :active-text-color="'var(--app-primary)'"
+                :background-color="'var(--app-sider-bg)'" :text-color="'var(--app-sider-text)'" router
+                @select="drawerVisible = false">
+                <el-sub-menu index="/ai">
+                    <template #title>
+                        <el-icon>
+                            <MagicStick />
+                        </el-icon>
+                        <span>AI绘图</span>
+                    </template>
+
+                    <el-menu-item index="/ai/magicImageEdit">
+                        <el-icon>
+                            <Crop />
+                        </el-icon>
+                        <span class="menu-label">魔法修图</span>
+                        <span class="hot-badge">🔥 HOT</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/library">
+                        <el-icon>
+                            <Promotion />
+                        </el-icon>
+                        <span class="menu-label">灵感广场</span>
+                        <span class="hot-badge">🔥 HOT</span>
+                    </el-menu-item>
+
+                    <el-menu-item index="/ai/magicImageEdit/history">
+                        <el-icon>
+                            <Picture />
+                        </el-icon>
+                        <span class="menu-label">我的图集</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/prompt">
+                        <el-icon>
+                            <EditPen />
+                        </el-icon>
+                        <span class="menu-label">提示词管理</span>
+                    </el-menu-item>
+                </el-sub-menu>
+
+
+
+                <el-sub-menu index="/ai">
+                    <template #title>
+                        <el-icon>
+                            <MagicStick />
+                        </el-icon>
+                        <span>AI知识库</span>
+                    </template>
+                    <el-menu-item index="/ai/chatRoom">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span class="menu-label">AI对话</span>
+                        <span class="hot-badge">🔥 HOT</span>
+                    </el-menu-item>
+                    <el-menu-item index="/ai/embed">
+                        <el-icon>
+                            <ChatLineRound />
+                        </el-icon>
+                        <span class="menu-label">知识库</span>
+                    </el-menu-item>
+
+                </el-sub-menu>
 
                 <el-sub-menu index="/user">
                     <template #title>

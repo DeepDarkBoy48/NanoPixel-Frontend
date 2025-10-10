@@ -89,3 +89,24 @@ export const deleteReviewService = (id) => {
 export const clearChatMemoryService = () => {
     return request.post("chatroom/clear");
 };
+
+// Embed 文档相关接口
+export const uploadEmbedPdfService = (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return request.post("embed/upload", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};
+
+export const listEmbedPdfService = () => {
+    return request.post("embed/list");
+};
+
+export const deleteEmbedPdfService = (fileId) => {
+    return request.delete("embed/delete", {
+        params: { fileid: fileId },
+    });
+};

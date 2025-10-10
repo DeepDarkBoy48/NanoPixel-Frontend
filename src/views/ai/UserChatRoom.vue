@@ -5,7 +5,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { ElImageViewer, ElMessage } from 'element-plus'
 import MarkdownIt from 'markdown-it'
 import DOMPurify from 'dompurify'
-import { clearChatMemoryService } from '@/api/ai'
+import { clearChatMemoryService, listEmbedPdfService } from '@/api/ai'
 // 导入用户信息存储
 import useUserInfoStore from '@/store/userInfo'
 //用于储存消息列表
@@ -31,6 +31,13 @@ const scrollbarRef = ref(null)
 
 // 深度搜索开关
 const deepSearch = ref(false)
+const embedOptions = ref([])
+const selectedFileIds = ref([])
+const truncateLabel = (label) => {
+    if (!label) return ''
+    const maxLength = 18
+    return label.length > maxLength ? `${label.slice(0, maxLength)}…` : label
+}
 
 // 图片预览（点击放大）相关状态
 const imagePreviewVisible = ref(false)
@@ -46,6 +53,19 @@ const openImagePreview = (urls = [], index = 0) => {
 
 const closeImagePreview = () => {
     imagePreviewVisible.value = false
+}
+
+const fetchEmbedOptions = async () => {
+    try {
+        const response = await listEmbedPdfService()
+        const data = Array.isArray(response?.data) ? response.data : []
+        embedOptions.value = data.map(item => ({
+            label: item.name || `文件${item.id}`,
+            value: item.id
+        }))
+    } catch (error) {
+        console.error('获取文件列表失败:', error)
+    }
 }
 
 // 事件委托：捕获内容区 img 点击，打开预览
@@ -289,6 +309,8 @@ const connectWs = () => {
 
 // 在组件挂载时连接
 onMounted(() => {
+    fetchEmbedOptions()
+
     if (userInfo.info.id) {
         connectWs()
     } else {
@@ -345,6 +367,11 @@ const sendMessage = () => {
     let textToSend = raw
     if (deepSearch.value && !/^请搜索[:：]/.test(textToSend)) {
         textToSend = `请搜索：${textToSend}`
+    }
+
+    if (selectedFileIds.value.length > 0) {
+        const idsText = selectedFileIds.value.join(', ')
+        textToSend = `${textToSend} 从fileId为${idsText}中的文件检索相关信息。`
     }
 
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -472,8 +499,17 @@ const clearChatMemory = async () => {
             </el-scrollbar>
 
             <div class="input-area">
-                <el-input v-model="currentMessage" class="msg-input" type="textarea" placeholder="输入消息"
-                    :autosize="{ minRows: 2, maxRows: 6 }" @keydown="handleInputKeydown" />
+                <div class="input-main">
+                    <el-select v-model="selectedFileIds" class="embed-select" multiple filterable collapse-tags
+                        collapse-tags-tooltip :max-collapse-tags="1" placeholder="选择知识库的文件" size="small">
+                        <el-option v-for="item in embedOptions" :key="item.value" :label="item.label"
+                            :value="item.value">
+                            <span class="option-text">{{ truncateLabel(item.label) }}</span>
+                        </el-option>
+                    </el-select>
+                    <el-input v-model="currentMessage" class="msg-input" type="textarea" placeholder="输入消息"
+                        :autosize="{ minRows: 2, maxRows: 6 }" @keydown="handleInputKeydown" />
+                </div>
                 <div class="input-actions">
                     <el-switch v-model="deepSearch" class="deep-search-switch" inline-prompt active-text="网络搜索"
                         inactive-text="网络搜索" />
@@ -1529,8 +1565,77 @@ const clearChatMemory = async () => {
     }
 }
 
+.input-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.embed-select {
+    width: 100%;
+
+    :deep(.el-select__wrapper) {
+        min-height: 34px;
+        padding: 2px 8px;
+        gap: 4px;
+    }
+
+    :deep(.el-select__selection) {
+        gap: 4px;
+    }
+
+    :deep(.el-tag) {
+        max-width: 110px;
+        font-size: 12px;
+        margin: 0;
+    }
+
+    :deep(.el-select-dropdown__item) {
+        max-width: 100%;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    :deep(.el-select-dropdown__item span) {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    :deep(.option-text) {
+        display: block;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    :deep(.el-select__tags-text) {
+        max-width: 80px;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+    }
+
+    @media (max-width: 768px) {
+        :deep(.el-select__wrapper) {
+            min-height: 32px;
+            padding: 2px 6px;
+        }
+
+        :deep(.el-tag) {
+            max-width: 70px;
+        }
+    }
+}
+
 .msg-input {
     flex: 1;
+    width: 100%;
 
     :deep(.el-textarea__inner) {
         background: rgba(255, 255, 255, 0.8);
