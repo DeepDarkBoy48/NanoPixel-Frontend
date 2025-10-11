@@ -13,7 +13,7 @@
                 :before-upload="beforeUpload" :on-change="handleFileChange" :auto-upload="false">
                 <el-button type="default" :disabled="uploading">选择 PDF 文件</el-button>
             </el-upload>
-            <p class="tip-text">仅支持 PDF 格式文件，单次上传一个文件。</p>
+            <p class="tip-text">仅支持 PDF 格式文件，单次上传一个文件，且小于 5MB。</p>
         </el-card>
 
         <el-card class="list-card">
@@ -136,12 +136,23 @@ const fetchEmbedList = async () => {
     }
 };
 
+const MAX_PDF_SIZE = 5 * 1024 * 1024; // 5MB
+const isPdf = (f) => {
+    const typeOk = f?.type === 'application/pdf';
+    const nameOk = typeof f?.name === 'string' && /\.pdf$/i.test(f.name);
+    return typeOk || nameOk;
+};
+
 const beforeUpload = (file) => {
     if (Array.isArray(fileList.value) && fileList.value.length > 0) {
         fileList.value = [];
     }
-    if (file.type !== 'application/pdf') {
+    if (!isPdf(file)) {
         ElMessage.error('仅支持上传 PDF 文件');
+        return false;
+    }
+    if (file.size > MAX_PDF_SIZE) {
+        ElMessage.error('文件大小需小于 5MB');
         return false;
     }
     selectedFile.value = file;
@@ -152,13 +163,36 @@ const handleFileChange = (file, files) => {
     if (files.length > 1) {
         files.splice(0, files.length - 1);
     }
-    selectedFile.value = file.raw;
+    const raw = file?.raw;
+    if (!raw || !isPdf(raw)) {
+        ElMessage.error('仅支持上传 PDF 文件');
+        uploadRef.value?.clearFiles();
+        selectedFile.value = null;
+        fileList.value = [];
+        return;
+    }
+    if (raw.size > MAX_PDF_SIZE) {
+        ElMessage.error('文件大小需小于 5MB');
+        uploadRef.value?.clearFiles();
+        selectedFile.value = null;
+        fileList.value = [];
+        return;
+    }
+    selectedFile.value = raw;
     fileList.value = files;
 };
 
 const submitUpload = async () => {
     if (!selectedFile.value) {
         ElMessage.warning('请先选择一个 PDF 文件');
+        return;
+    }
+    if (!isPdf(selectedFile.value)) {
+        ElMessage.error('仅支持上传 PDF 文件');
+        return;
+    }
+    if (selectedFile.value.size > MAX_PDF_SIZE) {
+        ElMessage.error('文件大小需小于 5MB');
         return;
     }
     try {
