@@ -33,6 +33,23 @@ const scrollbarRef = ref(null)
 const deepSearch = ref(false)
 const embedOptions = ref([])
 const selectedFileIds = ref([])
+// 互斥控制：选择知识库与网络搜索不可同时启用
+const isSwitchDisabled = computed(() => selectedFileIds.value.length > 0)
+const isSelectDisabled = computed(() => deepSearch.value === true)
+
+watch(selectedFileIds, (val) => {
+    if (Array.isArray(val) && val.length > 0) {
+        // 选中文件后，自动关闭网络搜索
+        deepSearch.value = false
+    }
+})
+
+watch(deepSearch, (val) => {
+    if (val === true) {
+        // 开启网络搜索后，清空并禁用文件选择
+        selectedFileIds.value = []
+    }
+})
 const truncateLabel = (label) => {
     if (!label) return ''
     const maxLength = 18
@@ -397,9 +414,17 @@ const handleInputKeydown = (e) => {
 const clearChatMemory = async () => {
     if (isClearingChat.value) return
 
+    // 校验用户ID是否存在
+    const sid = userInfo?.info?.id
+    if (!sid) {
+        ElMessage.error('无法清空记忆：未获取到用户ID')
+        return
+    }
+
     isClearingChat.value = true
     try {
-        const response = await clearChatMemoryService()
+        // 传递 sid 给后端
+        const response = await clearChatMemoryService(sid)
         const message = typeof response?.data === 'string' ? response.data.trim() : response?.message
         const displayText = message || '记忆已清空'
 
@@ -501,7 +526,8 @@ const clearChatMemory = async () => {
             <div class="input-area">
                 <div class="input-main">
                     <el-select v-model="selectedFileIds" class="embed-select" multiple filterable collapse-tags
-                        collapse-tags-tooltip :max-collapse-tags="1" placeholder="选择知识库的文件" size="small">
+                        :disabled="isSelectDisabled" collapse-tags-tooltip :max-collapse-tags="1" placeholder="选择知识库的文件"
+                        size="small">
                         <el-option v-for="item in embedOptions" :key="item.value" :label="item.label"
                             :value="item.value">
                             <span class="option-text">{{ truncateLabel(item.label) }}</span>
@@ -511,8 +537,8 @@ const clearChatMemory = async () => {
                         :autosize="{ minRows: 2, maxRows: 6 }" @keydown="handleInputKeydown" />
                 </div>
                 <div class="input-actions">
-                    <el-switch v-model="deepSearch" class="deep-search-switch" inline-prompt active-text="网络搜索"
-                        inactive-text="网络搜索" />
+                    <el-switch v-model="deepSearch" :disabled="isSwitchDisabled" class="deep-search-switch"
+                        inline-prompt active-text="网络搜索" inactive-text="网络搜索" />
                     <el-button type="primary" :disabled="isAiThinking" @click="sendMessage">发送</el-button>
                 </div>
             </div>

@@ -85,9 +85,10 @@ export const deleteReviewService = (id) => {
     return request.delete(`review/${id}`);
 };
 
-// 清空聊天记忆
-export const clearChatMemoryService = () => {
-    return request.post("chatroom/clear");
+// 清空聊天记忆（需要携带 sid）
+export const clearChatMemoryService = (sid) => {
+    // 后端使用 @RequestParam("sid") 接收，因此通过 query 参数传递
+    return request.post("chatroom/clear", null, { params: { sid } });
 };
 
 // Embed 文档相关接口
