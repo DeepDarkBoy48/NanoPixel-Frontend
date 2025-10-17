@@ -139,13 +139,12 @@ const goBlog = () => {
           <!-- 登录表单 -->
           <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="rules">
             <div class="test-account-tip">
-              <span class="tip-left">测试账号：徐晨阳2025 密码：123456</span>
+              <div class="tip-left-col">
+                <div class="tip-row"><span class="tip-label">账号：</span><span class="tip-value">徐晨阳2025</span></div>
+                <div class="tip-row"><span class="tip-label">密码：</span><span class="tip-value">123456</span></div>
+              </div>
               <span class="tip-arrow" aria-hidden="true">➜</span>
-              <el-button
-                class="quick-login-btn"
-                size="large"
-                @click="oneClickLogin"
-              >使用测试账号一键登陆</el-button>
+              <el-button class="quick-login-btn" size="large" @click="oneClickLogin">使用此测试账号一键登陆</el-button>
             </div>
             <el-form-item prop="username">
               <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>
@@ -269,51 +268,70 @@ const goBlog = () => {
   line-height: 1.5;
 }
 
-  .test-account-tip {
-    margin-bottom: 10px;
-    padding: 6px 10px;
-    border-radius: 8px;
-    background: rgba(255, 152, 0, 0.12);
-    border: 1px solid rgba(255, 152, 0, 0.35);
-    color: #ffa726;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    letter-spacing: 0.01em;
-  }
-  .tip-left {
-    white-space: nowrap;
-    flex: 1 1 auto;
-  }
-  .tip-arrow {
-    color: #22c55e;
-    font-size: 18px;
-    line-height: 1;
-    flex: none;
-    filter: drop-shadow(0 1px 3px rgba(34, 197, 94, 0.45));
-  }
-  .quick-login-btn {
-    display: inline-block;
-    margin: 0;
-    padding: 8px 12px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 6px 14px rgba(34, 197, 94, 0.30);
-    transition: all 0.2s ease;
-  }
-  .quick-login-btn:hover {
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-    transform: translateY(-1px);
-    box-shadow: 0 14px 30px rgba(34, 197, 94, 0.45);
-  }
+.test-account-tip {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 152, 0, 0.12);
+  border: 1px solid rgba(255, 152, 0, 0.35);
+  color: #ffa726;
+  font-weight: 600;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  column-gap: 12px;
+  letter-spacing: 0.01em;
+  min-height: 72px;
+}
 
-  /* 移除旧箭头与动效，整体更紧凑 */
+.tip-left-col {
+  display: grid;
+  row-gap: 6px;
+  align-content: center;
+}
+
+.tip-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.tip-label {
+  opacity: 0.95;
+}
+
+.tip-value {
+  color: #ffc46b;
+}
+
+.tip-arrow {
+  color: #22c55e;
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(34, 197, 94, 0.45));
+}
+
+.quick-login-btn {
+  display: inline-block;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.30);
+  transition: all 0.2s ease;
+}
+
+.quick-login-btn:hover {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(34, 197, 94, 0.45);
+}
+
+/* 移除旧箭头与动效，整体更紧凑 */
 
 .form-title {
   color: #fff;
@@ -410,7 +428,7 @@ const goBlog = () => {
   }
 }
 
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
   .login-container {
     width: 92%;
     padding: 16px;
@@ -434,13 +452,12 @@ const goBlog = () => {
   .test-account-tip {
     font-size: 0.9rem;
     margin-bottom: 10px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+    min-height: auto;
   }
-  .tip-left {
-    white-space: normal;
-  }
+
   .tip-arrow {
     display: none;
   }
