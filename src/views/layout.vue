@@ -179,7 +179,27 @@ const activeMenu = computed(() => {
                     </el-menu-item>
                 </el-sub-menu>
 
+                  <el-sub-menu index="/article">
+                    <template #title>
+                        <el-icon>
+                            <UserFilled />
+                        </el-icon>
+                        <span>文章中心</span>
+                    </template>
+                    <el-menu-item index="/article/category">
+                        <el-icon>
+                            <Management />
+                        </el-icon>
+                        <span>文章分类</span>
+                    </el-menu-item>
 
+                    <el-menu-item index="/article/manage">
+                        <el-icon>
+                            <Promotion />
+                        </el-icon>
+                        <span>文章管理</span>
+                    </el-menu-item>
+                </el-sub-menu>
 
                 <el-sub-menu index="/ai2">
                     <template #title>
@@ -240,27 +260,6 @@ const activeMenu = computed(() => {
                         <span>我的评论</span>
                     </el-menu-item>
                 </el-sub-menu>
-                <!-- <el-sub-menu index="/article">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>文章中心</span>
-                    </template>
-                    <el-menu-item index="/article/category">
-                        <el-icon>
-                            <Management />
-                        </el-icon>
-                        <span>文章分类</span>
-                    </el-menu-item>
-
-                    <el-menu-item index="/article/manage">
-                        <el-icon>
-                            <Promotion />
-                        </el-icon>
-                        <span>文章管理</span>
-                    </el-menu-item>
-                </el-sub-menu> -->
             </el-menu>
         </el-aside>
 
@@ -331,6 +330,28 @@ const activeMenu = computed(() => {
                         <span class="menu-label">知识库</span>
                     </el-menu-item>
 
+                </el-sub-menu>
+
+                <el-sub-menu index="/article">
+                    <template #title>
+                        <el-icon>
+                            <UserFilled />
+                        </el-icon>
+                        <span>文章中心</span>
+                    </template>
+                    <el-menu-item index="/article/category">
+                        <el-icon>
+                            <Management />
+                        </el-icon>
+                        <span>文章分类</span>
+                    </el-menu-item>
+
+                    <el-menu-item index="/article/manage">
+                        <el-icon>
+                            <Promotion />
+                        </el-icon>
+                        <span>文章管理</span>
+                    </el-menu-item>
                 </el-sub-menu>
 
                 <el-sub-menu index="/user">

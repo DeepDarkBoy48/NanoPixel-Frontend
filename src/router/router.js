@@ -34,6 +34,8 @@ const routes = [
       // 文章中心
       { path: "/article/category", component: ArticleCategoryVue },
       { path: "/article/manage", component: ArticleManageVue },
+
+      //用户中心
       { path: "/user/info", component: UserInfoVue },
       { path: "/user/avatar", component: UserAvatarVUe },
       { path: "/user/resetPassword", component: UserResetPasswordVue },
