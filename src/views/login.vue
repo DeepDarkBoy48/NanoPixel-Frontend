@@ -211,7 +211,7 @@ const goBlog = () => {
 .login-container {
   position: relative;
   z-index: 1;
-  width: 420px;
+  width: 500px;
   background: rgba(0, 0, 0, 0.3);
   padding: 40px;
   border-radius: 20px;
@@ -236,9 +236,10 @@ const goBlog = () => {
 }
 
 .site-logo {
+  display: block;
   width: 200px;
   height: auto;
-  margin-bottom: 30px;
+  margin: 0 auto;
   animation: float 3s ease-in-out infinite;
 }
 

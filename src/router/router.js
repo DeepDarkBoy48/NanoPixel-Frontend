@@ -17,6 +17,7 @@ import LibraryDetail from "@/views/ai/libraryDetail.vue";
 import promptManagerVue from "@/views/ai/promptManager.vue";
 import embedVue from "@/views/ai/embed.vue";
 import IframeVue from "@/views/youtube/iframe.vue";
+import SmashEnglishVue from "@/views/SmashEnglish/index.vue";
 
 // 路由配置说明：
 // - 根路径使用 Layout 作为统一布局容器，所有业务页面作为其子路由渲染在 <router-view/>
@@ -59,6 +60,9 @@ const routes = [
 
       // AI 模块：Embed
       { path: "/ai/embed", component: embedVue },
+      
+      // AI 模块：Smash English
+      { path: "/ai/smashEnglish", component: SmashEnglishVue },
 
       { path: "/youtube/iframe", component: IframeVue },
     ],

@@ -1,7 +1,6 @@
 <script setup>
 import { Plus, Upload } from '@element-plus/icons-vue'
-import { ref } from 'vue'
-import avatar from '@/assets/default.png'
+import { ref, computed } from 'vue'
 const uploadRef = ref()
 import { useTokenStore } from '@/store/token.js'
 const tokenStore = useTokenStore();
@@ -12,12 +11,15 @@ const userInfoStore = useUserInfoStore();
 //用户头像地址
 const imgUrl = ref(userInfoStore.info.userPic)
 
+const defaultAvatar = computed(() => {
+    const seed = userInfoStore.info.nickname || 'default_user'
+    return `https://api.dicebear.com/9.x/identicon/svg?seed=${seed}`
+})
+
 //图片上传成功的回调函数
 const uploadSuccess = (result) => {
     imgUrl.value = result.data.fileUrl;
 }
-
-
 
 import { userAvatarUpdateService } from '@/api/user.js'
 import { ElMessage } from 'element-plus'
@@ -46,7 +48,7 @@ const updateAvatar = async () => {
                     action="/api/upload" name="file" :headers="{ 'Authorization': tokenStore.token }"
                     :on-success="uploadSuccess">
                     <img v-if="imgUrl" :src="imgUrl" class="avatar" />
-                    <img v-else :src="avatar" width="278" />
+                    <img v-else :src="defaultAvatar" width="278" />
                 </el-upload>
                 <br />
                 <el-button type="primary" :icon="Plus" size="large"

@@ -17,7 +17,7 @@ import {
     Picture,
     MagicStick,
 } from '@element-plus/icons-vue'
-import avatar from '@/assets/default.png'
+
 import { userInfoService } from '@/api/user.js'
 import useUserInfoStore from '@/store/userInfo.js'
 import { useTokenStore } from '@/store/token.js'
@@ -127,599 +127,646 @@ const activeMenu = computed(() => {
     if (path.startsWith('/ai/prompt')) return '/ai/prompt'
     return path
 })
+
+// 计算用户头像：如果有设置头像则使用设置的，否则使用基于昵称的随机图片
+const currentAvatar = computed(() => {
+    if (userInfoStore.info.userPic) {
+        return userInfoStore.info.userPic
+    }
+    const seed = userInfoStore.info.nickname || 'default_user'
+    return `https://api.dicebear.com/9.x/identicon/svg?seed=${seed}`
+})
+
 </script>
 <template>
     <!-- el-container 容器 -->
     <el-container class="layout-container">
         <!-- 左侧菜单 (桌面端) -->
-        <el-aside v-if="!isMobile" :width="isCollapse ? '64px' : '200px'">
-            <div class="el-aside__logo"></div>
+        <el-aside v-if="!isMobile" :width="isCollapse ? '64px' : '260px'" class="desktop-aside">
+            
+            <!-- 用户信息区域 (展开时显示) -->
+            <div class="user-info-section" v-if="!isCollapse">
+                <el-avatar :size="50" :src="currentAvatar" />
+                <div class="user-details">
+                    <span class="username">{{ userInfoStore.info.nickname || '用户' }}</span>
+                </div>
+            </div>
+            <!-- 折叠时的简略用户信息 -->
+            <div class="user-info-mini" v-else>
+                <el-avatar :size="32" :src="currentAvatar" />
+            </div>
+
             <!-- 菜单 -->
-            <el-menu :default-active="activeMenu" :default-openeds="defaultOpenedMenus" :active-text-color="'var(--app-primary)'"
-                :background-color="'var(--app-sider-bg)'" :text-color="'var(--app-sider-text)'" router
-                :collapse="isCollapse" :collapse-transition="false">
+            <el-scrollbar class="aside-menu-scroll">
+                <el-menu :default-active="activeMenu" :default-openeds="defaultOpenedMenus"
+                    :active-text-color="'var(--app-primary)'" :background-color="'transparent'"
+                    :text-color="'var(--app-sider-text)'" router :collapse="isCollapse" :collapse-transition="false">
 
+                    <el-sub-menu index="/ai">
+                        <template #title>
+                            <el-icon>
+                                <MagicStick />
+                            </el-icon>
+                            <span>AI绘图</span>
+                        </template>
 
+                        <el-menu-item index="/ai/magicImageEdit">
+                            <el-icon>
+                                <Crop />
+                            </el-icon>
+                            <span class="menu-label">魔法修图</span>
+                            <span class="hot-badge">🔥 HOT</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/library">
+                            <el-icon>
+                                <Promotion />
+                            </el-icon>
+                            <span class="menu-label">灵感广场</span>
+                            <span class="hot-badge">🔥 HOT</span>
+                        </el-menu-item>
 
+                        <el-menu-item index="/ai/magicImageEdit/history">
+                            <el-icon>
+                                <Picture />
+                            </el-icon>
+                            <span class="menu-label">我的图集</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/prompt">
+                            <el-icon>
+                                <EditPen />
+                            </el-icon>
+                            <span class="menu-label">提示词管理</span>
+                        </el-menu-item>
+                    </el-sub-menu>
 
-                <el-sub-menu index="/ai">
-                    <template #title>
-                        <el-icon>
-                            <MagicStick />
-                        </el-icon>
-                        <span>AI绘图</span>
-                    </template>
+                    <el-sub-menu index="/article">
+                        <template #title>
+                            <el-icon>
+                                <UserFilled />
+                            </el-icon>
+                            <span>文章中心</span>
+                        </template>
+                        <el-menu-item index="/article/category">
+                            <el-icon>
+                                <Management />
+                            </el-icon>
+                            <span>文章分类</span>
+                        </el-menu-item>
 
-                    <el-menu-item index="/ai/magicImageEdit">
-                        <el-icon>
-                            <Crop />
-                        </el-icon>
-                        <span class="menu-label">魔法修图</span>
-                        <span class="hot-badge">🔥 HOT</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/library">
-                        <el-icon>
-                            <Promotion />
-                        </el-icon>
-                        <span class="menu-label">灵感广场</span>
-                        <span class="hot-badge">🔥 HOT</span>
-                    </el-menu-item>
+                        <el-menu-item index="/article/manage">
+                            <el-icon>
+                                <Promotion />
+                            </el-icon>
+                            <span>文章管理</span>
+                        </el-menu-item>
+                    </el-sub-menu>
 
-                    <el-menu-item index="/ai/magicImageEdit/history">
-                        <el-icon>
-                            <Picture />
-                        </el-icon>
-                        <span class="menu-label">我的图集</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/prompt">
-                        <el-icon>
-                            <EditPen />
-                        </el-icon>
-                        <span class="menu-label">提示词管理</span>
-                    </el-menu-item>
-                </el-sub-menu>
+                    <el-sub-menu index="/ai2">
+                        <template #title>
+                            <el-icon>
+                                <MagicStick />
+                            </el-icon>
+                            <span>AI知识库</span>
+                        </template>
+                        <el-menu-item index="/ai/chatRoom">
+                            <el-icon>
+                                <ChatLineRound />
+                            </el-icon>
+                            <span class="menu-label">AI对话</span>
+                            <span class="hot-badge">🔥 HOT</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/embed">
+                            <el-icon>
+                                <ChatLineRound />
+                            </el-icon>
+                            <span class="menu-label">知识库</span>
+                        </el-menu-item>
 
-                  <el-sub-menu index="/article">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>文章中心</span>
-                    </template>
-                    <el-menu-item index="/article/category">
-                        <el-icon>
-                            <Management />
-                        </el-icon>
-                        <span>文章分类</span>
-                    </el-menu-item>
+                    </el-sub-menu>
 
-                    <el-menu-item index="/article/manage">
-                        <el-icon>
-                            <Promotion />
-                        </el-icon>
-                        <span>文章管理</span>
-                    </el-menu-item>
-                </el-sub-menu>
+                    <el-sub-menu index="/youtube">
+                        <template #title>
+                            <el-icon>
+                                <UserFilled />
+                            </el-icon>
+                            <span>YouTube中心</span>
+                        </template>
+                        <el-menu-item index="/youtube/iframe">
+                            <el-icon>
+                                <Management />
+                            </el-icon>
+                            <span>视频嵌入</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/smashEnglish">
+                            <el-icon>
+                                <EditPen />
+                            </el-icon>
+                            <span class="menu-label">英语语法分析</span>
+                            <span class="hot-badge">NEW</span>
+                        </el-menu-item>
+                    </el-sub-menu>
 
-                <el-sub-menu index="/ai2">
-                    <template #title>
-                        <el-icon>
-                            <MagicStick />
-                        </el-icon>
-                        <span>AI知识库</span>
-                    </template>
-                    <el-menu-item index="/ai/chatRoom">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span class="menu-label">AI对话</span>
-                        <span class="hot-badge">🔥 HOT</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/embed">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span class="menu-label">知识库</span>
-                    </el-menu-item>
+                    <el-sub-menu index="/user">
+                        <template #title>
+                            <el-icon>
+                                <UserFilled />
+                            </el-icon>
+                            <span>个人中心</span>
+                        </template>
 
-                </el-sub-menu>
+                        <el-menu-item index="/user/info">
+                            <el-icon>
+                                <User />
+                            </el-icon>
+                            <span>基本资料</span>
+                        </el-menu-item>
 
-                <el-sub-menu index="/youtube">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>YouTube中心</span>
-                    </template>
-                    <el-menu-item index="/youtube/iframe">
-                        <el-icon>
-                            <Management />
-                        </el-icon>
-                        <span>视频嵌入</span>
-                    </el-menu-item>
-                </el-sub-menu>
+                        <el-menu-item index="/user/avatar">
+                            <el-icon>
+                                <Crop />
+                            </el-icon>
+                            <span>更换头像</span>
+                        </el-menu-item>
 
-                <el-sub-menu index="/user">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>个人中心</span>
-                    </template>
+                        <el-menu-item index="/user/resetPassword">
+                            <el-icon>
+                                <EditPen />
+                            </el-icon>
+                            <span>重置密码</span>
+                        </el-menu-item>
 
-                    <el-menu-item index="/user/info">
-                        <el-icon>
-                            <User />
-                        </el-icon>
-                        <span>基本资料</span>
-                    </el-menu-item>
+                        <el-menu-item index="/user/review">
+                            <el-icon>
+                                <ChatLineRound />
+                            </el-icon>
+                            <span>我的评论</span>
+                        </el-menu-item>
+                    </el-sub-menu>
+                </el-menu>
+            </el-scrollbar>
 
-                    <el-menu-item index="/user/avatar">
-                        <el-icon>
-                            <Crop />
-                        </el-icon>
-                        <span>更换头像</span>
-                    </el-menu-item>
-
-                    <el-menu-item index="/user/resetPassword">
-                        <el-icon>
-                            <EditPen />
-                        </el-icon>
-                        <span>重置密码</span>
-                    </el-menu-item>
-
-                    <el-menu-item index="/user/review">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span>我的评论</span>
-                    </el-menu-item>
-                </el-sub-menu>
-            </el-menu>
+            <!-- 底部操作区 -->
+            <div class="aside-footer">
+                <!-- 主题切换 -->
+                <div class="footer-item" @click="toggleTheme" :title="isDark ? '切换为浅色' : '切换为深色'">
+                    <el-icon>
+                        <component :is="isDark ? Moon : Sunny" />
+                    </el-icon>
+                    <span v-if="!isCollapse">主题模式</span>
+                </div>
+                <!-- 退出登录 -->
+                <div class="footer-item danger" @click="handleCommand('logout')" title="退出登录">
+                    <el-icon>
+                        <SwitchButton />
+                    </el-icon>
+                    <span v-if="!isCollapse">退出登录</span>
+                </div>
+                <!-- 折叠按钮 -->
+                <div class="footer-item collapse-btn" @click="handleMenuClick" :title="isCollapse ? '展开' : '折叠'">
+                    <el-icon>
+                        <component :is="isCollapse ? Expand : Fold" />
+                    </el-icon>
+                </div>
+            </div>
         </el-aside>
 
         <!-- 抽屉菜单 (移动端) -->
-        <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="200px" :with-header="false"
+        <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="240px" :with-header="false"
             class="mobile-drawer">
-            <div class="el-aside__logo"></div>
-            <el-menu :default-active="activeMenu" :default-openeds="defaultOpenedMenus" :active-text-color="'var(--app-primary)'"
-                :background-color="'var(--app-sider-bg)'" :text-color="'var(--app-sider-text)'" router
-                @select="drawerVisible = false">
-                <el-sub-menu index="/ai">
-                    <template #title>
-                        <el-icon>
-                            <MagicStick />
-                        </el-icon>
-                        <span>AI绘图</span>
-                    </template>
+            <div class="mobile-drawer-content">
+                
+                 <!-- 移动端用户信息 -->
+                <div class="user-info-section">
+                    <el-avatar :size="50" :src="currentAvatar" />
+                    <div class="user-details">
+                        <span class="username">{{ userInfoStore.info.nickname || '用户' }}</span>
+                    </div>
+                </div>
 
-                    <el-menu-item index="/ai/magicImageEdit">
-                        <el-icon>
-                            <Crop />
-                        </el-icon>
-                        <span class="menu-label">魔法修图</span>
-                        <span class="hot-badge">🔥 HOT</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/library">
-                        <el-icon>
-                            <Promotion />
-                        </el-icon>
-                        <span class="menu-label">灵感广场</span>
-                        <span class="hot-badge">🔥 HOT</span>
-                    </el-menu-item>
+                <el-menu :default-active="activeMenu" :default-openeds="defaultOpenedMenus"
+                    :active-text-color="'var(--app-primary)'" :background-color="'transparent'"
+                    :text-color="'var(--app-sider-text)'" router @select="drawerVisible = false">
+                    <el-sub-menu index="/ai">
+                        <template #title>
+                            <el-icon>
+                                <MagicStick />
+                            </el-icon>
+                            <span>AI绘图</span>
+                        </template>
 
-                    <el-menu-item index="/ai/magicImageEdit/history">
-                        <el-icon>
-                            <Picture />
-                        </el-icon>
-                        <span class="menu-label">我的图集</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/prompt">
-                        <el-icon>
-                            <EditPen />
-                        </el-icon>
-                        <span class="menu-label">提示词管理</span>
-                    </el-menu-item>
-                </el-sub-menu>
+                        <el-menu-item index="/ai/magicImageEdit">
+                            <el-icon>
+                                <Crop />
+                            </el-icon>
+                            <span class="menu-label">魔法修图</span>
+                            <span class="hot-badge">🔥 HOT</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/library">
+                            <el-icon>
+                                <Promotion />
+                            </el-icon>
+                            <span class="menu-label">灵感广场</span>
+                            <span class="hot-badge">🔥 HOT</span>
+                        </el-menu-item>
 
+                        <el-menu-item index="/ai/magicImageEdit/history">
+                            <el-icon>
+                                <Picture />
+                            </el-icon>
+                            <span class="menu-label">我的图集</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/prompt">
+                            <el-icon>
+                                <EditPen />
+                            </el-icon>
+                            <span class="menu-label">提示词管理</span>
+                        </el-menu-item>
+                    </el-sub-menu>
 
+                    <el-sub-menu index="/ai2">
+                        <template #title>
+                            <el-icon>
+                                <MagicStick />
+                            </el-icon>
+                            <span>AI知识库</span>
+                        </template>
+                        <el-menu-item index="/ai/chatRoom">
+                            <el-icon>
+                                <ChatLineRound />
+                            </el-icon>
+                            <span class="menu-label">AI对话</span>
+                            <span class="hot-badge">🔥 HOT</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/embed">
+                            <el-icon>
+                                <ChatLineRound />
+                            </el-icon>
+                            <span class="menu-label">知识库</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/smashEnglish">
+                            <el-icon>
+                                <EditPen />
+                            </el-icon>
+                            <span class="menu-label">英语语法分析</span>
+                            <span class="hot-badge">NEW</span>
+                        </el-menu-item>
 
-                <el-sub-menu index="/ai">
-                    <template #title>
+                    </el-sub-menu>
+
+                    <el-sub-menu index="/article">
+                        <template #title>
+                            <el-icon>
+                                <UserFilled />
+                            </el-icon>
+                            <span>文章中心</span>
+                        </template>
+                        <el-menu-item index="/article/category">
+                            <el-icon>
+                                <Management />
+                            </el-icon>
+                            <span>文章分类</span>
+                        </el-menu-item>
+
+                        <el-menu-item index="/article/manage">
+                            <el-icon>
+                                <Promotion />
+                            </el-icon>
+                            <span>文章管理</span>
+                        </el-menu-item>
+                    </el-sub-menu>
+
+                    <el-sub-menu index="/user">
+                        <template #title>
+                            <el-icon>
+                                <UserFilled />
+                            </el-icon>
+                            <span>个人中心</span>
+                        </template>
+
+                        <el-menu-item index="/user/info">
+                            <el-icon>
+                                <User />
+                            </el-icon>
+                            <span>基本资料</span>
+                        </el-menu-item>
+
+                        <el-menu-item index="/user/avatar">
+                            <el-icon>
+                                <Crop />
+                            </el-icon>
+                            <span>更换头像</span>
+                        </el-menu-item>
+
+                        <el-menu-item index="/user/resetPassword">
+                            <el-icon>
+                                <EditPen />
+                            </el-icon>
+                            <span>重置密码</span>
+                        </el-menu-item>
+
+                        <el-menu-item index="/user/review">
+                            <el-icon>
+                                <ChatLineRound />
+                            </el-icon>
+                            <span>我的评论</span>
+                        </el-menu-item>
+                    </el-sub-menu>
+                </el-menu>
+                
+                 <div class="aside-footer">
+                    <div class="footer-item" @click="toggleTheme">
                         <el-icon>
-                            <MagicStick />
+                            <component :is="isDark ? Moon : Sunny" />
                         </el-icon>
-                        <span>AI知识库</span>
-                    </template>
-                    <el-menu-item index="/ai/chatRoom">
+                        <span>主题模式</span>
+                    </div>
+                    <div class="footer-item danger" @click="handleCommand('logout')">
                         <el-icon>
-                            <ChatLineRound />
+                            <SwitchButton />
                         </el-icon>
-                        <span class="menu-label">AI对话</span>
-                        <span class="hot-badge">🔥 HOT</span>
-                    </el-menu-item>
-                    <el-menu-item index="/ai/embed">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span class="menu-label">知识库</span>
-                    </el-menu-item>
-
-                </el-sub-menu>
-
-                <el-sub-menu index="/article">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>文章中心</span>
-                    </template>
-                    <el-menu-item index="/article/category">
-                        <el-icon>
-                            <Management />
-                        </el-icon>
-                        <span>文章分类</span>
-                    </el-menu-item>
-
-                    <el-menu-item index="/article/manage">
-                        <el-icon>
-                            <Promotion />
-                        </el-icon>
-                        <span>文章管理</span>
-                    </el-menu-item>
-                </el-sub-menu>
-
-                <el-sub-menu index="/user">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>个人中心</span>
-                    </template>
-
-                    <el-menu-item index="/user/info">
-                        <el-icon>
-                            <User />
-                        </el-icon>
-                        <span>基本资料</span>
-                    </el-menu-item>
-
-                    <el-menu-item index="/user/avatar">
-                        <el-icon>
-                            <Crop />
-                        </el-icon>
-                        <span>更换头像</span>
-                    </el-menu-item>
-
-                    <el-menu-item index="/user/resetPassword">
-                        <el-icon>
-                            <EditPen />
-                        </el-icon>
-                        <span>重置密码</span>
-                    </el-menu-item>
-
-                    <el-menu-item index="/user/review">
-                        <el-icon>
-                            <ChatLineRound />
-                        </el-icon>
-                        <span>我的评论</span>
-                    </el-menu-item>
-
-
-                </el-sub-menu>
-            </el-menu>
+                        <span>退出登录</span>
+                    </div>
+                </div>
+            </div>
         </el-drawer>
 
         <!-- 右侧主区域 -->
-        <el-container>
-            <!-- 头部区域 -->
-            <el-header>
-                <div class="header-left">
-                    <el-icon @click="handleMenuClick" class="header-icon" role="button"
-                        :aria-label="isMobile ? (drawerVisible ? '关闭菜单' : '打开菜单') : (isCollapse ? '展开侧边栏' : '折叠侧边栏')">
-                        <template v-if="isMobile">
-                            <span class="hamburger-icon" :class="{ 'is-open': drawerVisible }"></span>
-                        </template>
-                        <template v-else>
-                            <component :is="isCollapse ? Expand : Fold" />
-                        </template>
-                    </el-icon>
-                    <span class="header-title"></span><strong>{{ userInfoStore.info.nickname }}</strong>
-                </div>
-                <div class="header-center"></div>
-                <div class="header-right">
-                    <!-- 主题切换按钮 -->
-                    <el-icon class="header-icon theme-toggle" @click="toggleTheme" :title="isDark ? '切换为浅色' : '切换为深色'">
-                        <component :is="isDark ? Moon : Sunny" />
-                    </el-icon>
-                    <!-- 用户菜单 -->
-                    <!-- command: 条目被点击后会触发,在事件函数上可以声明一个参数,接收条目对应的指令 -->
-                    <el-dropdown placement="bottom-end" @command="handleCommand">
-                        <span class="el-dropdown__box">
-                            <el-avatar :src="userInfoStore.info.userPic ? userInfoStore.info.userPic : avatar" />
-                            <el-icon>
-                                <CaretBottom />
-                            </el-icon>
-                        </span> <template #dropdown>
-                            <el-dropdown-menu>
-                                <el-dropdown-item command="info" :icon="User">
-                                    基本资料
-                                </el-dropdown-item>
-                                <el-dropdown-item command="avatar" :icon="Crop">
-                                    更换头像
-                                </el-dropdown-item>
-                                <el-dropdown-item command="resetPassword" :icon="EditPen">
-                                    重置密码
-                                </el-dropdown-item>
-                                <el-dropdown-item command="logout" :icon="SwitchButton">
-                                    退出登录
-                                </el-dropdown-item>
-                            </el-dropdown-menu>
-                        </template>
-                    </el-dropdown>
-                </div>
-            </el-header>
+        <el-container class="main-container">
+            <!-- 移动端头部 (仅在移动端显示) -->
+            <div class="mobile-header" v-if="isMobile">
+                <el-icon @click="drawerVisible = true" class="menu-trigger">
+                    <Fold />
+                </el-icon>
+                <span class="mobile-title">Robin Blog</span>
+            </div>
 
             <!-- 中间区域 -->
             <el-main>
                 <RouterView />
             </el-main>
-
-            <!-- 底部区域
-            <el-footer>
-                大事件 ©2023 Created by 黑马程序员
-            </el-footer> -->
         </el-container>
     </el-container>
 </template>
 <style lang="scss" scoped>
 .layout-container {
     height: var(--app-vh, 100vh);
-    overflow-x: hidden;
+    overflow: hidden;
+    display: flex;
 
-    .el-aside {
-        background-color: var(--app-sider-bg);
-        /* 侧边栏背景随主题 */
-        transition: width 0.3s;
-
-        &__logo {
-            height: 120px;
-            background: url('@/assets/logo.png') no-repeat center / 120px auto;
-        }
-
-        .el-menu {
-            border-right: none;
-            /* Element Plus 菜单主题变量（统一浅/深） */
-            --el-menu-bg-color: var(--app-sider-bg);
-            --el-menu-text-color: var(--app-sider-text);
-            --el-menu-active-color: var(--app-primary);
-            --el-menu-hover-bg-color: var(--app-sider-hover-bg);
-            --el-menu-hover-text-color: var(--app-sider-text);
-        }
-
-        /* 菜单项文字与 HOT 徽标 */
-        :deep(.el-menu-item) {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .hot-badge {
-            margin-left: 4px;
-            padding: 1px 6px;
-            border-radius: 999px;
-            font-size: 10px;
-            line-height: 1.2;
-            color: #d4380d;
-            background: color-mix(in srgb, #fa8c16 18%, transparent);
-            border: 1px solid color-mix(in srgb, #fa8c16 45%, transparent);
-            user-select: none;
-        }
-
-        :deep(.el-menu-item.is-active),
-        :deep(.el-sub-menu.is-active),
-        :deep(.el-sub-menu__title.is-active) {
-            background-color: var(--app-sider-active-bg) !important;
-            color: var(--app-primary) !important;
-        }
-
-        :deep(.el-menu-item:hover) {
-            background-color: var(--app-sider-hover-bg);
-        }
-
-        :deep(.el-sub-menu__title:hover) {
-            background-color: var(--app-sider-hover-bg);
-        }
-    }
-
-    .el-main {
-        flex: 1;
-        /* 让 el-main 充满剩余空间 */
+    .desktop-aside {
         display: flex;
-        /* 内部也使用 flex 布局 */
         flex-direction: column;
-        /* 纵向排列 */
-        min-height: 0;
-        /* 关键：允许 flex item 收缩 */
-        padding: 12px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        box-sizing: border-box;
-        /* 主区域背景与边框色（随主题） */
-        background: var(--app-main-bg);
-        --el-border-color: var(--app-header-border);
-        --el-border-color-light: var(--app-header-border);
-        --el-border-color-lighter: var(--app-header-border);
+        background-color: var(--app-sider-bg);
+        border-right: 1px solid var(--app-header-border);
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        z-index: 10;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
 
-        @media (max-width: 768px) {
-            padding: 8px;
-        }
-    }
-
-    .el-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: var(--app-header-bg);
-        border-bottom: 1px solid var(--app-header-border);
-
-        .header-left {
+        .aside-header {
+            padding: 20px 0;
             display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .header-center {
-            flex: 1;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 0 8px;
-            min-width: 0;
+            align-items: center;
+            
+            .el-aside__logo {
+                height: 40px;
+                width: 120px;
+                background: url('@/assets/logo.png') no-repeat center / contain;
+                transition: all 0.3s;
+            }
         }
 
-        div {
+        .user-info-section {
             display: flex;
+            flex-direction: column;
             align-items: center;
+            padding: 20px 10px;
+            border-bottom: 1px solid var(--app-header-border);
+            margin-bottom: 10px;
 
-            .header-icon {
-                font-size: 24px;
-                margin-right: 12px;
+            .user-details {
+                margin-top: 10px;
+                text-align: center;
+                
+                .username {
+                    display: block;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: var(--app-sider-text);
+                    margin-bottom: 4px;
+                }
+                
+                .user-role {
+                    display: inline-block;
+                    font-size: 12px;
+                    padding: 2px 8px;
+                    background: var(--app-primary);
+                    color: white;
+                    border-radius: 10px;
+                    opacity: 0.8;
+                }
+            }
+        }
+
+        .user-info-mini {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--app-header-border);
+        }
+
+        .aside-menu-scroll {
+            flex: 1;
+            
+            .el-menu {
+                border-right: none;
+                --el-menu-bg-color: transparent;
+                --el-menu-text-color: var(--app-sider-text);
+                --el-menu-active-color: var(--app-primary);
+                --el-menu-hover-bg-color: var(--app-sider-hover-bg);
+            }
+        }
+
+        .aside-footer {
+            padding: 10px;
+            border-top: 1px solid var(--app-header-border);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .footer-item {
+                display: flex;
+                align-items: center;
+                padding: 10px 14px;
                 cursor: pointer;
-                color: var(--app-header-icon);
-                transition: color 0.3s;
+                border-radius: 8px;
+                color: var(--app-sider-text);
+                transition: all 0.2s;
+                
+                .el-icon {
+                    font-size: 18px;
+                    margin-right: 12px;
+                }
+                
+                span {
+                    font-size: 14px;
+                    white-space: nowrap;
+                }
 
                 &:hover {
-                    color: var(--el-color-primary);
+                    background-color: var(--app-sider-hover-bg);
                 }
 
-                /* 经典三横杠（移动端） */
-                .hamburger-icon {
-                    position: relative;
-                    display: inline-block;
-                    width: 22px;
-                    height: 2px;
-                    background-color: currentColor;
-                    border-radius: 2px;
+                &.danger {
+                    color: #f56c6c;
+                    &:hover {
+                        background-color: rgba(245, 108, 108, 0.1);
+                    }
                 }
-
-                .hamburger-icon::before,
-                .hamburger-icon::after {
-                    content: '';
-                    position: absolute;
-                    left: 0;
-                    width: 100%;
-                    height: 2px;
-                    background-color: currentColor;
-                    border-radius: 2px;
-                }
-
-                .hamburger-icon::before {
-                    top: -6px;
-                }
-
-                .hamburger-icon::after {
-                    top: 6px;
+                
+                &.collapse-btn {
+                    justify-content: center;
+                    margin-top: 4px;
+                    border-top: 1px solid var(--app-header-border);
+                    padding-top: 14px;
+                    
+                    .el-icon {
+                        margin-right: 0;
+                    }
                 }
             }
         }
+    }
 
-        .el-dropdown__box {
+    /* 菜单项样式优化 */
+    :deep(.el-menu-item) {
+        margin: 4px 10px;
+        border-radius: 8px;
+        height: 44px;
+        line-height: 44px;
+        
+        &.is-active {
+            background-color: var(--app-sider-active-bg);
+            font-weight: 600;
+        }
+    }
+    
+    :deep(.el-sub-menu__title) {
+        margin: 4px 10px;
+        border-radius: 8px;
+        height: 44px;
+        line-height: 44px;
+    }
+
+    .hot-badge {
+        margin-left: auto;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-size: 10px;
+        line-height: 1.2;
+        color: #d4380d;
+        background: color-mix(in srgb, #fa8c16 18%, transparent);
+        border: 1px solid color-mix(in srgb, #fa8c16 45%, transparent);
+    }
+
+    .main-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        background: var(--app-main-bg);
+        
+        .mobile-header {
+            height: 50px;
+            background: var(--app-header-bg);
+            border-bottom: 1px solid var(--app-header-border);
             display: flex;
             align-items: center;
-
-            .el-icon {
-                color: var(--app-header-icon-weak);
-                margin-left: 10px;
+            padding: 0 16px;
+            
+            .menu-trigger {
+                font-size: 24px;
+                color: var(--app-header-icon);
+                margin-right: 16px;
             }
-
-            &:active,
-            &:focus {
-                outline: none;
+            
+            .mobile-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: var(--app-header-text);
             }
         }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            /* 拉开与头像的距离 */
-            margin-left: 8px;
+        .el-main {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            
+            @media (max-width: 768px) {
+                padding: 12px;
+            }
         }
     }
 }
 
+/* 移动端抽屉样式 */
 :deep(.mobile-drawer) {
     .el-drawer__body {
         padding: 0;
         background-color: var(--app-sider-bg);
     }
-
-    .el-menu {
-        border-right: none;
-        /* Element Plus 菜单主题变量（统一浅/深） */
-        --el-menu-bg-color: var(--app-sider-bg);
-        --el-menu-text-color: var(--app-sider-text);
-        --el-menu-active-color: var(--app-primary);
-        --el-menu-hover-bg-color: var(--app-sider-hover-bg);
-        --el-menu-hover-text-color: var(--app-sider-text);
-    }
-
-    /* 移动端抽屉菜单项激活状态样式 */
-    .el-menu-item.is-active,
-    .el-sub-menu.is-active,
-    .el-sub-menu__title.is-active {
-        background-color: var(--app-sider-active-bg) !important;
-        color: var(--app-primary) !important;
-    }
-
-    /* 移动端抽屉菜单项悬停状态样式 */
-    .el-menu-item:hover {
-        background-color: var(--app-sider-hover-bg);
-    }
-
-    .el-sub-menu__title:hover {
-        background-color: var(--app-sider-hover-bg);
-    }
-}
-
-
-@media (max-width: 767px) {
-    .el-header {
-        .header-title {
-            display: none;
+    
+    .mobile-drawer-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        
+        .el-aside__logo {
+            height: 60px;
+            background: url('@/assets/logo.png') no-repeat center / 100px auto;
+            margin-top: 10px;
         }
-
-        .header-center {
-            display: none;
-            /* 移动端隐藏模块导航，避免拥挤 */
+        
+        .user-info-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            
+            .username {
+                margin-top: 10px;
+                font-weight: 600;
+                color: var(--app-sider-text);
+            }
         }
-    }
-}
-
-/* 移动端：固定整体布局并让头部粘在顶部 */
-@media (max-width: 768px) {
-    .layout-container {
-        position: fixed;
-        inset: 0;
-        height: 100dvh;
-        width: 100%;
-        overflow: hidden;
-        /* 禁止整体横向滚动 */
-        background: var(--app-main-bg);
-        /* 适配 iOS 安全区域 */
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-        box-sizing: border-box;
-    }
-
-    .layout-container .el-header {
-        position: sticky;
-        top: env(safe-area-inset-top);
-        z-index: 100;
-        background: var(--app-header-bg);
+        
+        .el-menu {
+            flex: 1;
+            border: none;
+            --el-menu-bg-color: transparent;
+        }
+        
+        .aside-footer {
+            padding: 16px;
+            border-top: 1px solid var(--app-header-border);
+            
+            .footer-item {
+                display: flex;
+                align-items: center;
+                padding: 12px;
+                color: var(--app-sider-text);
+                
+                .el-icon {
+                    font-size: 20px;
+                    margin-right: 12px;
+                }
+                
+                &.danger {
+                    color: #f56c6c;
+                }
+            }
+        }
     }
 }
 </style>
