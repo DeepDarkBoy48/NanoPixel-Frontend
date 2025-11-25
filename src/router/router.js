@@ -13,10 +13,10 @@ import BlogVue from "@/views/blog/blog.vue";
 import magicImageEditVue from "@/views/ai/magicImageEdit.vue";
 import libraryVue from "@/views/ai/library.vue";
 import MagicHistory from "@/views/ai/magicedit/MagicHistory.vue";
-import canvasVue from "@/views/ai/canvas.vue";
 import LibraryDetail from "@/views/ai/libraryDetail.vue";
 import promptManagerVue from "@/views/ai/promptManager.vue";
 import embedVue from "@/views/ai/embed.vue";
+import IframeVue from "@/views/youtube/iframe.vue";
 
 // 路由配置说明：
 // - 根路径使用 Layout 作为统一布局容器，所有业务页面作为其子路由渲染在 <router-view/>
@@ -43,6 +43,8 @@ const routes = [
       // AI 模块：聊天室
       { path: "/ai/chatRoom", component: UserChatRoomVue },
 
+
+
       // AI 模块：魔法修图（入口 + 子页面）
       { path: "/ai/magicImageEdit", component: magicImageEditVue },
       { path: "/ai/magicImageEdit/history", component: MagicHistory },
@@ -54,11 +56,11 @@ const routes = [
       // AI 模块：Prompt 管理
       { path: "/ai/prompt", component: promptManagerVue },
 
-      // AI 模块：Canvas
-      { path: "/ai/canvas", component: canvasVue },
 
       // AI 模块：Embed
       { path: "/ai/embed", component: embedVue },
+
+      { path: "/youtube/iframe", component: IframeVue },
     ],
   },
   { path: "/blog", component: BlogVue },

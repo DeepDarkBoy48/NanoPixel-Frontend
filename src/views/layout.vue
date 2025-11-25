@@ -224,6 +224,21 @@ const activeMenu = computed(() => {
 
                 </el-sub-menu>
 
+                <el-sub-menu index="/youtube">
+                    <template #title>
+                        <el-icon>
+                            <UserFilled />
+                        </el-icon>
+                        <span>YouTube中心</span>
+                    </template>
+                    <el-menu-item index="/youtube/iframe">
+                        <el-icon>
+                            <Management />
+                        </el-icon>
+                        <span>视频嵌入</span>
+                    </el-menu-item>
+                </el-sub-menu>
+
                 <el-sub-menu index="/user">
                     <template #title>
                         <el-icon>
