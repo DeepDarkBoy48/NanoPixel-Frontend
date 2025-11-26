@@ -7,14 +7,14 @@ import { DictionaryPage } from './components/DictionaryPage';
 import { WritingPage } from './components/WritingPage';
 import { Footer } from './components/Footer';
 import { AiAssistant } from './components/AiAssistant';
-import { analyzeSentence } from './services/geminiService';
+import { analyzeSentenceService } from './services/geminiService';
 import { AnalysisResult, DictionaryResult, WritingResult, ModelLevel } from './types';
 import { Sparkles, BookOpen, AlertCircle } from 'lucide-react';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'analyzer' | 'dictionary' | 'writing'>('analyzer');
   const [modelLevel, setModelLevel] = useState<ModelLevel>('mini');
-  
+
   // Analyzer State
   const [isAnalyzerLoading, setIsAnalyzerLoading] = useState(false);
   const [analyzerResult, setAnalyzerResult] = useState<AnalysisResult | null>(null);
@@ -34,7 +34,7 @@ const App: React.FC = () => {
     setAnalyzerResult(null);
 
     try {
-      const data = await analyzeSentence(sentence, modelLevel);
+      const data = await analyzeSentenceService(sentence, modelLevel);
       setAnalyzerResult(data);
     } catch (err: any) {
       console.error(err);
@@ -49,15 +49,15 @@ const App: React.FC = () => {
   let contextType: 'sentence' | 'word' | 'writing' = 'sentence';
 
   if (activeTab === 'analyzer') {
-      assistantContextContent = analyzerResult?.englishSentence || null;
-      contextType = 'sentence';
+    assistantContextContent = analyzerResult?.englishSentence || null;
+    contextType = 'sentence';
   } else if (activeTab === 'dictionary') {
-      assistantContextContent = dictionaryResult?.word || null;
-      contextType = 'word';
+    assistantContextContent = dictionaryResult?.word || null;
+    contextType = 'word';
   } else {
-      // Reconstruct the full text from segments for context
-      assistantContextContent = writingResult?.segments.map(s => s.text).join('') || null;
-      contextType = 'writing';
+    // Reconstruct the full text from segments for context
+    assistantContextContent = writingResult?.segments.map(s => s.text).join('') || null;
+    contextType = 'writing';
   }
 
   // Dynamic container width based on active tab
@@ -70,15 +70,15 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 font-sans">
-      <Header 
-        activeTab={activeTab} 
-        onNavigate={setActiveTab} 
+      <Header
+        activeTab={activeTab}
+        onNavigate={setActiveTab}
         modelLevel={modelLevel}
         onModelChange={setModelLevel}
       />
 
       <main className={`flex-grow container mx-auto px-4 py-8 ${getContainerMaxWidth()} flex flex-col gap-8 relative transition-all duration-300 ease-in-out`}>
-        
+
         {activeTab === 'analyzer' && (
           <>
             {/* Hero Section */}
@@ -92,7 +92,7 @@ const App: React.FC = () => {
               </h1>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
                 输入任何英语句子，立刻解析其主谓宾定状补结构。
-                <br className="hidden md:block"/>适合英语学习者、教师及语言爱好者。
+                <br className="hidden md:block" />适合英语学习者、教师及语言爱好者。
               </p>
             </div>
 
@@ -103,7 +103,7 @@ const App: React.FC = () => {
 
             {/* Results Section */}
             <div className="w-full">
-               {isAnalyzerLoading && (
+              {isAnalyzerLoading && (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-500"></div>
                   <p className="text-slate-500 animate-pulse">正在分析句子结构...</p>
@@ -135,29 +135,29 @@ const App: React.FC = () => {
             </div>
           </>
         )}
-        
+
         {activeTab === 'dictionary' && (
-          <DictionaryPage 
-             initialResult={dictionaryResult} 
-             onResultChange={setDictionaryResult} 
-             modelLevel={modelLevel}
+          <DictionaryPage
+            initialResult={dictionaryResult}
+            onResultChange={setDictionaryResult}
+            modelLevel={modelLevel}
           />
         )}
 
         {activeTab === 'writing' && (
-            <WritingPage
-                initialResult={writingResult}
-                onResultChange={setWritingResult}
-                modelLevel={modelLevel}
-            />
+          <WritingPage
+            initialResult={writingResult}
+            onResultChange={setWritingResult}
+            modelLevel={modelLevel}
+          />
         )}
       </main>
 
       <Footer />
-      
+
       {/* Floating AI Assistant */}
-      <AiAssistant 
-        currentContext={assistantContextContent} 
+      <AiAssistant
+        currentContext={assistantContextContent}
         contextType={contextType}
       />
     </div>

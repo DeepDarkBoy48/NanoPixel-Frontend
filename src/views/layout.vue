@@ -249,14 +249,8 @@ const currentAvatar = computed(() => {
                             <el-icon>
                                 <UserFilled />
                             </el-icon>
-                            <span>YouTube中心</span>
+                            <span>SmashEnglish</span>
                         </template>
-                        <el-menu-item index="/youtube/iframe">
-                            <el-icon>
-                                <Management />
-                            </el-icon>
-                            <span>视频嵌入</span>
-                        </el-menu-item>
                         <el-menu-item index="/ai/smashEnglish">
                             <el-icon>
                                 <EditPen />
@@ -403,6 +397,15 @@ const currentAvatar = computed(() => {
                             </el-icon>
                             <span class="menu-label">知识库</span>
                         </el-menu-item>
+                    </el-sub-menu>
+
+                    <el-sub-menu index="/youtube">
+                        <template #title>
+                            <el-icon>
+                                <UserFilled />
+                            </el-icon>
+                            <span>SmashEnglish</span>
+                        </template>
                         <el-menu-item index="/ai/smashEnglish">
                             <el-icon>
                                 <EditPen />
@@ -410,7 +413,6 @@ const currentAvatar = computed(() => {
                             <span class="menu-label">英语语法分析</span>
                             <span class="hot-badge">NEW</span>
                         </el-menu-item>
-
                     </el-sub-menu>
 
                     <el-sub-menu index="/article">

@@ -64,10 +64,11 @@ const routes = [
       // AI 模块：Smash English
       { path: "/ai/smashEnglish", component: SmashEnglishVue },
 
-      { path: "/youtube/iframe", component: IframeVue },
+
     ],
   },
   { path: "/blog", component: BlogVue },
+  { path: "/smashEnglish", component: SmashEnglishVue },
 ];
 
 //创建路由器

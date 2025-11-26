@@ -22,6 +22,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      "/api/fastapi": {
+        // target: "http://localhost:8000",
+        target: "http://47.79.43.73:8001",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
       "/api": {
         //获取路径中包含了/api的请求
         target: "http://localhost:8081", //后台服务所在的源

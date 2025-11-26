@@ -1,5 +1,6 @@
 <script setup>
-import { User, Lock } from "@element-plus/icons-vue";
+import './login_sticker.css';
+import { User, Lock, MagicStick } from "@element-plus/icons-vue";
 import { ref } from "vue";
 //引入element-plus的消息提示组件
 import { ElMessage } from 'element-plus'
@@ -97,6 +98,10 @@ const clearRegisterData = () => {
 const goBlog = () => {
   router.push({ path: '/blog' })
 }
+
+const goSmashEnglish = () => {
+  router.push({ path: '/smashEnglish' })
+}
 </script>
 
 <template>
@@ -157,9 +162,14 @@ const goBlog = () => {
             <el-form-item>
               <el-button class="button" type="primary" auto-insert-space @click="login">登录</el-button>
             </el-form-item>
-            <!-- <el-form-item class="blog-button-container">
-              <el-button class="blog-button" text @click="goBlog">前往博客</el-button>
-            </el-form-item> -->
+            <!-- Smash English Sticker -->
+            <div class="smash-english-sticker" @click="goSmashEnglish">
+              <div class="sticker-content">
+                <el-icon class="sticker-icon"><MagicStick /></el-icon>
+                <span>Smash English</span>
+              </div>
+              <div class="sticker-shine"></div>
+            </div>
             <el-form-item class="flex">
               <el-link type="info" :underline="false" @click="isRegister = true; clearRegisterData()">
                 注册 →

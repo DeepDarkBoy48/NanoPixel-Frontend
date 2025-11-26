@@ -33,6 +33,12 @@ instance.interceptors.request.use(
 //添加响应拦截器
 instance.interceptors.response.use(
   (result) => {
+    // Special handling for FastAPI endpoints which return raw JSON
+    // Check baseURL override or url pattern
+    if (result.config.url && (result.config.url.startsWith('/fastapi') || result.config.url.includes('/fastapi'))) {
+      return result.data;
+    }
+
     //如果业务状态码为0，代表本次操作成功
     if (result.data.code == 0) {
       ElMessage.success(result.data.message || "操作成功");
