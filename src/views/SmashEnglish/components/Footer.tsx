@@ -3,7 +3,7 @@ import React from 'react';
 export const Footer: React.FC = () => {
   return (
     <footer className="py-6 text-center text-slate-400 text-sm">
-      <p>© {new Date().getFullYear()} GrammaViz. Powered by Google Gemini.</p>
+      <p>© {new Date().getFullYear()} 英语粉碎机. Designed by 徐晨阳.</p>
     </footer>
   );
 };

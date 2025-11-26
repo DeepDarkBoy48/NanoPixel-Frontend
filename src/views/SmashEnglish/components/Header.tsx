@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Book, PenTool, Zap, Brain, Rocket, ChevronDown } from 'lucide-react';
+import { Sparkles, Book, PenTool, Zap, Brain, Rocket, ChevronDown, Home } from 'lucide-react';
 import { ModelLevel } from '../types';
 
 interface HeaderProps {
@@ -160,6 +160,15 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onNavigate, modelLeve
                 {getModelIcon(modelLevel)}
             </button>
         </div>
+
+        {/* Back to Home Button */}
+        <button
+          onClick={() => window.location.href = '/login'}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-lg text-sm font-medium hover:from-pink-600 hover:to-rose-500 transition-all shadow-sm hover:shadow-md"
+        >
+          <Home className="w-4 h-4" />
+          <span className="hidden sm:inline">返回主页</span>
+        </button>
 
       </div>
     </header>
