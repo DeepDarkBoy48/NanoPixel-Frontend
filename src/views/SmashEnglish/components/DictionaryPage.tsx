@@ -17,6 +17,7 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
     const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
     const audioContextRef = useRef<AudioContext | null>(null);
+    const audioCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -46,7 +47,14 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
             const ctx = audioContextRef.current;
             if (ctx.state === 'suspended') await ctx.resume();
 
-            const buffer = await generateSpeechService(text);
+            let buffer: AudioBuffer;
+            if (audioCacheRef.current.has(text)) {
+                buffer = audioCacheRef.current.get(text)!;
+            } else {
+                buffer = await generateSpeechService(text);
+                audioCacheRef.current.set(text, buffer);
+            }
+
             const source = ctx.createBufferSource();
             source.buffer = buffer;
             source.connect(ctx.destination);
