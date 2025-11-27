@@ -13,12 +13,6 @@ interface WritingPageProps {
 
 const MODES: { value: WritingMode; label: string; shortLabel: string }[] = [
     { value: 'fix', label: '基础纠错', shortLabel: '纠错' },
-    { value: 'ielts-5.5', label: '雅思 5.5', shortLabel: '5.5' },
-    { value: 'ielts-6.0', label: '雅思 6.0', shortLabel: '6.0' },
-    { value: 'ielts-6.5', label: '雅思 6.5', shortLabel: '6.5' },
-    { value: 'ielts-7.0', label: '雅思 7.0', shortLabel: '7.0' },
-    { value: 'ielts-7.5', label: '雅思 7.5', shortLabel: '7.5' },
-    { value: 'ielts-8.0', label: '雅思 8.0', shortLabel: '8.0' },
 ];
 
 type ViewMode = 'diff' | 'syntax';
@@ -114,7 +108,7 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
         setActiveSentence(null);
     };
 
-    const isIeltsMode = (m: WritingMode) => m.startsWith('ielts');
+    const isIeltsMode = (m: WritingMode) => false;
     const isDiffView = viewMode === 'diff';
 
     return (
@@ -127,41 +121,23 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
                         AI 写作润色
                     </h1>
                     <p className="text-slate-500 text-sm mt-2">
-                        智能纠正语法错误，或升级文章为雅思高分范文
+                        智能纠正语法错误
                     </p>
                 </div>
 
-                {/* Mode Switcher - Dropdown */}
+                {/* Mode Display - Static */}
                 <div className="relative group">
-                    <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${isIeltsMode(mode) ? 'text-indigo-600' : 'text-green-600'}`}>
-                        {isIeltsMode(mode) ? <Wand2 className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-green-600">
+                        <CheckCircle2 className="w-4 h-4" />
                     </div>
 
-                    <select
-                        value={mode}
-                        onChange={(e) => setMode(e.target.value as WritingMode)}
-                        disabled={!!result}
-                        className={`
-                            appearance-none
-                            pl-10 pr-10 py-2.5
+                    <div className="
+                            pl-10 pr-6 py-2.5
                             rounded-xl text-sm font-bold
-                            border transition-all cursor-pointer outline-none shadow-sm
-                            disabled:opacity-50 disabled:cursor-not-allowed
-                            ${isIeltsMode(mode)
-                                ? 'bg-indigo-50 text-indigo-900 border-indigo-100 hover:border-indigo-200 focus:ring-4 focus:ring-indigo-100'
-                                : 'bg-green-50 text-green-900 border-green-100 hover:border-green-200 focus:ring-4 focus:ring-green-100'
-                            }
-                        `}
-                    >
-                        {MODES.map((m) => (
-                            <option key={m.value} value={m.value} className="text-slate-700 bg-white">
-                                {m.label}
-                            </option>
-                        ))}
-                    </select>
-
-                    <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${isIeltsMode(mode) ? 'text-indigo-400' : 'text-green-400'}`}>
-                        <ChevronDown className="w-4 h-4" />
+                            border shadow-sm
+                            bg-green-50 text-green-900 border-green-100
+                        ">
+                        基础纠错
                     </div>
                 </div>
             </div>
