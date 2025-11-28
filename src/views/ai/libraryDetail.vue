@@ -385,10 +385,10 @@ watch(mediaId, (id) => {
     padding: 16px 20px 20px;
     border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
     border-radius: 28px;
-    background: linear-gradient(145deg, color-mix(in srgb, var(--app-surface) 94%, #fff 6%) 0%, color-mix(in srgb, var(--app-surface) 96%, #667eea 4%) 100%);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--app-surface) 94%, #fff 6%) 0%, color-mix(in srgb, var(--app-surface) 96%, #D97459 4%) 100%);
     box-shadow:
         inset 0 0 0 1px color-mix(in srgb, var(--el-border-color) 35%, transparent),
-        0 20px 60px rgba(15, 23, 42, 0.08);
+        0 20px 60px rgba(92, 75, 58, 0.08);
     animation: boardFadeIn 1s ease-out forwards;
     opacity: 0;
     transform: translateY(20px);
@@ -408,18 +408,18 @@ watch(mediaId, (id) => {
 }
 
 .board-header .el-button {
-    background: linear-gradient(135deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 90%, #667eea 10%) 100%);
+    background: linear-gradient(135deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 90%, #D97459 10%) 100%);
     border: 1px solid color-mix(in srgb, var(--app-primary) 30%, transparent);
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 4px 15px rgba(217, 116, 89, 0.1);
 }
 
 .board-header .el-button:hover {
-    background: linear-gradient(135deg, var(--app-primary) 0%, #4facfe 100%);
+    background: linear-gradient(135deg, var(--app-primary) 0%, #F4A261 100%);
     color: #fff;
     border-color: var(--app-primary);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px rgba(217, 116, 89, 0.3);
 }
 
 .board-header .el-button .toolbar-icon {
@@ -454,8 +454,8 @@ watch(mediaId, (id) => {
     flex: 1;
     border-radius: 28px;
     border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
-    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 96%, #667eea 4%) 100%);
-    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 96%, #D97459 4%) 100%);
+    box-shadow: 0 16px 36px rgba(92, 75, 58, 0.08);
     padding: 16px 18px 18px;
     display: flex;
     flex-direction: column;
@@ -475,7 +475,7 @@ watch(mediaId, (id) => {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%);
+    background: radial-gradient(circle at 80% 20%, rgba(217, 116, 89, 0.05) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
@@ -488,9 +488,9 @@ watch(mediaId, (id) => {
 .stage-card:hover {
     transform: translateY(-8px);
     box-shadow:
-        0 25px 50px rgba(15, 23, 42, 0.15),
-        0 0 0 1px rgba(102, 126, 234, 0.1) inset,
-        0 0 30px rgba(102, 126, 234, 0.1);
+        0 25px 50px rgba(92, 75, 58, 0.15),
+        0 0 0 1px rgba(217, 116, 89, 0.1) inset,
+        0 0 30px rgba(217, 116, 89, 0.1);
     border-color: color-mix(in srgb, var(--app-primary) 30%, transparent);
 }
 
@@ -521,7 +521,7 @@ watch(mediaId, (id) => {
 }
 
 .stage-card:hover header h3 {
-    background: linear-gradient(135deg, var(--app-primary) 0%, #4facfe 70%);
+    background: linear-gradient(135deg, var(--app-primary) 0%, #F4A261 70%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -559,9 +559,9 @@ watch(mediaId, (id) => {
     bottom: 0;
     background: linear-gradient(45deg,
             transparent 0%,
-            rgba(102, 126, 234, 0.05) 25%,
+            rgba(217, 116, 89, 0.05) 25%,
             transparent 50%,
-            rgba(118, 75, 162, 0.05) 75%,
+            rgba(244, 162, 97, 0.05) 75%,
             transparent 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -572,9 +572,9 @@ watch(mediaId, (id) => {
 .media-frame:hover {
     transform: scale(1.02);
     box-shadow:
-        inset 0 0 0 2px rgba(102, 126, 234, 0.2),
+        inset 0 0 0 2px rgba(217, 116, 89, 0.2),
         0 8px 30px rgba(0, 0, 0, 0.15),
-        0 0 40px rgba(102, 126, 234, 0.1);
+        0 0 40px rgba(217, 116, 89, 0.1);
 }
 
 .media-frame:hover::after {
@@ -602,19 +602,19 @@ watch(mediaId, (id) => {
     top: 12px;
     left: 12px;
     z-index: 3;
-    background: linear-gradient(135deg, #1a4fff 0%, #667eea 100%);
+    background: linear-gradient(135deg, #D97459 0%, #F4A261 100%);
     color: #fff;
     font-size: 11px;
     padding: 4px 10px;
     border-radius: 999px;
     transition: all 0.3s ease;
     animation: badgePulse 2s ease-in-out infinite;
-    box-shadow: 0 2px 8px rgba(26, 79, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(217, 116, 89, 0.3);
 }
 
 .badge:hover {
     transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(26, 79, 255, 0.5);
+    box-shadow: 0 4px 15px rgba(217, 116, 89, 0.5);
 }
 
 @keyframes badgePulse {
@@ -643,8 +643,8 @@ watch(mediaId, (id) => {
 .meta-card {
     border-radius: 26px;
     border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
-    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 95%, #667eea 5%) 100%);
-    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 95%, #D97459 5%) 100%);
+    box-shadow: 0 14px 34px rgba(92, 75, 58, 0.07);
     padding: 18px 20px 20px;
     display: flex;
     flex-direction: column;
@@ -665,7 +665,7 @@ watch(mediaId, (id) => {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 70% 30%, rgba(118, 75, 162, 0.04) 0%, transparent 50%);
+    background: radial-gradient(circle at 70% 30%, rgba(244, 162, 97, 0.04) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
@@ -680,9 +680,9 @@ watch(mediaId, (id) => {
 .meta-card:hover {
     transform: translateY(-6px);
     box-shadow:
-        0 20px 40px rgba(15, 23, 42, 0.12),
-        0 0 0 1px rgba(118, 75, 162, 0.1) inset,
-        0 0 25px rgba(118, 75, 162, 0.08);
+        0 20px 40px rgba(92, 75, 58, 0.12),
+        0 0 0 1px rgba(244, 162, 97, 0.1) inset,
+        0 0 25px rgba(244, 162, 97, 0.08);
     border-color: color-mix(in srgb, var(--app-primary) 25%, transparent);
 }
 
@@ -715,7 +715,7 @@ watch(mediaId, (id) => {
 
 .prompt-card:hover header h3,
 .meta-card:hover header h3 {
-    background: linear-gradient(135deg, var(--app-primary) 0%, #764ba2 80%);
+    background: linear-gradient(135deg, var(--app-primary) 0%, #F4A261 80%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -725,15 +725,15 @@ watch(mediaId, (id) => {
     background: linear-gradient(135deg, color-mix(in srgb, var(--app-primary) 10%, transparent) 0%, color-mix(in srgb, var(--app-primary) 15%, transparent) 100%);
     border: 1px solid color-mix(in srgb, var(--app-primary) 30%, transparent);
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 2px 8px rgba(217, 116, 89, 0.1);
 }
 
 .prompt-card header .el-button:hover {
-    background: linear-gradient(135deg, var(--app-primary) 0%, #4facfe 100%);
+    background: linear-gradient(135deg, var(--app-primary) 0%, #F4A261 100%);
     color: #fff;
     border-color: var(--app-primary);
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(217, 116, 89, 0.3);
 }
 
 .prompt-content {
@@ -762,7 +762,7 @@ watch(mediaId, (id) => {
     height: 100%;
     background: linear-gradient(90deg,
             transparent 0%,
-            rgba(102, 126, 234, 0.1) 50%,
+            rgba(217, 116, 89, 0.1) 50%,
             transparent 100%);
     transition: left 0.5s ease;
     pointer-events: none;
@@ -773,7 +773,7 @@ watch(mediaId, (id) => {
     background: linear-gradient(135deg,
             color-mix(in srgb, var(--app-primary) 15%, transparent) 0%,
             color-mix(in srgb, var(--app-primary) 10%, transparent) 100%);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 4px 15px rgba(217, 116, 89, 0.1);
 }
 
 .prompt-content:hover::before {
@@ -852,7 +852,7 @@ watch(mediaId, (id) => {
     }
 
     100% {
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 4px 15px rgba(217, 116, 89, 0.1);
         transform: scale(1);
     }
 }
@@ -887,7 +887,7 @@ watch(mediaId, (id) => {
     background: color-mix(in srgb, var(--app-surface-2) 80%, transparent);
     border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 4px 12px rgba(217, 116, 89, 0.1);
 }
 
 .meta-item:nth-child(1) {
@@ -934,7 +934,7 @@ watch(mediaId, (id) => {
 }
 
 .meta-item:hover .label {
-    background: linear-gradient(135deg, var(--app-primary) 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--app-primary) 0%, #F4A261 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -954,14 +954,14 @@ watch(mediaId, (id) => {
 
 .comment-panel {
     flex: 0 0 360px;
-    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 95%, #667eea 5%) 100%);
+    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 95%, #D97459 5%) 100%);
     border-radius: 28px;
     border: 1px solid color-mix(in srgb, var(--el-border-color) 74%, transparent);
     padding: 20px;
     box-shadow:
-        0 20px 50px rgba(15, 23, 42, 0.12),
+        0 20px 50px rgba(92, 75, 58, 0.12),
         0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 0 20px rgba(102, 126, 234, 0.1);
+        0 0 20px rgba(217, 116, 89, 0.1);
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -978,8 +978,8 @@ watch(mediaId, (id) => {
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(circle at 30% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 70% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+        radial-gradient(circle at 30% 20%, rgba(217, 116, 89, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(244, 162, 97, 0.08) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
 }
@@ -1007,15 +1007,15 @@ watch(mediaId, (id) => {
 }
 
 .comment-panel header .el-button {
-    background: linear-gradient(135deg, var(--app-primary) 0%, color-mix(in srgb, var(--app-primary) 80%, #4facfe) 100%);
+    background: linear-gradient(135deg, var(--app-primary) 0%, color-mix(in srgb, var(--app-primary) 80%, #F4A261) 100%);
     border: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(217, 116, 89, 0.3);
 }
 
 .comment-panel header .el-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 25px rgba(217, 116, 89, 0.4);
 }
 
 .comment-panel header p {
@@ -1028,8 +1028,8 @@ watch(mediaId, (id) => {
     border-radius: 18px;
     padding: 16px;
     background: linear-gradient(135deg,
-            color-mix(in srgb, var(--app-surface-2) 90%, #101727 10%) 0%,
-            color-mix(in srgb, var(--app-surface-2) 85%, #667eea 15%) 100%);
+            color-mix(in srgb, var(--app-surface-2) 90%, #FDF9F6 10%) 0%,
+            color-mix(in srgb, var(--app-surface-2) 85%, #D97459 15%) 100%);
     border: 1px solid color-mix(in srgb, var(--el-border-color) 70%, transparent);
     display: flex;
     flex-direction: column;
@@ -1038,12 +1038,12 @@ watch(mediaId, (id) => {
     animation: formSlideDown 0.4s ease-out forwards;
     transform: translateY(-10px);
     opacity: 0;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 8px 25px rgba(217, 116, 89, 0.1);
 }
 
 .comment-form:hover {
     border-color: color-mix(in srgb, var(--app-primary) 50%, transparent);
-    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 12px 35px rgba(217, 116, 89, 0.15);
 }
 
 @keyframes formSlideDown {
@@ -1084,7 +1084,7 @@ watch(mediaId, (id) => {
     gap: 12px;
     padding: 14px 16px;
     border-radius: 18px;
-    background: color-mix(in srgb, var(--app-surface-2) 92%, #101727 8%);
+    background: color-mix(in srgb, var(--app-surface-2) 92%, #FDF9F6 8%);
     border: 1px solid color-mix(in srgb, var(--el-border-color) 80%, transparent);
     transition: all 0.3s ease;
     animation: commentSlideIn 0.6s ease-out forwards;
@@ -1094,9 +1094,9 @@ watch(mediaId, (id) => {
 
 .comment-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 25px rgba(92, 75, 58, 0.12);
     border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
-    background: color-mix(in srgb, var(--app-surface-2) 95%, #101727 5%);
+    background: color-mix(in srgb, var(--app-surface-2) 95%, #FDF9F6 5%);
 }
 
 @keyframes commentSlideIn {
@@ -1135,7 +1135,7 @@ watch(mediaId, (id) => {
     flex: 0 0 36px;
     height: 36px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #D97459 0%, #F4A261 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1145,7 +1145,7 @@ watch(mediaId, (id) => {
     position: relative;
     transition: all 0.3s ease;
     animation: avatarPulse 2s ease-in-out infinite;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(217, 116, 89, 0.3);
 }
 
 .comment-avatar::before {
@@ -1155,7 +1155,7 @@ watch(mediaId, (id) => {
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffecd2);
+    background: linear-gradient(45deg, #D97459, #F4A261, #E9C46A, #E89A84, #F0B9A7);
     border-radius: 14px;
     z-index: -1;
     animation: avatarGlow 3s ease-in-out infinite;
@@ -1164,27 +1164,27 @@ watch(mediaId, (id) => {
 
 .comment-avatar:hover {
     transform: scale(1.1);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 8px 25px rgba(217, 116, 89, 0.5);
 }
 
 .comment-item:nth-child(2n) .comment-avatar {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+    background: linear-gradient(135deg, #E89A84 0%, #D97459 100%);
+    box-shadow: 0 4px 15px rgba(232, 154, 132, 0.3);
 }
 
 .comment-item:nth-child(3n) .comment-avatar {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    background: linear-gradient(135deg, #F4A261 0%, #E9C46A 100%);
+    box-shadow: 0 4px 15px rgba(244, 162, 97, 0.3);
 }
 
 .comment-item:nth-child(4n) .comment-avatar {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+    background: linear-gradient(135deg, #C86750 0%, #D97459 100%);
+    box-shadow: 0 4px 15px rgba(200, 103, 80, 0.3);
 }
 
 .comment-item:nth-child(5n) .comment-avatar {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    box-shadow: 0 4px 15px rgba(250, 112, 154, 0.3);
+    background: linear-gradient(135deg, #F0B9A7 0%, #F4A261 100%);
+    box-shadow: 0 4px 15px rgba(240, 185, 167, 0.3);
 }
 
 @keyframes avatarPulse {
@@ -1264,7 +1264,7 @@ watch(mediaId, (id) => {
 }
 
 .comment-item:hover .comment-content {
-    text-shadow: 0 1px 3px rgba(102, 126, 234, 0.1);
+    text-shadow: 0 1px 3px rgba(217, 116, 89, 0.1);
     transform: translateX(2px);
 }
 

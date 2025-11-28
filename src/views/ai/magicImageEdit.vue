@@ -41,7 +41,7 @@
                                             <div class="category-option">
                                                 <span class="category-option__name" :title="item.categoryName">{{
                                                     item.categoryName
-                                                }}</span>
+                                                    }}</span>
                                                 <span class="category-option__count">{{ item.promptCount ?? 0 }}
                                                     个模版</span>
                                             </div>
@@ -554,32 +554,32 @@ onMounted(() => {
     transition: all 0.3s ease;
 }
 
-/* 光明模式上传按钮 */
+/* 光明模式上传按钮 - 暖色风格 */
 html:not([data-theme="dark"]) .upload-btn {
-    background: linear-gradient(135deg, #2D3748, #4A5568) !important;
-    border: 1px solid #E2E8F0 !important;
-    box-shadow: 0 4px 12px rgba(45, 55, 72, 0.15);
+    background: linear-gradient(135deg, #5C4B3A, #7A6B5C) !important;
+    border: 1px solid #EDE5DC !important;
+    box-shadow: 0 4px 12px rgba(92, 75, 58, 0.2);
     color: #FFFFFF !important;
 }
 
 html:not([data-theme="dark"]) .upload-btn:hover {
-    background: linear-gradient(135deg, #1A202C, #2D3748) !important;
+    background: linear-gradient(135deg, #4A3C2E, #5C4B3A) !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(45, 55, 72, 0.25);
+    box-shadow: 0 6px 20px rgba(92, 75, 58, 0.3);
 }
 
-/* 黑暗模式上传按钮 */
+/* 黑暗模式上传按钮 - 暖色风格 */
 html[data-theme="dark"] .upload-btn {
-    background: linear-gradient(135deg, #F7FAFC, #EDF2F7) !important;
-    border: 1px solid #4A5568 !important;
-    box-shadow: 0 4px 12px rgba(247, 250, 252, 0.1);
-    color: #2D3748 !important;
+    background: linear-gradient(135deg, #FAF4EF, #F5E6DC) !important;
+    border: 1px solid #3D342A !important;
+    box-shadow: 0 4px 12px rgba(244, 162, 97, 0.15);
+    color: #5C4B3A !important;
 }
 
 html[data-theme="dark"] .upload-btn:hover {
-    background: linear-gradient(135deg, #FFFFFF, #F7FAFC) !important;
+    background: linear-gradient(135deg, #FFFFFF, #FAF4EF) !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(247, 250, 252, 0.2);
+    box-shadow: 0 6px 20px rgba(244, 162, 97, 0.25);
 }
 
 .upload-icon {
@@ -641,36 +641,36 @@ html[data-theme="dark"] .upload-btn:hover {
     transition: all 0.3s ease;
 }
 
-/* 光明模式重置按钮 */
+/* 光明模式重置按钮 - 暖色风格 */
 html:not([data-theme="dark"]) .reset-btn {
-    background: #F7FAFC !important;
-    border: 1px solid #E2E8F0 !important;
-    color: #4A5568 !important;
-    box-shadow: 0 2px 8px rgba(74, 85, 104, 0.1);
+    background: #FBF7F3 !important;
+    border: 1px solid #EDE5DC !important;
+    color: #5C4B3A !important;
+    box-shadow: 0 2px 8px rgba(92, 75, 58, 0.1);
 }
 
 html:not([data-theme="dark"]) .reset-btn:hover {
-    background: #EDF2F7 !important;
-    border-color: #CBD5E0 !important;
-    color: #2D3748 !important;
+    background: #F5E6DC !important;
+    border-color: #D9C8B8 !important;
+    color: #4A3C2E !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74, 85, 104, 0.15);
+    box-shadow: 0 4px 12px rgba(92, 75, 58, 0.15);
 }
 
-/* 黑暗模式重置按钮 */
+/* 黑暗模式重置按钮 - 暖色风格 */
 html[data-theme="dark"] .reset-btn {
-    background: #4A5568 !important;
-    border: 1px solid #2D3748 !important;
-    color: #E2E8F0 !important;
-    box-shadow: 0 2px 8px rgba(74, 85, 104, 0.2);
+    background: #3D342A !important;
+    border: 1px solid #2A2420 !important;
+    color: #E8DED3 !important;
+    box-shadow: 0 2px 8px rgba(61, 52, 42, 0.2);
 }
 
 html[data-theme="dark"] .reset-btn:hover {
-    background: #2D3748 !important;
-    border-color: #1A202C !important;
-    color: #F7FAFC !important;
+    background: #2A2420 !important;
+    border-color: #1E1A16 !important;
+    color: #FAF4EF !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
+    box-shadow: 0 4px 12px rgba(61, 52, 42, 0.3);
 }
 
 .right {
@@ -700,7 +700,7 @@ html[data-theme="dark"] .reset-btn:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, transparent, rgba(64, 158, 255, 0.1), transparent);
+    background: linear-gradient(45deg, transparent, rgba(217, 116, 89, 0.1), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
@@ -709,8 +709,8 @@ html[data-theme="dark"] .reset-btn:hover {
 
 .preview-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    border-color: rgba(64, 158, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(92, 75, 58, 0.15);
+    border-color: rgba(217, 116, 89, 0.3);
 }
 
 .preview-card:hover::before {
@@ -799,7 +799,7 @@ html[data-theme="dark"] .reset-btn:hover {
     justify-content: center;
 }
 
-/* 炫酷加载动画效果 */
+/* 炫酷加载动画效果 - 暖色风格 */
 .generation-loading {
     position: absolute;
     inset: 12px;
@@ -809,14 +809,14 @@ html[data-theme="dark"] .reset-btn:hover {
     justify-content: center;
     gap: 20px;
     background: linear-gradient(135deg,
-            rgba(64, 158, 255, 0.1) 0%,
-            rgba(147, 51, 234, 0.1) 50%,
-            rgba(245, 101, 101, 0.1) 100%);
-    border: 2px solid rgba(64, 158, 255, 0.3);
+            rgba(217, 116, 89, 0.1) 0%,
+            rgba(244, 162, 97, 0.1) 50%,
+            rgba(233, 196, 106, 0.1) 100%);
+    border: 2px solid rgba(217, 116, 89, 0.3);
     border-radius: 16px;
     backdrop-filter: blur(8px);
     box-shadow:
-        0 8px 32px rgba(64, 158, 255, 0.2),
+        0 8px 32px rgba(217, 116, 89, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     z-index: 5;
     animation: loading-glow 2s ease-in-out infinite alternate;
@@ -825,13 +825,13 @@ html[data-theme="dark"] .reset-btn:hover {
 @keyframes loading-glow {
     0% {
         box-shadow:
-            0 8px 32px rgba(64, 158, 255, 0.2),
+            0 8px 32px rgba(217, 116, 89, 0.2),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
     100% {
         box-shadow:
-            0 12px 40px rgba(64, 158, 255, 0.4),
+            0 12px 40px rgba(217, 116, 89, 0.4),
             inset 0 1px 0 rgba(255, 255, 255, 0.4);
     }
 }
@@ -851,8 +851,8 @@ html[data-theme="dark"] .reset-btn:hover {
     width: 100px;
     height: 100px;
     border: 3px solid transparent;
-    border-top: 3px solid #4F46E5;
-    border-right: 3px solid #7C3AED;
+    border-top: 3px solid #D97459;
+    border-right: 3px solid #E89A84;
     border-radius: 50%;
     animation: magic-spin-outer 2s linear infinite;
 }
@@ -862,8 +862,8 @@ html[data-theme="dark"] .reset-btn:hover {
     width: 70px;
     height: 70px;
     border: 2px solid transparent;
-    border-left: 2px solid #EC4899;
-    border-bottom: 2px solid #F59E0B;
+    border-left: 2px solid #F4A261;
+    border-bottom: 2px solid #E9C46A;
     border-radius: 50%;
     animation: magic-spin-middle 1.5s linear infinite reverse;
 }
@@ -872,7 +872,7 @@ html[data-theme="dark"] .reset-btn:hover {
     position: absolute;
     width: 40px;
     height: 40px;
-    background: linear-gradient(45deg, #4F46E5, #7C3AED, #EC4899, #F59E0B);
+    background: linear-gradient(45deg, #D97459, #E89A84, #F4A261, #E9C46A);
     border-radius: 50%;
     animation: magic-pulse 1s ease-in-out infinite alternate;
 }
@@ -889,7 +889,7 @@ html[data-theme="dark"] .reset-btn:hover {
     left: 50%;
     width: 4px;
     height: 4px;
-    background: linear-gradient(45deg, #4F46E5, #EC4899);
+    background: linear-gradient(45deg, #D97459, #F4A261);
     border-radius: 50%;
     transform-origin: 0 0;
     animation: magic-particles 2s ease-in-out infinite;
@@ -919,12 +919,12 @@ html[data-theme="dark"] .reset-btn:hover {
 @keyframes magic-pulse {
     0% {
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
+        box-shadow: 0 0 0 0 rgba(217, 116, 89, 0.7);
     }
 
     100% {
         transform: scale(1.2);
-        box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+        box-shadow: 0 0 0 10px rgba(217, 116, 89, 0);
     }
 }
 
@@ -953,7 +953,7 @@ html[data-theme="dark"] .reset-btn:hover {
 }
 
 .pulsing-text {
-    color: #4F46E5;
+    color: #D97459;
     font-size: 16px;
     font-weight: 600;
     animation: text-pulse 1.5s ease-in-out infinite;
@@ -974,12 +974,12 @@ html[data-theme="dark"] .reset-btn:hover {
     0%,
     100% {
         transform: scale(1);
-        text-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
+        text-shadow: 0 0 10px rgba(217, 116, 89, 0.3);
     }
 
     50% {
         transform: scale(1.05);
-        text-shadow: 0 0 20px rgba(79, 70, 229, 0.6);
+        text-shadow: 0 0 20px rgba(217, 116, 89, 0.6);
     }
 }
 
@@ -1028,7 +1028,7 @@ html[data-theme="dark"] .reset-btn:hover {
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4F46E5, #7C3AED, #EC4899, #F59E0B);
+    background: linear-gradient(90deg, #D97459, #E89A84, #F4A261, #E9C46A);
     background-size: 200% 100%;
     border-radius: 2px;
     animation: progress-animation 3s ease-in-out infinite;
@@ -1102,58 +1102,58 @@ html[data-theme="dark"] .reset-btn:hover {
     transform: scale(0.98) !important;
 }
 
-/* 光明模式魔法按钮 */
+/* 光明模式魔法按钮 - 暖色风格 */
 html:not([data-theme="dark"]) .magic-submit-btn {
-    background: linear-gradient(135deg, #6B46C1, #8B5CF6) !important;
-    border: 1px solid #E2E8F0 !important;
-    box-shadow: 0 4px 12px rgba(107, 70, 193, 0.2);
+    background: linear-gradient(135deg, #D97459, #E89A84) !important;
+    border: 1px solid #EDE5DC !important;
+    box-shadow: 0 4px 12px rgba(217, 116, 89, 0.25);
     color: #FFFFFF !important;
 }
 
 html:not([data-theme="dark"]) .magic-submit-btn:hover {
-    background: linear-gradient(135deg, #553C9A, #6B46C1) !important;
+    background: linear-gradient(135deg, #C86750, #D97459) !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(107, 70, 193, 0.3) !important;
+    box-shadow: 0 8px 25px rgba(217, 116, 89, 0.35) !important;
 }
 
 html:not([data-theme="dark"]) .magic-submit-btn.is-loading {
-    background: linear-gradient(135deg, #D69E2E, #ED8936) !important;
+    background: linear-gradient(135deg, #F4A261, #E9C46A) !important;
     animation: button-pulse 1.5s ease-in-out infinite !important;
 }
 
-/* 黑暗模式魔法按钮 */
+/* 黑暗模式魔法按钮 - 暖色风格 */
 html[data-theme="dark"] .magic-submit-btn {
-    background: linear-gradient(135deg, #E6FFFA, #B2F5EA) !important;
-    border: 1px solid #4A5568 !important;
-    box-shadow: 0 4px 12px rgba(230, 255, 250, 0.1);
-    color: #2D3748 !important;
+    background: linear-gradient(135deg, #F4A261, #E9C46A) !important;
+    border: 1px solid #3D342A !important;
+    box-shadow: 0 4px 12px rgba(244, 162, 97, 0.2);
+    color: #2A2420 !important;
 }
 
 html[data-theme="dark"] .magic-submit-btn:hover {
-    background: linear-gradient(135deg, #FFFFFF, #E6FFFA) !important;
+    background: linear-gradient(135deg, #E9C46A, #F4D35E) !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(230, 255, 250, 0.2) !important;
+    box-shadow: 0 8px 25px rgba(244, 162, 97, 0.3) !important;
 }
 
 html[data-theme="dark"] .magic-submit-btn.is-loading {
-    background: linear-gradient(135deg, #FFF5F5, #FED7D7) !important;
+    background: linear-gradient(135deg, #E89A84, #F4A261) !important;
     animation: button-pulse 1.5s ease-in-out infinite !important;
 }
 
-/* 光明模式动画 */
+/* 光明模式动画 - 暖色风格 */
 @keyframes button-pulse {
 
     0%,
     100% {
-        box-shadow: 0 0 0 0 rgba(214, 158, 46, 0.7);
+        box-shadow: 0 0 0 0 rgba(217, 116, 89, 0.7);
     }
 
     50% {
-        box-shadow: 0 0 0 10px rgba(214, 158, 46, 0);
+        box-shadow: 0 0 0 10px rgba(217, 116, 89, 0);
     }
 }
 
-/* 黑暗模式动画 */
+/* 黑暗模式动画 - 暖色风格 */
 html[data-theme="dark"] .magic-submit-btn.is-loading {
     animation: button-pulse-dark 1.5s ease-in-out infinite !important;
 }
@@ -1162,11 +1162,11 @@ html[data-theme="dark"] .magic-submit-btn.is-loading {
 
     0%,
     100% {
-        box-shadow: 0 0 0 0 rgba(254, 215, 215, 0.7);
+        box-shadow: 0 0 0 0 rgba(244, 162, 97, 0.7);
     }
 
     50% {
-        box-shadow: 0 0 0 10px rgba(254, 215, 215, 0);
+        box-shadow: 0 0 0 10px rgba(244, 162, 97, 0);
     }
 }
 

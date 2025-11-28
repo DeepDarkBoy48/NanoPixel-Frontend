@@ -15,17 +15,17 @@ body {
 :root {
   --app-message-offset: 72px;
   /* 桌面端头部高度约 60px + 间距 */
-  /* 主题色：GitHub 风格（亮） */
-  --el-color-primary: #0969DA;
-  /* 链接/主操作蓝 */
-  --app-primary: #0969DA;
+  /* 主题色：暖色风格 */
+  --el-color-primary: #D97459;
+  /* 温暖珊瑚橙主色 */
+  --el-color-primary-light-3: #E89A84;
+  --el-color-primary-light-5: #F0B9A7;
+  --el-color-primary-light-7: #F5D4C8;
+  --el-color-primary-light-8: #F9E4DC;
+  --el-color-primary-light-9: #FCF2EE;
+  --el-color-primary-dark-2: #C86750;
+  --app-primary: #D97459;
   /* 布局变量（亮） */
-  --app-sider-bg: #f6f8fa;
-  /* 侧边栏背景 */
-  --app-sider-text: #24292f;
-  /* 侧边栏文字 */
-  --app-sider-active-bg: rgba(9, 105, 218, 0.12);
-  --app-sider-hover-bg: rgba(9, 105, 218, 0.08);
   --app-main-bg: #f6f8fa;
   /* 页面主背景 */
   --app-header-bg: #f6f8fa;
@@ -40,6 +40,29 @@ body {
   /* 卡片/弹层 */
   --app-surface-2: #f6f8fa;
   /* 次级表面 */
+
+  /* ========== 侧边栏淡暖色风格 ========== */
+  /* 参考 Notion/Stripe 的温暖配色设计 */
+  --app-sider-bg: linear-gradient(180deg, #FDF9F6 0%, #FAF4EF 100%);
+  /* 奶油渐变背景 */
+  --app-sider-bg-solid: #FBF7F3;
+  /* 固体背景色备用 */
+  --app-sider-text: #5C4B3A;
+  /* 温暖深棕文字 */
+  --app-sider-text-muted: #9C8B7A;
+  /* 次级文字 */
+  --app-sider-primary: #D97459;
+  /* 温暖珊瑚橙主色 */
+  --app-sider-active-bg: linear-gradient(135deg, rgba(217, 116, 89, 0.12) 0%, rgba(244, 162, 97, 0.08) 100%);
+  /* 激活状态渐变 */
+  --app-sider-hover-bg: rgba(217, 116, 89, 0.06);
+  /* 悬停背景 */
+  --app-sider-border: #EDE5DC;
+  /* 温暖边框 */
+  --app-sider-divider: #F0E8E0;
+  /* 分割线 */
+  --app-sider-shadow: 0 1px 3px rgba(92, 75, 58, 0.06);
+  /* 阴影 */
 }
 
 @media (max-width: 768px) {
@@ -94,15 +117,15 @@ select {
 /* 暗色主题覆盖 */
 .dark {
   color-scheme: dark;
-  --el-color-primary: #2f81f7;
-  /* 链接/主操作蓝 */
-  --app-primary: #2f81f7;
-  --app-sider-bg: #161b22;
-  /* 侧边栏背景 */
-  --app-sider-text: #c9d1d9;
-  /* 侧边栏文字 */
-  --app-sider-active-bg: rgba(47, 129, 247, 0.20);
-  --app-sider-hover-bg: rgba(47, 129, 247, 0.12);
+  --el-color-primary: #F4A261;
+  /* 温暖琥珀橙主色 */
+  --el-color-primary-light-3: #F6B580;
+  --el-color-primary-light-5: #F8C89F;
+  --el-color-primary-light-7: #FADBBF;
+  --el-color-primary-light-8: #FCEBD8;
+  --el-color-primary-light-9: #FDF5EC;
+  --el-color-primary-dark-2: #E09254;
+  --app-primary: #F4A261;
   --app-main-bg: #0d1117;
   /* 页面主背景 */
   --app-header-bg: #161b22;
@@ -116,4 +139,26 @@ select {
   /* 卡片/弹层 */
   --app-surface-2: #0d1117;
   /* 次级表面 */
+
+  /* ========== 侧边栏暖色暗色风格 ========== */
+  --app-sider-bg: linear-gradient(180deg, #2A2420 0%, #231E1A 100%);
+  /* 暖棕渐变背景 */
+  --app-sider-bg-solid: #262019;
+  /* 固体背景色备用 */
+  --app-sider-text: #E8DED3;
+  /* 温暖浅色文字 */
+  --app-sider-text-muted: #9C8B7A;
+  /* 次级文字 */
+  --app-sider-primary: #F4A261;
+  /* 温暖琥珀橙主色 */
+  --app-sider-active-bg: linear-gradient(135deg, rgba(244, 162, 97, 0.18) 0%, rgba(233, 196, 106, 0.10) 100%);
+  /* 激活状态渐变 */
+  --app-sider-hover-bg: rgba(244, 162, 97, 0.10);
+  /* 悬停背景 */
+  --app-sider-border: #3D342A;
+  /* 温暖边框 */
+  --app-sider-divider: #352D24;
+  /* 分割线 */
+  --app-sider-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  /* 阴影 */
 }

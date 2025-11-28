@@ -307,7 +307,7 @@ onMounted(() => {
 .title {
     margin: 0;
     font-size: 18px;
-    background: linear-gradient(135deg, var(--el-text-color-primary) 0%, var(--app-primary) 70%, #4facfe 100%);
+    background: linear-gradient(135deg, var(--el-text-color-primary) 0%, #D97459 70%, #F4A261 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -335,11 +335,11 @@ onMounted(() => {
 }
 
 .actions .el-button:not(.sort-group .el-button) {
-    background: linear-gradient(135deg, var(--app-primary) 0%, #4facfe 100%);
+    background: linear-gradient(135deg, #D97459 0%, #F4A261 100%);
     border: none;
     color: #fff;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(217, 116, 89, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -357,7 +357,7 @@ onMounted(() => {
 
 .actions .el-button:not(.sort-group .el-button):hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 25px rgba(217, 116, 89, 0.4);
 }
 
 .actions .el-button:not(.sort-group .el-button):hover::before {
@@ -378,7 +378,7 @@ onMounted(() => {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(217, 116, 89, 0.2), transparent);
     transition: left 0.5s ease;
 }
 
@@ -387,30 +387,37 @@ onMounted(() => {
 }
 
 .sort-group :deep(.el-button.is-plain:hover) {
-    border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    border-color: color-mix(in srgb, #D97459 40%, transparent);
+    box-shadow: 0 4px 12px rgba(217, 116, 89, 0.2);
     transform: translateY(-2px);
 }
 
 .sort-group :deep(.el-button--primary.is-plain) {
     /* 激活态：更明显 */
+    color: var(--el-color-primary);
     border-color: color-mix(in srgb, var(--el-color-primary) 55%, transparent);
     background: linear-gradient(135deg,
             color-mix(in srgb, var(--el-color-primary) 14%, transparent) 0%,
             color-mix(in srgb, var(--el-color-primary) 10%, transparent) 100%);
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 2px 8px rgba(217, 116, 89, 0.2);
     animation: activeButtonPulse 2s ease-in-out infinite;
+}
+
+.sort-group :deep(.el-button--primary.is-plain:hover),
+.sort-group :deep(.el-button--primary.is-plain:focus) {
+    color: var(--el-color-primary);
+    border-color: var(--el-color-primary);
 }
 
 @keyframes activeButtonPulse {
 
     0%,
     100% {
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 2px 8px rgba(217, 116, 89, 0.2);
     }
 
     50% {
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(217, 116, 89, 0.3);
     }
 }
 
@@ -423,12 +430,12 @@ onMounted(() => {
 .skeleton-card {
     break-inside: avoid;
     margin-bottom: 16px;
-    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 96%, #667eea 4%) 100%);
+    background: linear-gradient(145deg, var(--app-surface) 0%, color-mix(in srgb, var(--app-surface) 96%, #D97459 4%) 100%);
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--el-border-color);
     /* Softer, gradient-like shadow */
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 14px rgba(92, 75, 58, 0.08);
     transition: all 0.4s ease;
     animation: cardSlideIn 0.8s ease-out forwards;
     opacity: 0;
@@ -454,7 +461,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 70% 30%, rgba(102, 126, 234, 0.05) 0%, transparent 60%);
+    background: radial-gradient(circle at 70% 30%, rgba(217, 116, 89, 0.08) 0%, transparent 60%);
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
@@ -497,12 +504,12 @@ onMounted(() => {
 .card:hover {
     transform: translateY(-8px) scale(1.02);
     /* Subtle highlight */
-    border-color: color-mix(in srgb, var(--app-primary) 40%, transparent);
+    border-color: color-mix(in srgb, #D97459 40%, transparent);
     /* Enhanced shadow on hover */
     box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.12),
-        0 0 0 1px rgba(102, 126, 234, 0.1) inset,
-        0 0 30px rgba(102, 126, 234, 0.15);
+        0 20px 40px rgba(92, 75, 58, 0.12),
+        0 0 0 1px rgba(217, 116, 89, 0.1) inset,
+        0 0 30px rgba(217, 116, 89, 0.15);
 }
 
 .card:hover::before {
@@ -524,23 +531,23 @@ onMounted(() => {
 }
 
 .card:hover .media-header {
-    background: color-mix(in srgb, var(--app-surface-2) 90%, #667eea 10%);
-    border-bottom-color: color-mix(in srgb, var(--app-primary) 30%, transparent);
+    background: color-mix(in srgb, var(--app-surface-2) 90%, #D97459 10%);
+    border-bottom-color: color-mix(in srgb, #D97459 30%, transparent);
 }
 
 .media-header .el-button {
     border-radius: 999px;
     height: 26px;
     padding: 0 10px;
-    border-color: color-mix(in srgb, var(--app-primary) 35%, transparent);
-    color: var(--app-primary);
+    border-color: color-mix(in srgb, #D97459 35%, transparent);
+    color: #D97459;
     background: linear-gradient(135deg,
-            color-mix(in srgb, var(--app-primary) 8%, transparent) 0%,
-            color-mix(in srgb, var(--app-primary) 5%, transparent) 100%);
+            color-mix(in srgb, #D97459 8%, transparent) 0%,
+            color-mix(in srgb, #D97459 5%, transparent) 100%);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 2px 6px rgba(217, 116, 89, 0.1);
 }
 
 .media-header .el-button::before {
@@ -550,16 +557,16 @@ onMounted(() => {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(217, 116, 89, 0.2), transparent);
     transition: left 0.5s ease;
 }
 
 .media-header .el-button:hover {
     background: linear-gradient(135deg,
-            color-mix(in srgb, var(--app-primary) 15%, transparent) 0%,
-            color-mix(in srgb, var(--app-primary) 10%, transparent) 100%);
+            color-mix(in srgb, #D97459 15%, transparent) 0%,
+            color-mix(in srgb, #D97459 10%, transparent) 100%);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 12px rgba(217, 116, 89, 0.2);
 }
 
 .media-header .el-button:hover::before {
@@ -568,7 +575,7 @@ onMounted(() => {
 
 .card:hover .media-header .el-button {
     animation: buttonPulse 2s ease-in-out infinite;
-    border-color: color-mix(in srgb, var(--app-primary) 50%, transparent);
+    border-color: color-mix(in srgb, #D97459 50%, transparent);
 }
 
 .card:hover .media-header .detail-btn {
@@ -580,11 +587,11 @@ onMounted(() => {
 
     0%,
     100% {
-        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 2px 6px rgba(217, 116, 89, 0.1);
     }
 
     50% {
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(217, 116, 89, 0.3);
         transform: translateY(-1px) scale(1.02);
     }
 }
@@ -642,9 +649,9 @@ onMounted(() => {
     bottom: 0;
     background: linear-gradient(45deg,
             transparent 0%,
-            rgba(102, 126, 234, 0.08) 25%,
+            rgba(217, 116, 89, 0.08) 25%,
             transparent 50%,
-            rgba(79, 172, 254, 0.08) 75%,
+            rgba(244, 162, 97, 0.08) 75%,
             transparent 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -683,20 +690,20 @@ onMounted(() => {
     top: 10px;
     left: 10px;
     z-index: 3;
-    background: linear-gradient(135deg, #1a4fff 0%, #667eea 100%);
+    background: linear-gradient(135deg, #D97459 0%, #F4A261 100%);
     color: #fff;
     font-size: 12px;
     padding: 3px 9px;
     border-radius: 999px;
     transition: all 0.3s ease;
     animation: badgePulse 2s ease-in-out infinite;
-    box-shadow: 0 2px 8px rgba(26, 79, 255, 0.4);
+    box-shadow: 0 2px 8px rgba(217, 116, 89, 0.4);
     backdrop-filter: blur(8px);
 }
 
 .badge:hover {
     transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(26, 79, 255, 0.6);
+    box-shadow: 0 4px 15px rgba(217, 116, 89, 0.6);
 }
 
 @keyframes badgePulse {
@@ -704,12 +711,12 @@ onMounted(() => {
     0%,
     100% {
         transform: scale(1);
-        box-shadow: 0 2px 8px rgba(26, 79, 255, 0.4);
+        box-shadow: 0 2px 8px rgba(217, 116, 89, 0.4);
     }
 
     50% {
         transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(26, 79, 255, 0.6);
+        box-shadow: 0 4px 12px rgba(217, 116, 89, 0.6);
     }
 }
 

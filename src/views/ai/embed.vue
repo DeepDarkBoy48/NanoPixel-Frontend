@@ -253,12 +253,12 @@ onBeforeUnmount(() => {
     gap: 20px;
     padding: 24px;
     color: var(--app-sider-text);
-    --embed-card-bg: var(--app-surface);
-    --embed-secondary-surface: var(--app-surface-2);
-    --embed-card-border: rgba(15, 23, 42, 0.12);
-    --embed-card-shadow: 0 6px 20px rgba(31, 45, 61, 0.08);
-    --embed-muted-text: #909399;
-    --embed-placeholder-text: #c0c4cc;
+    --embed-card-bg: linear-gradient(180deg, #FDF9F6 0%, #FAF4EF 100%);
+    --embed-secondary-surface: #FBF7F3;
+    --embed-card-border: rgba(217, 116, 89, 0.15);
+    --embed-card-shadow: 0 6px 20px rgba(92, 75, 58, 0.08);
+    --embed-muted-text: #9C8B7A;
+    --embed-placeholder-text: #C4B5A6;
 }
 
 .upload-card,
@@ -374,19 +374,11 @@ onBeforeUnmount(() => {
     text-align: right;
 }
 
-.mobile-card-actions {
+    .mobile-card-actions {
     display: flex;
     justify-content: flex-end;
 }
 
-:global(.dark) .embed-page {
-    --embed-card-bg: rgba(22, 27, 34, 0.92);
-    --embed-secondary-surface: rgba(13, 17, 23, 0.96);
-    --embed-card-border: rgba(110, 118, 129, 0.55);
-    --embed-card-shadow: 0 12px 28px rgba(1, 4, 9, 0.55);
-    --embed-muted-text: #8b949e;
-    --embed-placeholder-text: #6e7681;
-}
 
 @media (max-width: 768px) {
     .embed-page {
@@ -423,5 +415,76 @@ onBeforeUnmount(() => {
     .mobile-card {
         padding: 14px 16px;
     }
+}
+</style>
+
+<style>
+/* Global dark mode overrides for Embed Page */
+html.dark .embed-page {
+    --embed-card-bg: linear-gradient(180deg, #2A2420 0%, #231E1A 100%);
+    --embed-secondary-surface: #262019;
+    --embed-card-border: rgba(244, 162, 97, 0.25);
+    --embed-card-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+    --embed-muted-text: #9C8B7A;
+    --embed-placeholder-text: #7A6B5C;
+    /* Ensure text color is correct */
+    color: #E8DED3;
+}
+
+/* Fix Element Plus components in dark mode */
+html.dark .embed-page .el-card {
+    background: var(--embed-card-bg);
+    border-color: var(--embed-card-border);
+    color: #E8DED3;
+}
+
+html.dark .embed-page .section-title {
+    color: #E8DED3;
+}
+
+html.dark .embed-page .upload-card,
+html.dark .embed-page .list-card {
+    background: var(--embed-card-bg);
+    border-color: var(--embed-card-border);
+}
+
+/* Fix Table Backgrounds */
+html.dark .embed-page .el-table,
+html.dark .embed-page .el-table__expanded-cell {
+    background-color: transparent !important;
+    --el-table-bg-color: transparent;
+    --el-table-tr-bg-color: transparent;
+    --el-table-header-bg-color: rgba(244, 162, 97, 0.05);
+    --el-table-border-color: var(--embed-card-border);
+    --el-text-color-regular: #E8DED3;
+    color: #E8DED3;
+}
+
+html.dark .embed-page .el-table th.el-table__cell {
+    background-color: rgba(244, 162, 97, 0.05) !important;
+    color: #E8DED3;
+    border-bottom-color: var(--embed-card-border);
+}
+
+html.dark .embed-page .el-table tr {
+    background-color: transparent !important;
+}
+
+html.dark .embed-page .el-table td.el-table__cell {
+    border-bottom-color: var(--embed-card-border);
+}
+
+html.dark .embed-page .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+    background-color: rgba(244, 162, 97, 0.1) !important;
+}
+
+/* Fix Mobile Card */
+html.dark .embed-page .mobile-card {
+    background: var(--embed-card-bg);
+    border-color: var(--embed-card-border);
+}
+html.dark .embed-page .mobile-file-name,
+html.dark .embed-page .mobile-card-row .value {
+    color: #E8DED3;
 }
 </style>

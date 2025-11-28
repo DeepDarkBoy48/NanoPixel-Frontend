@@ -237,15 +237,15 @@ const menuItems = computed(() => [
 
         <!-- 桌面端侧边栏 -->
         <aside v-if="!isMobile"
-            class="flex flex-col border-r border-[var(--app-header-border)] bg-[var(--app-sider-bg)] shadow-sm overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] z-10"
+            class="sidebar-warm flex flex-col border-r overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] z-10"
             :style="{ width: isCollapse ? '64px' : '260px' }">
 
             <!-- 用户信息区域 -->
-            <div class="flex flex-col items-center py-5 px-2.5 border-b border-[var(--app-header-border)] mb-2.5 transition-all duration-300"
+            <div class="flex flex-col items-center py-5 px-2.5 border-b border-[var(--app-sider-border)] mb-2.5 transition-all duration-300 user-info-glow"
                 :class="isCollapse ? 'px-2' : 'px-4'">
                 <div class="transition-all duration-300 ease-out" :class="isCollapse ? 'scale-75' : 'scale-100'">
                     <img :src="currentAvatar" :alt="userInfoStore.info.nickname"
-                        class="rounded-full object-cover ring-2 ring-[var(--app-primary)]/20 transition-all duration-300"
+                        class="rounded-full object-cover ring-2 ring-[var(--app-sider-primary)]/25 shadow-md transition-all duration-300"
                         :class="isCollapse ? 'w-8 h-8' : 'w-12 h-12'" />
                 </div>
                 <div class="overflow-hidden transition-all duration-300 ease-out"
@@ -262,9 +262,9 @@ const menuItems = computed(() => [
                     <template v-for="item in menuItems" :key="item.index">
                         <!-- 普通菜单项 -->
                         <div v-if="item.type === 'item'" @click="navigateTo(item.index)" :class="[
-                            'group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 ease-out',
+                            'group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ease-out menu-item-warm',
                             isActive(item.index)
-                                ? 'bg-[var(--app-sider-active-bg)] text-[var(--app-primary)] font-semibold shadow-sm'
+                                ? 'menu-item-active text-[var(--app-sider-primary)] font-semibold'
                                 : 'text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)]',
                             isCollapse ? 'justify-center' : ''
                         ]">
@@ -274,7 +274,7 @@ const menuItems = computed(() => [
                             <span v-if="!isCollapse" class="flex-1 truncate transition-all duration-200">{{ item.label
                                 }}</span>
                             <span v-if="!isCollapse && item.hot"
-                                class="px-1.5 py-0.5 text-[10px] font-medium text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400 rounded-full border border-orange-200 dark:border-orange-800/50 animate-pulse">
+                                class="hot-badge px-1.5 py-0.5 text-[10px] font-semibold text-white rounded-full shadow-sm">
                                 🔥 HOT
                             </span>
                         </div>
@@ -285,9 +285,9 @@ const menuItems = computed(() => [
                             <div class="submenu-popover-trigger"
                                 @click="isCollapse ? togglePopover(item.index, $event) : toggleSubMenu(item.index)"
                                 :class="[
-                                    'group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 ease-out',
+                                    'group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ease-out',
                                     hasActiveChild(item.children.map(c => c.index)) || activePopover === item.index
-                                        ? 'text-[var(--app-primary)] bg-[var(--app-sider-hover-bg)]'
+                                        ? 'text-[var(--app-sider-primary)] bg-[var(--app-sider-hover-bg)]'
                                         : 'text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)]',
                                     isCollapse ? 'justify-center' : ''
                                 ]">
@@ -296,7 +296,8 @@ const menuItems = computed(() => [
                                     <component :is="item.icon" />
                                 </el-icon>
                                 <span v-if="!isCollapse" class="flex-1 truncate">{{ item.label }}</span>
-                                <el-icon v-if="!isCollapse" class="text-xs transition-transform duration-300 ease-out"
+                                <el-icon v-if="!isCollapse"
+                                    class="text-xs transition-transform duration-300 ease-out text-[var(--app-sider-text-muted)]"
                                     :class="isExpanded(item.index) ? 'rotate-90' : 'rotate-0'">
                                     <ArrowRight />
                                 </el-icon>
@@ -309,9 +310,9 @@ const menuItems = computed(() => [
                                 <div class="pl-4 space-y-0.5 py-1">
                                     <div v-for="child in item.children" :key="child.index"
                                         @click="navigateTo(child.index)" :class="[
-                                            'group flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 ease-out',
+                                            'group flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 ease-out menu-item-warm',
                                             isActive(child.index)
-                                                ? 'bg-[var(--app-sider-active-bg)] text-[var(--app-primary)] font-semibold'
+                                                ? 'menu-item-active text-[var(--app-sider-primary)] font-semibold'
                                                 : 'text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)] hover:translate-x-1'
                                         ]">
                                         <el-icon
@@ -320,7 +321,7 @@ const menuItems = computed(() => [
                                         </el-icon>
                                         <span class="flex-1 truncate text-sm">{{ child.label }}</span>
                                         <span v-if="child.hot"
-                                            class="px-1.5 py-0.5 text-[10px] font-medium text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400 rounded-full border border-orange-200 dark:border-orange-800/50">
+                                            class="hot-badge px-1.5 py-0.5 text-[10px] font-semibold text-white rounded-full shadow-sm">
                                             🔥 HOT
                                         </span>
                                     </div>
@@ -330,17 +331,17 @@ const menuItems = computed(() => [
                             <!-- 折叠状态：点击弹出子菜单 -->
                             <Transition name="popover">
                                 <div v-if="isCollapse && activePopover === item.index"
-                                    class="submenu-popover fixed left-[68px] z-50 min-w-[180px] py-2 bg-[var(--app-sider-bg)] rounded-lg shadow-xl border border-[var(--app-header-border)]"
+                                    class="submenu-popover fixed left-[68px] z-50 min-w-[180px] py-2 rounded-xl shadow-xl border popover-warm"
                                     :style="{ top: popoverPosition.top + 'px' }">
                                     <div
-                                        class="px-3 py-1.5 mb-1 text-xs font-medium text-[var(--app-sider-text)] opacity-60 border-b border-[var(--app-header-border)]">
+                                        class="px-3 py-1.5 mb-1 text-xs font-medium text-[var(--app-sider-text-muted)] border-b border-[var(--app-sider-border)]">
                                         {{ item.label }}
                                     </div>
                                     <div v-for="child in item.children" :key="child.index"
                                         @click="navigateTo(child.index); closePopover()" :class="[
-                                            'group flex items-center gap-3 px-3 py-2 mx-1 rounded-md cursor-pointer transition-all duration-200 ease-out',
+                                            'group flex items-center gap-3 px-3 py-2 mx-1 rounded-lg cursor-pointer transition-all duration-200 ease-out menu-item-warm',
                                             isActive(child.index)
-                                                ? 'bg-[var(--app-sider-active-bg)] text-[var(--app-primary)] font-semibold'
+                                                ? 'menu-item-active text-[var(--app-sider-primary)] font-semibold'
                                                 : 'text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)]'
                                         ]">
                                         <el-icon class="text-base shrink-0">
@@ -348,7 +349,7 @@ const menuItems = computed(() => [
                                         </el-icon>
                                         <span class="flex-1 text-sm whitespace-nowrap">{{ child.label }}</span>
                                         <span v-if="child.hot"
-                                            class="px-1.5 py-0.5 text-[10px] font-medium text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400 rounded-full">
+                                            class="hot-badge px-1.5 py-0.5 text-[10px] font-semibold text-white rounded-full shadow-sm">
                                             🔥
                                         </span>
                                     </div>
@@ -360,13 +361,13 @@ const menuItems = computed(() => [
             </div>
 
             <!-- 底部操作区 -->
-            <div class="border-t border-[var(--app-header-border)] p-2.5 space-y-1">
+            <div class="border-t border-[var(--app-sider-border)] p-2.5 space-y-1 bg-[var(--app-sider-bg-solid)]/50">
                 <!-- 主题切换 -->
                 <div @click="toggleTheme" :class="[
-                    'group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 ease-out text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)]',
+                    'group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ease-out text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)]',
                     isCollapse ? 'justify-center' : ''
                 ]" :title="isDark ? '切换为浅色' : '切换为深色'">
-                    <el-icon class="text-lg transition-all duration-300 group-hover:rotate-180">
+                    <el-icon class="text-lg transition-all duration-300 group-hover:rotate-180 text-amber-500">
                         <component :is="isDark ? Moon : Sunny" />
                     </el-icon>
                     <span v-if="!isCollapse" class="text-sm">主题模式</span>
@@ -374,7 +375,7 @@ const menuItems = computed(() => [
 
                 <!-- 退出登录 -->
                 <div @click="handleCommand('logout')" :class="[
-                    'group flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 ease-out text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20',
+                    'group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ease-out text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20',
                     isCollapse ? 'justify-center' : ''
                 ]" title="退出登录">
                     <el-icon class="text-lg transition-transform duration-200 group-hover:scale-110">
@@ -385,7 +386,7 @@ const menuItems = computed(() => [
 
                 <!-- 折叠按钮 -->
                 <div @click="handleMenuClick"
-                    class="flex items-center justify-center py-3 mt-1 border-t border-[var(--app-header-border)] cursor-pointer text-[var(--app-sider-text)] hover:text-[var(--app-primary)] transition-all duration-200"
+                    class="flex items-center justify-center py-3 mt-1 border-t border-[var(--app-sider-border)] cursor-pointer text-[var(--app-sider-text-muted)] hover:text-[var(--app-sider-primary)] transition-all duration-200"
                     :title="isCollapse ? '展开' : '折叠'">
                     <el-icon class="text-lg transition-transform duration-300 ease-out"
                         :class="isCollapse ? 'rotate-180' : 'rotate-0'">
@@ -405,12 +406,13 @@ const menuItems = computed(() => [
         <!-- 移动端抽屉菜单 -->
         <Transition name="slide">
             <aside v-if="isMobile && drawerVisible"
-                class="fixed left-0 top-0 bottom-0 w-[260px] bg-[var(--app-sider-bg)] z-50 flex flex-col shadow-2xl transform transition-transform duration-300 ease-out">
+                class="sidebar-warm fixed left-0 top-0 bottom-0 w-[260px] z-50 flex flex-col shadow-2xl transform transition-transform duration-300 ease-out">
 
                 <!-- 移动端用户信息 -->
-                <div class="flex flex-col items-center py-6 px-4 border-b border-[var(--app-header-border)]">
+                <div
+                    class="flex flex-col items-center py-6 px-4 border-b border-[var(--app-sider-border)] user-info-glow">
                     <img :src="currentAvatar" :alt="userInfoStore.info.nickname"
-                        class="w-14 h-14 rounded-full object-cover ring-2 ring-[var(--app-primary)]/20" />
+                        class="w-14 h-14 rounded-full object-cover ring-2 ring-[var(--app-sider-primary)]/25 shadow-md" />
                     <span class="mt-3 text-base font-semibold text-[var(--app-sider-text)]">
                         {{ userInfoStore.info.nickname || '用户' }}
                     </span>
@@ -422,9 +424,9 @@ const menuItems = computed(() => [
                         <template v-for="item in menuItems" :key="item.index">
                             <!-- 普通菜单项 -->
                             <div v-if="item.type === 'item'" @click="navigateTo(item.index)" :class="[
-                                'group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 active:scale-[0.98]',
+                                'group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 active:scale-[0.98] menu-item-warm',
                                 isActive(item.index)
-                                    ? 'bg-[var(--app-sider-active-bg)] text-[var(--app-primary)] font-semibold'
+                                    ? 'menu-item-active text-[var(--app-sider-primary)] font-semibold'
                                     : 'text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)]'
                             ]">
                                 <el-icon class="text-xl">
@@ -432,7 +434,7 @@ const menuItems = computed(() => [
                                 </el-icon>
                                 <span class="flex-1">{{ item.label }}</span>
                                 <span v-if="item.hot"
-                                    class="px-2 py-0.5 text-[10px] font-medium text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400 rounded-full">
+                                    class="hot-badge px-2 py-0.5 text-[10px] font-semibold text-white rounded-full shadow-sm">
                                     🔥 HOT
                                 </span>
                             </div>
@@ -442,14 +444,15 @@ const menuItems = computed(() => [
                                 <div @click="toggleSubMenu(item.index)" :class="[
                                     'group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 active:scale-[0.98]',
                                     hasActiveChild(item.children.map(c => c.index))
-                                        ? 'text-[var(--app-primary)]'
+                                        ? 'text-[var(--app-sider-primary)]'
                                         : 'text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)]'
                                 ]">
                                     <el-icon class="text-xl">
                                         <component :is="item.icon" />
                                     </el-icon>
                                     <span class="flex-1">{{ item.label }}</span>
-                                    <el-icon class="text-sm transition-transform duration-300"
+                                    <el-icon
+                                        class="text-sm transition-transform duration-300 text-[var(--app-sider-text-muted)]"
                                         :class="isExpanded(item.index) ? 'rotate-90' : 'rotate-0'">
                                         <ArrowRight />
                                     </el-icon>
@@ -460,9 +463,9 @@ const menuItems = computed(() => [
                                     <div class="pl-5 space-y-0.5 py-1">
                                         <div v-for="child in item.children" :key="child.index"
                                             @click="navigateTo(child.index)" :class="[
-                                                'flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 active:scale-[0.98]',
+                                                'flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200 active:scale-[0.98] menu-item-warm',
                                                 isActive(child.index)
-                                                    ? 'bg-[var(--app-sider-active-bg)] text-[var(--app-primary)] font-semibold'
+                                                    ? 'menu-item-active text-[var(--app-sider-primary)] font-semibold'
                                                     : 'text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)]'
                                             ]">
                                             <el-icon class="text-lg">
@@ -470,7 +473,7 @@ const menuItems = computed(() => [
                                             </el-icon>
                                             <span class="flex-1 text-sm">{{ child.label }}</span>
                                             <span v-if="child.hot"
-                                                class="px-1.5 py-0.5 text-[10px] font-medium text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400 rounded-full">
+                                                class="hot-badge px-1.5 py-0.5 text-[10px] font-semibold text-white rounded-full shadow-sm">
                                                 🔥 HOT
                                             </span>
                                         </div>
@@ -482,16 +485,16 @@ const menuItems = computed(() => [
                 </div>
 
                 <!-- 移动端底部操作区 -->
-                <div class="border-t border-[var(--app-header-border)] p-4 space-y-2">
+                <div class="border-t border-[var(--app-sider-border)] p-4 space-y-2 bg-[var(--app-sider-bg-solid)]/50">
                     <div @click="toggleTheme"
                         class="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer text-[var(--app-sider-text)] hover:bg-[var(--app-sider-hover-bg)] transition-all duration-200 active:scale-[0.98]">
-                        <el-icon class="text-xl">
+                        <el-icon class="text-xl text-amber-500">
                             <component :is="isDark ? Moon : Sunny" />
                         </el-icon>
                         <span>主题模式</span>
                     </div>
                     <div @click="handleCommand('logout')"
-                        class="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 active:scale-[0.98]">
+                        class="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all duration-200 active:scale-[0.98]">
                         <el-icon class="text-xl">
                             <SwitchButton />
                         </el-icon>
@@ -524,6 +527,103 @@ const menuItems = computed(() => [
 </template>
 
 <style scoped>
+/* ========== 侧边栏温暖风格样式 ========== */
+
+/* 侧边栏主容器 */
+.sidebar-warm {
+    background: var(--app-sider-bg);
+    border-color: var(--app-sider-border);
+    box-shadow:
+        1px 0 0 var(--app-sider-border),
+        4px 0 16px -4px rgba(92, 75, 58, 0.08);
+}
+
+/* 用户信息区域柔和发光 */
+.user-info-glow {
+    position: relative;
+}
+
+.user-info-glow::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent,
+            var(--app-sider-primary) 20%,
+            var(--app-sider-primary) 80%,
+            transparent);
+    opacity: 0.3;
+}
+
+/* 菜单项激活状态 */
+.menu-item-active {
+    background: var(--app-sider-active-bg);
+    box-shadow: var(--app-sider-shadow);
+    position: relative;
+}
+
+.menu-item-active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--app-sider-primary);
+    border-radius: 0 2px 2px 0;
+}
+
+/* 菜单项温暖过渡效果 */
+.menu-item-warm {
+    position: relative;
+}
+
+.menu-item-warm::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(217, 116, 89, 0.04) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.menu-item-warm:hover::after {
+    opacity: 1;
+}
+
+/* HOT 徽章温暖渐变 */
+.hot-badge {
+    background: linear-gradient(135deg, #E07C55 0%, #F4A261 100%);
+    box-shadow: 0 2px 8px -2px rgba(224, 124, 85, 0.5);
+}
+
+.dark .hot-badge {
+    background: linear-gradient(135deg, #F4A261 0%, #E9C46A 100%);
+    box-shadow: 0 2px 8px -2px rgba(244, 162, 97, 0.4);
+}
+
+/* 弹出菜单温暖风格 */
+.popover-warm {
+    background: var(--app-sider-bg);
+    border-color: var(--app-sider-border);
+    box-shadow:
+        0 4px 24px -4px rgba(92, 75, 58, 0.15),
+        0 0 1px rgba(92, 75, 58, 0.1);
+}
+
+.dark .popover-warm {
+    box-shadow:
+        0 4px 24px -4px rgba(0, 0, 0, 0.4),
+        0 0 1px rgba(244, 162, 97, 0.1);
+}
+
 /* Vue Transition 动画 */
 .fade-enter-active,
 .fade-leave-active {
@@ -557,7 +657,7 @@ const menuItems = computed(() => [
     transform: translateX(-8px);
 }
 
-/* 自定义滚动条 */
+/* 自定义滚动条 - 温暖风格 */
 .scrollbar-thin::-webkit-scrollbar {
     width: 4px;
 }
@@ -567,11 +667,29 @@ const menuItems = computed(() => [
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: var(--app-header-border);
+    background: var(--app-sider-border);
     border-radius: 2px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: var(--app-primary);
+    background: var(--app-sider-primary);
+}
+
+/* 侧边栏内容区滚动条 */
+.sidebar-warm ::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-warm ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-warm ::-webkit-scrollbar-thumb {
+    background: var(--app-sider-border);
+    border-radius: 2px;
+}
+
+.sidebar-warm ::-webkit-scrollbar-thumb:hover {
+    background: var(--app-sider-primary);
 }
 </style>

@@ -34,7 +34,7 @@ const updateUserInfo = async () => {
 }
 </script>
 <template>
-    <el-card class="page-container">
+    <el-card class="page-container warm-card">
         <template #header>
             <div class="header">
                 <span>基本资料</span>
@@ -60,3 +60,60 @@ const updateUserInfo = async () => {
         </el-row>
     </el-card>
 </template>
+
+<style scoped>
+.warm-card {
+    background: linear-gradient(180deg, #FDF9F6 0%, #FAF4EF 100%);
+    border: 1px solid rgba(217, 116, 89, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(92, 75, 58, 0.08);
+}
+
+.warm-card :deep(.el-card__header) {
+    background: linear-gradient(135deg, rgba(217, 116, 89, 0.08) 0%, rgba(244, 162, 97, 0.05) 100%);
+    border-bottom: 1px solid rgba(217, 116, 89, 0.12);
+}
+
+.header span {
+    font-weight: 600;
+    color: #5C4B3A;
+}
+
+:deep(.el-button--primary) {
+    background: linear-gradient(135deg, #D97459 0%, #E89A84 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(217, 116, 89, 0.25);
+}
+
+:deep(.el-button--primary:hover) {
+    background: linear-gradient(135deg, #C86750 0%, #D97459 100%);
+    box-shadow: 0 6px 16px rgba(217, 116, 89, 0.35);
+}
+
+:deep(.el-input__wrapper:focus-within) {
+    box-shadow: 0 0 0 1px #D97459 inset;
+}
+
+.dark .warm-card {
+    background: linear-gradient(180deg, #2A2420 0%, #231E1A 100%);
+    border-color: rgba(244, 162, 97, 0.2);
+}
+
+.dark .warm-card :deep(.el-card__header) {
+    background: linear-gradient(135deg, rgba(244, 162, 97, 0.12) 0%, rgba(233, 196, 106, 0.08) 100%);
+    border-bottom-color: rgba(244, 162, 97, 0.15);
+}
+
+.dark .header span {
+    color: #E8DED3;
+}
+
+.dark :deep(.el-button--primary) {
+    background: linear-gradient(135deg, #F4A261 0%, #E9C46A 100%);
+    color: #2A2420;
+}
+
+.dark :deep(.el-input__wrapper:focus-within) {
+    box-shadow: 0 0 0 1px #F4A261 inset;
+}
+</style>

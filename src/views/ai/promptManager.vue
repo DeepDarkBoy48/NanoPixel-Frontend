@@ -112,7 +112,7 @@
                                     </div>
                                     <div class="meta">
                                         <el-tag size="small" type="info" effect="plain">{{ p.categoryName || '未分类'
-                                            }}</el-tag>
+                                        }}</el-tag>
                                         <span class="create-time">{{ formatTime(p.createTime) }}</span>
                                     </div>
                                 </div>
@@ -154,7 +154,7 @@
                             :value="item.id">
                             <div class="select-option">
                                 <span class="select-option__name" :title="item.categoryName">{{ item.categoryName
-                                }}</span>
+                                    }}</span>
                                 <span class="select-option__count">{{ item.promptCount ?? 0 }} 个模版</span>
                             </div>
                         </el-option>
@@ -513,23 +513,23 @@ onMounted(async () => {
     gap: 16px;
 }
 
-/* 顶部指引 */
+/* 顶部指引 - 暖色风格 */
 .guide-banner {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 12px;
     padding: 12px 14px;
-    border: 1px solid var(--el-border-color-lighter);
-    background: color-mix(in srgb, var(--el-color-danger-light-9) 70%, #fff 30%);
-    border-left: 4px solid var(--el-color-danger-light-5);
+    border: 1px solid rgba(217, 116, 89, 0.2);
+    background: linear-gradient(135deg, rgba(217, 116, 89, 0.08) 0%, rgba(244, 162, 97, 0.05) 100%);
+    border-left: 4px solid #D97459;
     border-radius: 12px;
 }
 
 .guide-badge {
     font-size: 12px;
     color: #fff;
-    background: #d92626;
+    background: linear-gradient(135deg, #D97459 0%, #E89A84 100%);
     border-radius: 6px;
     padding: 2px 8px;
 }

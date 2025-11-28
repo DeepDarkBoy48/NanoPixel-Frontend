@@ -13,7 +13,7 @@
         <div class="guide-actions">
           <el-button size="small" type="primary" plain @click="goToInspiration">打开灵感库</el-button>
           <el-button size="small" link @click="guideCollapsed = !guideCollapsed">{{ guideCollapsed ? '展开提示' : '收起提示'
-            }}</el-button>
+          }}</el-button>
         </div>
       </div>
       <div class="list-panel">
@@ -443,16 +443,16 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  border: 1px solid var(--el-border-color-lighter);
-  background: color-mix(in srgb, var(--el-color-primary-light-9) 70%, #fff 30%);
-  border-left: 4px solid var(--el-color-primary-light-5);
+  border: 1px solid rgba(217, 116, 89, 0.2);
+  background: linear-gradient(135deg, rgba(217, 116, 89, 0.08) 0%, rgba(244, 162, 97, 0.05) 100%);
+  border-left: 4px solid #D97459;
   border-radius: 12px;
 }
 
 .guide-badge {
   font-size: 12px;
   color: #fff;
-  background: var(--el-color-primary);
+  background: linear-gradient(135deg, #D97459 0%, #E89A84 100%);
   border-radius: 6px;
   padding: 2px 8px;
 }

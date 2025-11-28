@@ -91,3 +91,6 @@ export interface Message {
 
 // --- Model Configuration ---
 export type ModelLevel = 'mini' | 'quick' | 'deep';
+
+// --- Page Mode ---
+export type PageMode = 'writing' | 'reading';  // 写作纠错 | 文章精读

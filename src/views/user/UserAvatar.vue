@@ -36,7 +36,7 @@ const updateAvatar = async () => {
 </script>
 
 <template>
-    <el-card class="page-container">
+    <el-card class="page-container warm-card">
         <template #header>
             <div class="header">
                 <span>更换头像</span>
@@ -55,7 +55,7 @@ const updateAvatar = async () => {
                     @click="uploadRef.$el.querySelector('input').click()">
                     选择图片
                 </el-button>
-                <el-button type="success" :icon="Upload" size="large" @click="updateAvatar">
+                <el-button class="upload-btn" :icon="Upload" size="large" @click="updateAvatar">
                     上传头像
                 </el-button>
             </el-col>
@@ -64,6 +64,23 @@ const updateAvatar = async () => {
 </template>
 
 <style lang="scss" scoped>
+.warm-card {
+    background: linear-gradient(180deg, #FDF9F6 0%, #FAF4EF 100%);
+    border: 1px solid rgba(217, 116, 89, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(92, 75, 58, 0.08);
+
+    :deep(.el-card__header) {
+        background: linear-gradient(135deg, rgba(217, 116, 89, 0.08) 0%, rgba(244, 162, 97, 0.05) 100%);
+        border-bottom: 1px solid rgba(217, 116, 89, 0.12);
+    }
+
+    .header span {
+        font-weight: 600;
+        color: #5C4B3A;
+    }
+}
+
 .avatar-uploader {
     :deep() {
         .avatar {
@@ -73,8 +90,8 @@ const updateAvatar = async () => {
         }
 
         .el-upload {
-            border: 1px dashed var(--el-border-color);
-            border-radius: 6px;
+            border: 2px dashed rgba(217, 116, 89, 0.3);
+            border-radius: 12px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
@@ -82,15 +99,72 @@ const updateAvatar = async () => {
         }
 
         .el-upload:hover {
-            border-color: var(--el-color-primary);
+            border-color: #D97459;
+            box-shadow: 0 4px 16px rgba(217, 116, 89, 0.15);
         }
 
         .el-icon.avatar-uploader-icon {
             font-size: 28px;
-            color: #8c939d;
+            color: #9C8B7A;
             width: 278px;
             height: 278px;
             text-align: center;
-        }}
+        }
+    }
+}
+
+:deep(.el-button--primary) {
+    background: linear-gradient(135deg, #D97459 0%, #E89A84 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(217, 116, 89, 0.25);
+}
+
+:deep(.el-button--primary:hover) {
+    background: linear-gradient(135deg, #C86750 0%, #D97459 100%);
+    box-shadow: 0 6px 16px rgba(217, 116, 89, 0.35);
+}
+
+.upload-btn {
+    background: linear-gradient(135deg, #5C4B3A 0%, #7A6B5C 100%) !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(92, 75, 58, 0.2);
+}
+
+.upload-btn:hover {
+    background: linear-gradient(135deg, #4A3C2E 0%, #5C4B3A 100%) !important;
+    box-shadow: 0 6px 16px rgba(92, 75, 58, 0.3);
+}
+
+.dark .warm-card {
+    background: linear-gradient(180deg, #2A2420 0%, #231E1A 100%);
+    border-color: rgba(244, 162, 97, 0.2);
+
+    :deep(.el-card__header) {
+        background: linear-gradient(135deg, rgba(244, 162, 97, 0.12) 0%, rgba(233, 196, 106, 0.08) 100%);
+        border-bottom-color: rgba(244, 162, 97, 0.15);
+    }
+
+    .header span {
+        color: #E8DED3;
+    }
+}
+
+.dark :deep(.el-button--primary) {
+    background: linear-gradient(135deg, #F4A261 0%, #E9C46A 100%);
+    color: #2A2420;
+}
+
+.dark .upload-btn {
+    background: linear-gradient(135deg, #F4A261 0%, #E9C46A 100%) !important;
+    color: #2A2420 !important;
+}
+
+.dark .avatar-uploader :deep(.el-upload) {
+    border-color: rgba(244, 162, 97, 0.3);
+}
+
+.dark .avatar-uploader :deep(.el-upload:hover) {
+    border-color: #F4A261;
 }
 </style>

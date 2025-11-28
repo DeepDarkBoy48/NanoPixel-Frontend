@@ -547,85 +547,85 @@ const clearChatMemory = async () => {
 
 
 <style lang="scss" scoped>
-// 主题变量定义
+// 主题变量定义 - 暖色风格
 :root {
-    // 光亮模式
-    --chat-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    --chat-surface: rgba(255, 255, 255, 0.9);
-    --chat-border: rgba(15, 23, 42, 0.12);
-    --chat-text: #0f172a;
-    --chat-text-secondary: #64748b;
+    // 光亮模式 - 奶油暖色
+    --chat-bg: linear-gradient(135deg, #FDF9F6 0%, #FAF4EF 100%);
+    --chat-surface: rgba(251, 247, 243, 0.95);
+    --chat-border: rgba(92, 75, 58, 0.12);
+    --chat-text: #5C4B3A;
+    --chat-text-secondary: #9C8B7A;
 
-    // AI消息
-    --ai-bubble: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --ai-border: rgba(102, 126, 234, 0.3);
+    // AI消息 - 温暖橙色系
+    --ai-bubble: linear-gradient(135deg, #D97459 0%, #E89A84 100%);
+    --ai-border: rgba(217, 116, 89, 0.3);
     --ai-text: #ffffff;
-    --ai-glow: 0 8px 32px rgba(102, 126, 234, 0.3);
+    --ai-glow: 0 8px 32px rgba(217, 116, 89, 0.3);
 
-    // 自己的消息
-    --self-bubble: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --self-border: rgba(79, 172, 254, 0.3);
+    // 自己的消息 - 温暖琥珀色
+    --self-bubble: linear-gradient(135deg, #F4A261 0%, #E9C46A 100%);
+    --self-border: rgba(244, 162, 97, 0.3);
     --self-text: #ffffff;
-    --self-glow: 0 8px 32px rgba(79, 172, 254, 0.3);
+    --self-glow: 0 8px 32px rgba(244, 162, 97, 0.3);
 
-    // 其他用户消息
-    --other-bubble: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    --other-border: rgba(168, 237, 234, 0.3);
-    --other-text: #0f172a;
-    --other-glow: 0 8px 32px rgba(168, 237, 234, 0.2);
+    // 其他用户消息 - 柔和暖色
+    --other-bubble: linear-gradient(135deg, #F5D4C8 0%, #FDF2EE 100%);
+    --other-border: rgba(245, 212, 200, 0.5);
+    --other-text: #5C4B3A;
+    --other-glow: 0 8px 32px rgba(245, 212, 200, 0.2);
 
-    // 系统消息
+    // 系统消息 - 温暖提示色
     --system-bubble: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
     --system-border: rgba(255, 236, 210, 0.3);
-    --system-text: #0f172a;
+    --system-text: #5C4B3A;
     --system-glow: 0 8px 32px rgba(255, 236, 210, 0.2);
 
-    // 表格主题色
-    --chat-table-surface: rgba(255, 255, 255, 0.85);
-    --chat-table-header: rgba(247, 249, 255, 0.94);
-    --chat-table-border: rgba(15, 23, 42, 0.12);
-    --chat-table-zebra: rgba(15, 23, 42, 0.05);
-    --chat-table-label: rgba(71, 85, 105, 0.85);
+    // 表格主题色 - 暖色调
+    --chat-table-surface: rgba(251, 247, 243, 0.9);
+    --chat-table-header: rgba(250, 244, 239, 0.96);
+    --chat-table-border: rgba(92, 75, 58, 0.12);
+    --chat-table-zebra: rgba(217, 116, 89, 0.05);
+    --chat-table-label: rgba(92, 75, 58, 0.75);
 }
 
 .dark {
-    // 黑暗模式
-    --chat-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    --chat-surface: rgba(30, 41, 59, 0.95);
-    --chat-border: rgba(148, 163, 184, 0.2);
-    --chat-text: #f1f5f9;
-    --chat-text-secondary: #94a3b8;
+    // 黑暗模式 - 暖棕色调
+    --chat-bg: linear-gradient(135deg, #2A2420 0%, #231E1A 100%);
+    --chat-surface: rgba(38, 32, 25, 0.95);
+    --chat-border: rgba(156, 139, 122, 0.25);
+    --chat-text: #E8DED3;
+    --chat-text-secondary: #9C8B7A;
 
-    // AI消息 - 紫色系
-    --ai-bubble: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-    --ai-border: rgba(139, 92, 246, 0.4);
-    --ai-text: #ffffff;
-    --ai-glow: 0 0 20px rgba(139, 92, 246, 0.4), 0 8px 32px rgba(139, 92, 246, 0.2);
+    // AI消息 - 温暖橙色系
+    --ai-bubble: linear-gradient(135deg, #F4A261 0%, #E9C46A 100%);
+    --ai-border: rgba(244, 162, 97, 0.4);
+    --ai-text: #2A2420;
+    --ai-glow: 0 0 20px rgba(244, 162, 97, 0.4), 0 8px 32px rgba(244, 162, 97, 0.2);
 
-    // 自己的消息 - 蓝色系
-    --self-bubble: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    --self-border: rgba(59, 130, 246, 0.4);
+    // 自己的消息 - 珊瑚橙色
+    --self-bubble: linear-gradient(135deg, #D97459 0%, #E89A84 100%);
+    --self-border: rgba(217, 116, 89, 0.4);
     --self-text: #ffffff;
-    --self-glow: 0 0 20px rgba(59, 130, 246, 0.3), 0 8px 32px rgba(59, 130, 246, 0.2);
+    --self-glow: 0 0 20px rgba(217, 116, 89, 0.3), 0 8px 32px rgba(217, 116, 89, 0.2);
 
-    // 其他用户消息 - 青色系
-    --other-bubble: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-    --other-border: rgba(6, 182, 212, 0.4);
+    // 其他用户消息 - 暖色调
+    --other-bubble: linear-gradient(135deg, #B08968 0%, #9C6644 100%);
+    --other-border: rgba(176, 137, 104, 0.4);
     --other-text: #ffffff;
-    --other-glow: 0 0 20px rgba(6, 182, 212, 0.3), 0 8px 32px rgba(6, 182, 212, 0.2);
+    --other-glow: 0 0 20px rgba(176, 137, 104, 0.3), 0 8px 32px rgba(176, 137, 104, 0.2);
 
-    // 系统消息 - 橙色系
-    --system-bubble: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --system-border: rgba(245, 158, 11, 0.4);
-    --system-text: #ffffff;
-    --system-glow: 0 0 20px rgba(245, 158, 11, 0.3), 0 8px 32px rgba(245, 158, 11, 0.2);
+    // 系统消息 - 温暖提示色
+    --system-bubble: linear-gradient(135deg, #E9C46A 0%, #F4A261 100%);
+    --system-border: rgba(233, 196, 106, 0.4);
+    --system-text: #2A2420;
+    --system-glow: 0 0 20px rgba(233, 196, 106, 0.3), 0 8px 32px rgba(233, 196, 106, 0.2);
 
-    // 表格主题色（暗色）
-    --chat-table-surface: rgba(30, 41, 59, 0.82);
-    --chat-table-header: rgba(51, 65, 85, 0.9);
-    --chat-table-border: rgba(100, 116, 139, 0.35);
-    --chat-table-zebra: rgba(148, 163, 184, 0.14);
-    --chat-table-label: rgba(191, 219, 254, 0.8);
+    // 表格主题色（暗色暖调）
+    --chat-table-surface: rgba(38, 32, 25, 0.85);
+    --chat-table-header: rgba(61, 52, 42, 0.9);
+    --chat-table-border: rgba(156, 139, 122, 0.35);
+    --chat-table-zebra: rgba(244, 162, 97, 0.1);
+    --chat-table-label: rgba(232, 222, 211, 0.8);
 }
 
 .chat-room {
@@ -1199,20 +1199,20 @@ const clearChatMemory = async () => {
     }
 }
 
-// 思考内容样式
+// 思考内容样式 - 暖色风格
 .thinking-section {
     margin-bottom: 12px;
-    border: 2px solid rgba(79, 172, 254, 0.4);
+    border: 2px solid rgba(217, 116, 89, 0.4);
     border-radius: 10px;
-    background: rgba(79, 172, 254, 0.05);
+    background: rgba(217, 116, 89, 0.05);
     overflow: hidden;
     transition: all 0.3s ease;
 
     &:hover {
-        border-color: rgba(79, 172, 254, 0.6);
-        background: rgba(79, 172, 254, 0.08);
+        border-color: rgba(217, 116, 89, 0.6);
+        background: rgba(217, 116, 89, 0.08);
         transform: translateY(-1px);
-        box-shadow: 0 4px 16px rgba(79, 172, 254, 0.2);
+        box-shadow: 0 4px 16px rgba(217, 116, 89, 0.2);
     }
 }
 
@@ -1221,19 +1221,19 @@ const clearChatMemory = async () => {
     align-items: center;
     justify-content: space-between;
     padding: 10px 14px;
-    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(139, 92, 246, 0.1));
+    background: linear-gradient(135deg, rgba(217, 116, 89, 0.15), rgba(244, 162, 97, 0.1));
     cursor: pointer;
     transition: all 0.3s ease;
-    border-bottom: 1px solid rgba(79, 172, 254, 0.2);
+    border-bottom: 1px solid rgba(217, 116, 89, 0.2);
 
     &:hover {
-        background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(139, 92, 246, 0.15));
+        background: linear-gradient(135deg, rgba(217, 116, 89, 0.2), rgba(244, 162, 97, 0.15));
     }
 
     .thinking-label {
         font-size: 13px;
         font-weight: 600;
-        color: #4facfe;
+        color: #D97459;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         letter-spacing: 0.5px;
     }
@@ -1241,8 +1241,8 @@ const clearChatMemory = async () => {
     .thinking-icon {
         transition: transform 0.3s ease;
         font-size: 18px;
-        color: #4facfe;
-        filter: drop-shadow(0 1px 2px rgba(79, 172, 254, 0.3));
+        color: #D97459;
+        filter: drop-shadow(0 1px 2px rgba(217, 116, 89, 0.3));
 
         &.expanded {
             transform: rotate(180deg);
@@ -1467,8 +1467,8 @@ const clearChatMemory = async () => {
         width: 40px;
         height: 40px;
         border: 3px solid transparent;
-        border-top: 3px solid #4facfe;
-        border-right: 3px solid #00f2fe;
+        border-top: 3px solid #D97459;
+        border-right: 3px solid #F4A261;
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin: 0 auto;
@@ -1482,7 +1482,7 @@ const clearChatMemory = async () => {
             right: 2px;
             bottom: 2px;
             border: 2px solid transparent;
-            border-top: 2px solid rgba(79, 172, 254, 0.3);
+            border-top: 2px solid rgba(217, 116, 89, 0.3);
             border-radius: 50%;
             animation: spin 1.5s linear infinite reverse;
         }
@@ -1684,7 +1684,7 @@ const clearChatMemory = async () => {
         justify-content: center;
 
         :deep(.el-switch__core) {
-            box-shadow: 0 2px 8px rgba(64, 158, 255, 0.25);
+            box-shadow: 0 2px 8px rgba(217, 116, 89, 0.25);
         }
 
         // 提高开关内文字对比度
@@ -1698,15 +1698,15 @@ const clearChatMemory = async () => {
         border-radius: 12px;
         padding: 12px 20px;
         font-weight: 600;
-        background: linear-gradient(135deg, var(--el-color-primary) 0%, #1d4ed8 100%);
+        background: linear-gradient(135deg, #D97459 0%, #C86750 100%);
         border: none;
-        box-shadow: 0 4px 16px rgba(64, 158, 255, 0.3);
+        box-shadow: 0 4px 16px rgba(217, 116, 89, 0.3);
         transition: all 0.3s ease;
         width: 100%;
 
         &:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(64, 158, 255, 0.4);
+            box-shadow: 0 8px 24px rgba(217, 116, 89, 0.4);
         }
 
         &:active {
@@ -1969,17 +1969,17 @@ const clearChatMemory = async () => {
     user-select: text;
 }
 
-// 黑暗模式样式增强
+// 黑暗模式样式增强 - 暖色风格
 .dark {
 
     // 黑暗模式加载动画
     .chat-loading-state {
         .loading-spinner .spinner-ring {
-            border-top-color: #8b5cf6;
-            border-right-color: #a855f7;
+            border-top-color: #F4A261;
+            border-right-color: #E9C46A;
 
             &::before {
-                border-top-color: rgba(139, 92, 246, 0.4);
+                border-top-color: rgba(244, 162, 97, 0.4);
             }
         }
 
@@ -2033,62 +2033,62 @@ const clearChatMemory = async () => {
     }
 
     .input-actions .el-button {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        background: linear-gradient(135deg, #F4A261 0%, #E09254 100%);
+        box-shadow: 0 4px 16px rgba(244, 162, 97, 0.3);
 
         &:hover {
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 8px 24px rgba(244, 162, 97, 0.4);
         }
     }
 
-    // 黑暗模式下的头像炫酷增强
+    // 黑暗模式下的头像炫酷增强 - 暖色风格
     .avatar-wrapper .avatar {
         &::before {
             background: linear-gradient(45deg,
                     rgba(255, 255, 255, 0.1),
-                    rgba(59, 130, 246, 0.4),
-                    rgba(139, 92, 246, 0.4),
+                    rgba(217, 116, 89, 0.4),
+                    rgba(244, 162, 97, 0.4),
                     rgba(255, 255, 255, 0.1));
         }
 
         &::after {
             background: radial-gradient(circle,
-                    rgba(59, 130, 246, 0.3) 0%,
-                    rgba(139, 92, 246, 0.2) 50%,
+                    rgba(217, 116, 89, 0.3) 0%,
+                    rgba(244, 162, 97, 0.2) 50%,
                     transparent 70%);
         }
     }
 
     .message-self {
         .avatar {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5) !important;
-            border: 2px solid rgba(59, 130, 246, 0.5) !important;
+            background: linear-gradient(135deg, #D97459, #C86750) !important;
+            box-shadow: 0 0 25px rgba(217, 116, 89, 0.5) !important;
+            border: 2px solid rgba(217, 116, 89, 0.5) !important;
 
             &::before {
                 background: linear-gradient(45deg,
-                        rgba(59, 130, 246, 0.8),
-                        rgba(29, 78, 216, 0.8),
-                        rgba(59, 130, 246, 0.8)) !important;
+                        rgba(217, 116, 89, 0.8),
+                        rgba(200, 103, 80, 0.8),
+                        rgba(217, 116, 89, 0.8)) !important;
             }
 
             &::after {
                 background: radial-gradient(circle,
-                        rgba(59, 130, 246, 0.4) 0%,
-                        rgba(29, 78, 216, 0.3) 50%,
+                        rgba(217, 116, 89, 0.4) 0%,
+                        rgba(200, 103, 80, 0.3) 50%,
                         transparent 70%) !important;
             }
         }
 
         .user-name {
             color: rgba(255, 255, 255, 0.95) !important;
-            text-shadow: 0 0 12px rgba(59, 130, 246, 0.5) !important;
+            text-shadow: 0 0 12px rgba(217, 116, 89, 0.5) !important;
         }
     }
 
     .message-ai {
         .avatar.ai {
-            box-shadow: 0 0 25px rgba(139, 92, 246, 0.6) !important;
+            box-shadow: 0 0 25px rgba(244, 162, 97, 0.6) !important;
 
             &::before {
                 opacity: 1 !important;
@@ -2100,63 +2100,63 @@ const clearChatMemory = async () => {
         }
 
         .user-name {
-            color: #c084fc !important;
-            text-shadow: 0 0 12px rgba(139, 92, 246, 0.4) !important;
+            color: #F4A261 !important;
+            text-shadow: 0 0 12px rgba(244, 162, 97, 0.4) !important;
         }
     }
 
     .message-system {
         .avatar.system {
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.6) !important;
+            box-shadow: 0 0 25px rgba(233, 196, 106, 0.6) !important;
         }
 
         .user-name {
-            color: #fbbf24 !important;
-            text-shadow: 0 0 10px rgba(245, 158, 11, 0.4) !important;
+            color: #E9C46A !important;
+            text-shadow: 0 0 10px rgba(233, 196, 106, 0.4) !important;
         }
     }
 
     .message-other {
         .avatar:not(.ai):not(.system) {
-            background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5) !important;
-            border: 2px solid rgba(6, 182, 212, 0.4) !important;
+            background: linear-gradient(135deg, #B08968, #9C6644) !important;
+            box-shadow: 0 0 20px rgba(176, 137, 104, 0.5) !important;
+            border: 2px solid rgba(176, 137, 104, 0.4) !important;
         }
 
         .user-name {
-            color: #22d3ee !important;
-            text-shadow: 0 0 8px rgba(6, 182, 212, 0.3) !important;
+            color: #DDB892 !important;
+            text-shadow: 0 0 8px rgba(176, 137, 104, 0.3) !important;
         }
     }
 
-    // 黑暗模式下的思考内容样式
+    // 黑暗模式下的思考内容样式 - 暖色风格
     .thinking-section {
-        border-color: rgba(139, 92, 246, 0.6);
-        background: rgba(139, 92, 246, 0.08);
+        border-color: rgba(244, 162, 97, 0.6);
+        background: rgba(244, 162, 97, 0.08);
 
         &:hover {
-            border-color: rgba(139, 92, 246, 0.8);
-            background: rgba(139, 92, 246, 0.12);
-            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+            border-color: rgba(244, 162, 97, 0.8);
+            background: rgba(244, 162, 97, 0.12);
+            box-shadow: 0 4px 16px rgba(244, 162, 97, 0.3);
         }
     }
 
     .thinking-toggle {
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.15));
-        border-bottom-color: rgba(139, 92, 246, 0.3);
+        background: linear-gradient(135deg, rgba(244, 162, 97, 0.2), rgba(233, 196, 106, 0.15));
+        border-bottom-color: rgba(244, 162, 97, 0.3);
 
         &:hover {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(168, 85, 247, 0.2));
+            background: linear-gradient(135deg, rgba(244, 162, 97, 0.25), rgba(233, 196, 106, 0.2));
         }
 
         .thinking-label {
-            color: #c084fc;
-            text-shadow: 0 1px 2px rgba(139, 92, 246, 0.5);
+            color: #F4A261;
+            text-shadow: 0 1px 2px rgba(244, 162, 97, 0.5);
         }
 
         .thinking-icon {
-            color: #c084fc;
-            filter: drop-shadow(0 1px 2px rgba(139, 92, 246, 0.5));
+            color: #F4A261;
+            filter: drop-shadow(0 1px 2px rgba(244, 162, 97, 0.5));
         }
     }
 

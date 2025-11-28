@@ -113,7 +113,14 @@ onMounted(() => {
 
 .review-card {
     border-radius: 20px;
-    border: 1px solid color-mix(in srgb, var(--el-border-color) 70%, transparent);
+    border: 1px solid rgba(217, 116, 89, 0.15);
+    background: linear-gradient(180deg, #FDF9F6 0%, #FAF4EF 100%);
+    box-shadow: 0 4px 20px rgba(92, 75, 58, 0.08);
+}
+
+.review-card :deep(.el-card__header) {
+    background: linear-gradient(135deg, rgba(217, 116, 89, 0.08) 0%, rgba(244, 162, 97, 0.05) 100%);
+    border-bottom: 1px solid rgba(217, 116, 89, 0.12);
 }
 
 .card-header {
@@ -127,12 +134,24 @@ onMounted(() => {
     margin: 0;
     font-size: 20px;
     font-weight: 600;
+    color: #5C4B3A;
 }
 
 .card-header p {
     margin: 4px 0 0;
-    color: var(--el-text-color-secondary);
+    color: #9C8B7A;
     font-size: 13px;
+}
+
+.card-header :deep(.el-button) {
+    background: linear-gradient(135deg, #D97459 0%, #E89A84 100%);
+    border: none;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(217, 116, 89, 0.2);
+}
+
+.card-header :deep(.el-button:hover) {
+    background: linear-gradient(135deg, #C86750 0%, #D97459 100%);
 }
 
 .review-list {
@@ -147,8 +166,16 @@ onMounted(() => {
     gap: 16px;
     border-radius: 16px;
     padding: 16px 18px;
-    background: color-mix(in srgb, var(--app-surface-2) 92%, #101727 8%);
-    border: 1px solid color-mix(in srgb, var(--el-border-color) 72%, transparent);
+    background: linear-gradient(135deg, rgba(251, 247, 243, 0.9) 0%, rgba(250, 244, 239, 0.9) 100%);
+    border: 1px solid rgba(217, 116, 89, 0.12);
+    box-shadow: 0 2px 8px rgba(92, 75, 58, 0.06);
+    transition: all 0.3s ease;
+}
+
+.review-item:hover {
+    border-color: rgba(217, 116, 89, 0.25);
+    box-shadow: 0 4px 16px rgba(92, 75, 58, 0.1);
+    transform: translateY(-2px);
 }
 
 .review-item__main {
@@ -163,7 +190,7 @@ onMounted(() => {
     margin: 0;
     font-size: 14px;
     line-height: 1.6;
-    color: var(--el-text-color-primary);
+    color: #5C4B3A;
     word-break: break-word;
 }
 
@@ -172,12 +199,65 @@ onMounted(() => {
     flex-wrap: wrap;
     gap: 12px;
     font-size: 12px;
-    color: var(--el-text-color-secondary);
+    color: #9C8B7A;
 }
 
 .review-actions {
     display: flex;
     align-items: flex-start;
+}
+
+.review-actions :deep(.el-button--danger) {
+    color: #D97459;
+}
+
+.review-actions :deep(.el-button--danger:hover) {
+    color: #C86750;
+}
+
+/* Dark mode */
+.dark .review-card {
+    background: linear-gradient(180deg, #2A2420 0%, #231E1A 100%);
+    border-color: rgba(244, 162, 97, 0.2);
+}
+
+.dark .review-card :deep(.el-card__header) {
+    background: linear-gradient(135deg, rgba(244, 162, 97, 0.12) 0%, rgba(233, 196, 106, 0.08) 100%);
+    border-bottom-color: rgba(244, 162, 97, 0.15);
+}
+
+.dark .card-header h2 {
+    color: #E8DED3;
+}
+
+.dark .card-header p {
+    color: #9C8B7A;
+}
+
+.dark .card-header :deep(.el-button) {
+    background: linear-gradient(135deg, #F4A261 0%, #E9C46A 100%);
+    color: #2A2420;
+}
+
+.dark .review-item {
+    background: linear-gradient(135deg, rgba(38, 32, 25, 0.9) 0%, rgba(35, 30, 26, 0.9) 100%);
+    border-color: rgba(244, 162, 97, 0.15);
+}
+
+.dark .review-item:hover {
+    border-color: rgba(244, 162, 97, 0.3);
+}
+
+.dark .review-content {
+    color: #E8DED3;
+}
+
+.dark .review-meta {
+    color: #9C8B7A;
+}
+
+.dark .review-actions :deep(.el-button--danger) {
+    color: #F4A261;
 }
 
 @media (max-width: 768px) {
