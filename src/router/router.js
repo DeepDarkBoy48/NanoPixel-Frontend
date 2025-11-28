@@ -29,7 +29,7 @@ const routes = [
     path: "/",
     component: LayoutVue,
     // 重定向：进入根路径时默认打开图片库
-    redirect: "/ai/library",
+    redirect: "/ai/smashEnglish",
     // 子路由：在 Layout 内切换主体内容
     children: [
       // 文章中心
@@ -60,7 +60,7 @@ const routes = [
 
       // AI 模块：Embed
       { path: "/ai/embed", component: embedVue },
-      
+
       // AI 模块：Smash English
       { path: "/ai/smashEnglish", component: SmashEnglishVue },
 

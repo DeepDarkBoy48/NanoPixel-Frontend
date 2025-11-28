@@ -7,10 +7,9 @@ import { lookupWordService, generateSpeechService } from '../services/geminiServ
 interface DictionaryPageProps {
     initialResult: DictionaryResult | null;
     onResultChange: (result: DictionaryResult | null) => void;
-    modelLevel: ModelLevel;
 }
 
-export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, onResultChange, modelLevel }) => {
+export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, onResultChange }) => {
     const [query, setQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -27,7 +26,7 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
         setError(null);
 
         try {
-            const data = await lookupWordService(query, modelLevel);
+            const data = await lookupWordService(query);
             onResultChange(data);
         } catch (err: any) {
             setError(err.message || "查询失败，请稍后再试。");

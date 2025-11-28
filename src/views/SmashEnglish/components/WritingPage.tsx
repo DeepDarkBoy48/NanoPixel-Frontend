@@ -8,7 +8,6 @@ import { ResultDisplay } from './ResultDisplay';
 interface WritingPageProps {
     initialResult: WritingResult | null;
     onResultChange: (result: WritingResult | null) => void;
-    modelLevel: ModelLevel;
 }
 
 const MODES: { value: WritingMode; label: string; shortLabel: string }[] = [
@@ -17,7 +16,7 @@ const MODES: { value: WritingMode; label: string; shortLabel: string }[] = [
 
 type ViewMode = 'diff' | 'syntax';
 
-export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResultChange, modelLevel }) => {
+export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResultChange }) => {
     const [inputText, setInputText] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -54,7 +53,7 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
         setShowOriginal(false);
 
         try {
-            const data = await evaluateWritingService(inputText, mode, modelLevel);
+            const data = await evaluateWritingService(inputText, mode);
             setResult(data);
             onResultChange(data);
         } catch (err: any) {
@@ -80,7 +79,7 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
 
         try {
             // Reuse model level for nested syntax analysis too
-            const data = await analyzeSentenceService(sentence, modelLevel);
+            const data = await analyzeSentenceService(sentence);
             setSyntaxResult(data);
             // Update cache
             setSyntaxCache(prev => ({ ...prev, [sentence]: data }));

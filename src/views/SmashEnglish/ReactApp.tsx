@@ -8,16 +8,35 @@ import { WritingPage } from './components/WritingPage';
 import { Footer } from './components/Footer';
 import { AiAssistant } from './components/AiAssistant';
 import { analyzeSentenceService } from './services/geminiService';
-import { AnalysisResult, DictionaryResult, WritingResult, ModelLevel } from './types';
+import { AnalysisResult, DictionaryResult, WritingResult } from './types';
 import { Sparkles, BookOpen, AlertCircle } from 'lucide-react';
+
+// 预加载的示例分析结果
+const DEMO_RESULT: AnalysisResult = {
+  englishSentence: "Regular exercise can improve confidence.",
+  chineseTranslation: "规律的运动可以提升自信。",
+  sentencePattern: "S + V + O (主谓宾)",
+  mainTense: "Present Simple (一般现在时)",
+  chunks: [
+    { text: "Regular exercise", grammarDescription: "名词短语", partOfSpeech: "名词短语", role: "主语" },
+    { text: "can improve", grammarDescription: "情态动词短语", partOfSpeech: "情态动词短语", role: "谓语" },
+    { text: "confidence.", grammarDescription: "名词", partOfSpeech: "名词", role: "宾语" }
+  ],
+  detailedTokens: [
+    { text: "Regular", partOfSpeech: "ADJECTIVE", role: "定语", meaning: "规律的，经常的", explanation: "形容词，修饰名词 'exercise'，表示规律的、经常性的。" },
+    { text: "exercise", partOfSpeech: "NOUN", role: "主语", meaning: "运动，锻炼", explanation: "名词，意为运动、锻炼。在此句中作主语。" },
+    { text: "can", partOfSpeech: "MODAL VERB", role: "情态动词", meaning: "能，可以", explanation: "情态动词，表示能力或可能性，后面接动词原形。" },
+    { text: "improve", partOfSpeech: "VERB", role: "谓语动词", meaning: "改善，提高", explanation: "动词原形，意为改善、提高。与 'can' 共同构成谓语动词短语。" },
+    { text: "confidence", partOfSpeech: "NOUN", role: "宾语", meaning: "自信，信心", explanation: "名词，意为自信、信心。作动词 'improve' 的宾语。" }
+  ]
+};
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'analyzer' | 'dictionary' | 'writing'>('analyzer');
-  const [modelLevel, setModelLevel] = useState<ModelLevel>('mini');
 
-  // Analyzer State
+  // Analyzer State - 使用预加载的示例数据作为初始值
   const [isAnalyzerLoading, setIsAnalyzerLoading] = useState(false);
-  const [analyzerResult, setAnalyzerResult] = useState<AnalysisResult | null>(null);
+  const [analyzerResult, setAnalyzerResult] = useState<AnalysisResult | null>(DEMO_RESULT);
   const [analyzerError, setAnalyzerError] = useState<string | null>(null);
 
   // Dictionary State
@@ -34,7 +53,7 @@ const App: React.FC = () => {
     setAnalyzerResult(null);
 
     try {
-      const data = await analyzeSentenceService(sentence, modelLevel);
+      const data = await analyzeSentenceService(sentence);
       setAnalyzerResult(data);
     } catch (err: any) {
       console.error(err);
@@ -69,12 +88,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 font-sans">
+    <div className="min-h-full flex flex-col bg-slate-50 text-slate-800 font-sans">
       <Header
         activeTab={activeTab}
         onNavigate={setActiveTab}
-        modelLevel={modelLevel}
-        onModelChange={setModelLevel}
       />
 
       <main className={`flex-grow container mx-auto px-4 py-8 ${getContainerMaxWidth()} flex flex-col gap-8 relative transition-all duration-300 ease-in-out`}>
@@ -98,7 +115,7 @@ const App: React.FC = () => {
 
             {/* Input Section */}
             <div className="w-full max-w-2xl mx-auto">
-              <InputArea onAnalyze={handleAnalyze} isLoading={isAnalyzerLoading} />
+              <InputArea onAnalyze={handleAnalyze} isLoading={isAnalyzerLoading} initialValue={DEMO_RESULT.englishSentence} />
             </div>
 
             {/* Results Section */}
@@ -140,7 +157,6 @@ const App: React.FC = () => {
           <DictionaryPage
             initialResult={dictionaryResult}
             onResultChange={setDictionaryResult}
-            modelLevel={modelLevel}
           />
         )}
 
@@ -148,7 +164,6 @@ const App: React.FC = () => {
           <WritingPage
             initialResult={writingResult}
             onResultChange={setWritingResult}
-            modelLevel={modelLevel}
           />
         )}
       </main>

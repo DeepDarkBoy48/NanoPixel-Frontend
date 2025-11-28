@@ -1,5 +1,5 @@
 import request from "@/utils/request.js";
-import { AnalysisResult, DictionaryResult, WritingResult, Message, WritingMode, ModelLevel } from "../types";
+import { AnalysisResult, DictionaryResult, WritingResult, Message, WritingMode } from "../types";
 
 // --- Audio Helper Functions ---
 // Shared context for decoding only, to avoid creating new contexts repeatedly
@@ -44,16 +44,16 @@ async function decodeAudioData(
 
 // --- Public Services ---
 
-export const analyzeSentenceService = (sentence: string, modelLevel: ModelLevel = 'mini'): Promise<AnalysisResult> => {
-  return request.post('/fastapi/analyze', { sentence, modelLevel }) as Promise<AnalysisResult>;
+export const analyzeSentenceService = (sentence: string): Promise<AnalysisResult> => {
+  return request.post('/fastapi/analyze', { sentence }) as Promise<AnalysisResult>;
 };
 
-export const lookupWordService = (word: string, modelLevel: ModelLevel = 'mini'): Promise<DictionaryResult> => {
-  return request.post('/fastapi/lookup', { word, modelLevel }) as Promise<DictionaryResult>;
+export const lookupWordService = (word: string): Promise<DictionaryResult> => {
+  return request.post('/fastapi/lookup', { word }) as Promise<DictionaryResult>;
 };
 
-export const evaluateWritingService = (text: string, mode: WritingMode, modelLevel: ModelLevel = 'mini'): Promise<WritingResult> => {
-  return request.post('/fastapi/writing', { text, mode, modelLevel }) as Promise<WritingResult>;
+export const evaluateWritingService = (text: string, mode: WritingMode): Promise<WritingResult> => {
+  return request.post('/fastapi/writing', { text, mode }) as Promise<WritingResult>;
 };
 
 export const getChatResponseService = async (

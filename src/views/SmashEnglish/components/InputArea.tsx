@@ -4,6 +4,7 @@ import { Send, Shuffle } from 'lucide-react';
 interface InputAreaProps {
   onAnalyze: (sentence: string) => void;
   isLoading: boolean;
+  initialValue?: string;
 }
 
 const PRESETS = [
@@ -14,8 +15,8 @@ const PRESETS = [
   "Reading books expands your mind."
 ];
 
-export const InputArea: React.FC<InputAreaProps> = ({ onAnalyze, isLoading }) => {
-  const [text, setText] = useState("");
+export const InputArea: React.FC<InputAreaProps> = ({ onAnalyze, isLoading, initialValue = "" }) => {
+  const [text, setText] = useState(initialValue);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

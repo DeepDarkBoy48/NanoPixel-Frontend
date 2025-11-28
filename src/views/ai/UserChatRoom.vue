@@ -26,7 +26,7 @@ const thinkingExpandedStates = ref(new Map())
 let ws = null;
 // 心跳定时器
 let heartbeatInterval = null;
-// El-scrollbar 组件引用
+// 原生滚动容器引用
 const scrollbarRef = ref(null)
 
 // 深度搜索开关
@@ -193,7 +193,7 @@ const renderThinkingHtml = (msg) => {
 
 // 为表格单元格添加 data-label 属性，便于移动端展示
 const enhanceResponsiveTables = () => {
-    const wrap = scrollbarRef.value?.wrapRef
+    const wrap = scrollbarRef.value
     if (!wrap) return
 
     const tables = wrap.querySelectorAll('.bubble .content table, .thinking-content table')
@@ -296,10 +296,7 @@ const connectWs = () => {
             // 新消息后滚动到底部
             nextTick(() => {
                 if (scrollbarRef.value) {
-                    const scrollContainer = scrollbarRef.value.wrapRef
-                    if (scrollContainer) {
-                        scrollContainer.scrollTop = scrollContainer.scrollHeight
-                    }
+                    scrollbarRef.value.scrollTop = scrollbarRef.value.scrollHeight
                 }
                 enhanceResponsiveTables()
             })
@@ -336,9 +333,8 @@ onMounted(() => {
 
     // 绑定点击事件委托到滚动容器
     nextTick(() => {
-        const wrap = scrollbarRef.value?.wrapRef
-        if (wrap) {
-            wrap.addEventListener('click', handleContentClick)
+        if (scrollbarRef.value) {
+            scrollbarRef.value.addEventListener('click', handleContentClick)
         }
         enhanceResponsiveTables()
     })
@@ -366,9 +362,8 @@ onBeforeUnmount(() => {
     }
 
     // 移除图片点击事件
-    const wrap = scrollbarRef.value?.wrapRef
-    if (wrap) {
-        wrap.removeEventListener('click', handleContentClick)
+    if (scrollbarRef.value) {
+        scrollbarRef.value.removeEventListener('click', handleContentClick)
     }
 })
 
@@ -436,9 +431,8 @@ const clearChatMemory = async () => {
         })
 
         nextTick(() => {
-            const scrollContainer = scrollbarRef.value?.wrapRef
-            if (scrollContainer) {
-                scrollContainer.scrollTop = scrollContainer.scrollHeight
+            if (scrollbarRef.value) {
+                scrollbarRef.value.scrollTop = scrollbarRef.value.scrollHeight
             }
             enhanceResponsiveTables()
         })
@@ -467,7 +461,7 @@ const clearChatMemory = async () => {
             </div>
 
             <!-- 滚动容器 -->
-            <el-scrollbar class="message-list-scrollbar" ref="scrollbarRef">
+            <div class="message-list-scrollbar" ref="scrollbarRef">
                 <!-- 动态消息列表 -->
                 <div v-for="(msg, index) in messageList" :key="index"
                     :class="['message-row', `message-${getMessageType(msg.from)}`]">
@@ -521,7 +515,7 @@ const clearChatMemory = async () => {
                     <div class="empty-icon">💬</div>
                     <p>加载中</p>
                 </div>
-            </el-scrollbar>
+            </div>
 
             <div class="input-area">
                 <div class="input-main">
@@ -635,8 +629,8 @@ const clearChatMemory = async () => {
 }
 
 .chat-room {
-    height: 100vh;
-    min-height: 600px;
+    flex: 1;
+    min-height: 400px;
     background: var(--chat-bg);
     display: flex;
     flex-direction: column;
@@ -645,8 +639,8 @@ const clearChatMemory = async () => {
 }
 
 .chat-container {
-    height: 100vh;
-    min-height: 600px;
+    flex: 1;
+    min-height: 400px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -749,26 +743,11 @@ const clearChatMemory = async () => {
 .message-list-scrollbar {
     flex: 1;
     min-height: 200px;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     max-width: 100%;
-    padding: 8px 0;
-
-    :deep(.el-scrollbar__view) {
-        padding: 0 12px;
-        box-sizing: border-box;
-        max-width: 100%;
-        min-height: 200px;
-    }
-
-    :deep(.el-scrollbar__bar) {
-        opacity: 0.3;
-        border-radius: 6px;
-
-        .el-scrollbar__thumb {
-            background: var(--chat-text-secondary);
-            border-radius: 6px;
-        }
-    }
+    padding: 8px 12px;
+    box-sizing: border-box;
 }
 
 .message-row {
@@ -1752,12 +1731,10 @@ const clearChatMemory = async () => {
 @media (max-height: 400px) {
     .chat-room {
         min-height: 300px;
-        height: 100vh;
     }
 
     .chat-container {
         min-height: 300px;
-        height: 100vh;
     }
 
     .connection-status {
@@ -1765,11 +1742,7 @@ const clearChatMemory = async () => {
     }
 
     .message-list-scrollbar {
-        padding: 10px 0;
-
-        :deep(.el-scrollbar__view) {
-            padding: 0 16px;
-        }
+        padding: 10px 16px;
     }
 
     .input-area {
@@ -1799,8 +1772,7 @@ const clearChatMemory = async () => {
 // 移动端适配
 @media (max-width: 768px) {
     .chat-room {
-        height: 100vh;
-        min-height: 500px;
+        min-height: 400px;
         padding: 0;
         overflow-x: hidden;
     }
@@ -1814,8 +1786,7 @@ const clearChatMemory = async () => {
             display: none;
         }
 
-        height: 100vh;
-        min-height: 500px;
+        min-height: 400px;
     }
 
     .connection-status {
@@ -1829,15 +1800,7 @@ const clearChatMemory = async () => {
     }
 
     .message-list-scrollbar {
-        padding: 8px 0;
-
-        :deep(.el-scrollbar__wrap) {
-            overflow-x: hidden !important;
-        }
-
-        :deep(.el-scrollbar__view) {
-            padding: 0 8px;
-        }
+        padding: 8px;
     }
 
     .message-row {
@@ -1997,8 +1960,6 @@ const clearChatMemory = async () => {
 
 /* 强制允许聊天内容文本可选择（避免外层样式影响） */
 .message-list-scrollbar,
-.message-list-scrollbar :deep(.el-scrollbar__wrap),
-.message-list-scrollbar :deep(.el-scrollbar__view),
 .message-row,
 .bubble,
 .bubble .content {

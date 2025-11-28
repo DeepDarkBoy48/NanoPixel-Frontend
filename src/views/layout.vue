@@ -143,7 +143,7 @@ const currentAvatar = computed(() => {
     <el-container class="layout-container">
         <!-- 左侧菜单 (桌面端) -->
         <el-aside v-if="!isMobile" :width="isCollapse ? '64px' : '260px'" class="desktop-aside">
-            
+
             <!-- 用户信息区域 (展开时显示) -->
             <div class="user-info-section" v-if="!isCollapse">
                 <el-avatar :size="50" :src="currentAvatar" />
@@ -157,10 +157,41 @@ const currentAvatar = computed(() => {
             </div>
 
             <!-- 菜单 -->
-            <el-scrollbar class="aside-menu-scroll">
+            <div class="aside-menu-scroll">
                 <el-menu :default-active="activeMenu" :default-openeds="defaultOpenedMenus"
                     :active-text-color="'var(--app-primary)'" :background-color="'transparent'"
                     :text-color="'var(--app-sider-text)'" router :collapse="isCollapse" :collapse-transition="false">
+
+                    <el-menu-item index="/ai/smashEnglish">
+                        <el-icon>
+                            <EditPen />
+                        </el-icon>
+                        <span class="menu-label">AI 英语语法分析</span>
+                        <span class="hot-badge">🔥 HOT</span>
+                    </el-menu-item>
+
+                    <el-sub-menu index="/ai2">
+                        <template #title>
+                            <el-icon>
+                                <MagicStick />
+                            </el-icon>
+                            <span>RAG知识库</span>
+                        </template>
+                        <el-menu-item index="/ai/chatRoom">
+                            <el-icon>
+                                <ChatLineRound />
+                            </el-icon>
+                            <span class="menu-label">ChatBot</span>
+                            <span class="hot-badge">🔥 HOT</span>
+                        </el-menu-item>
+                        <el-menu-item index="/ai/embed">
+                            <el-icon>
+                                <ChatLineRound />
+                            </el-icon>
+                            <span class="menu-label">知识库Embed</span>
+                        </el-menu-item>
+
+                    </el-sub-menu>
 
                     <el-sub-menu index="/ai">
                         <template #title>
@@ -174,7 +205,7 @@ const currentAvatar = computed(() => {
                             <el-icon>
                                 <Crop />
                             </el-icon>
-                            <span class="menu-label">魔法修图</span>
+                            <span class="menu-label">魔法绘图</span>
                             <span class="hot-badge">🔥 HOT</span>
                         </el-menu-item>
                         <el-menu-item index="/ai/library">
@@ -182,24 +213,23 @@ const currentAvatar = computed(() => {
                                 <Promotion />
                             </el-icon>
                             <span class="menu-label">灵感广场</span>
-                            <span class="hot-badge">🔥 HOT</span>
                         </el-menu-item>
-
                         <el-menu-item index="/ai/magicImageEdit/history">
                             <el-icon>
                                 <Picture />
                             </el-icon>
-                            <span class="menu-label">我的图集</span>
+                            <span class="menu-label">绘图历史</span>
                         </el-menu-item>
                         <el-menu-item index="/ai/prompt">
                             <el-icon>
                                 <EditPen />
                             </el-icon>
-                            <span class="menu-label">提示词管理</span>
+                            <span class="menu-label">绘图提示词</span>
                         </el-menu-item>
+
                     </el-sub-menu>
 
-                    <el-sub-menu index="/article">
+                    <!-- <el-sub-menu index="/article">
                         <template #title>
                             <el-icon>
                                 <UserFilled />
@@ -219,46 +249,7 @@ const currentAvatar = computed(() => {
                             </el-icon>
                             <span>文章管理</span>
                         </el-menu-item>
-                    </el-sub-menu>
-
-                    <el-sub-menu index="/ai2">
-                        <template #title>
-                            <el-icon>
-                                <MagicStick />
-                            </el-icon>
-                            <span>AI知识库</span>
-                        </template>
-                        <el-menu-item index="/ai/chatRoom">
-                            <el-icon>
-                                <ChatLineRound />
-                            </el-icon>
-                            <span class="menu-label">AI对话</span>
-                            <span class="hot-badge">🔥 HOT</span>
-                        </el-menu-item>
-                        <el-menu-item index="/ai/embed">
-                            <el-icon>
-                                <ChatLineRound />
-                            </el-icon>
-                            <span class="menu-label">知识库</span>
-                        </el-menu-item>
-
-                    </el-sub-menu>
-
-                    <el-sub-menu index="/youtube">
-                        <template #title>
-                            <el-icon>
-                                <UserFilled />
-                            </el-icon>
-                            <span>SmashEnglish</span>
-                        </template>
-                        <el-menu-item index="/ai/smashEnglish">
-                            <el-icon>
-                                <EditPen />
-                            </el-icon>
-                            <span class="menu-label">英语语法分析</span>
-                            <span class="hot-badge">NEW</span>
-                        </el-menu-item>
-                    </el-sub-menu>
+                    </el-sub-menu> -->
 
                     <el-sub-menu index="/user">
                         <template #title>
@@ -297,7 +288,7 @@ const currentAvatar = computed(() => {
                         </el-menu-item>
                     </el-sub-menu>
                 </el-menu>
-            </el-scrollbar>
+            </div>
 
             <!-- 底部操作区 -->
             <div class="aside-footer">
@@ -328,8 +319,8 @@ const currentAvatar = computed(() => {
         <el-drawer v-if="isMobile" v-model="drawerVisible" title="菜单" direction="ltr" size="240px" :with-header="false"
             class="mobile-drawer">
             <div class="mobile-drawer-content">
-                
-                 <!-- 移动端用户信息 -->
+
+                <!-- 移动端用户信息 -->
                 <div class="user-info-section">
                     <el-avatar :size="50" :src="currentAvatar" />
                     <div class="user-details">
@@ -414,29 +405,6 @@ const currentAvatar = computed(() => {
                             <span class="hot-badge">NEW</span>
                         </el-menu-item>
                     </el-sub-menu>
-
-                    <el-sub-menu index="/article">
-                        <template #title>
-                            <el-icon>
-                                <UserFilled />
-                            </el-icon>
-                            <span>文章中心</span>
-                        </template>
-                        <el-menu-item index="/article/category">
-                            <el-icon>
-                                <Management />
-                            </el-icon>
-                            <span>文章分类</span>
-                        </el-menu-item>
-
-                        <el-menu-item index="/article/manage">
-                            <el-icon>
-                                <Promotion />
-                            </el-icon>
-                            <span>文章管理</span>
-                        </el-menu-item>
-                    </el-sub-menu>
-
                     <el-sub-menu index="/user">
                         <template #title>
                             <el-icon>
@@ -474,8 +442,8 @@ const currentAvatar = computed(() => {
                         </el-menu-item>
                     </el-sub-menu>
                 </el-menu>
-                
-                 <div class="aside-footer">
+
+                <div class="aside-footer">
                     <div class="footer-item" @click="toggleTheme">
                         <el-icon>
                             <component :is="isDark ? Moon : Sunny" />
@@ -503,7 +471,7 @@ const currentAvatar = computed(() => {
             </div>
 
             <!-- 中间区域 -->
-            <el-main>
+            <el-main :class="{ 'no-padding': route.path.startsWith('/ai/smashEnglish') }">
                 <RouterView />
             </el-main>
         </el-container>
@@ -530,7 +498,7 @@ const currentAvatar = computed(() => {
             display: flex;
             justify-content: center;
             align-items: center;
-            
+
             .el-aside__logo {
                 height: 40px;
                 width: 120px;
@@ -550,7 +518,7 @@ const currentAvatar = computed(() => {
             .user-details {
                 margin-top: 10px;
                 text-align: center;
-                
+
                 .username {
                     display: block;
                     font-size: 16px;
@@ -558,7 +526,7 @@ const currentAvatar = computed(() => {
                     color: var(--app-sider-text);
                     margin-bottom: 4px;
                 }
-                
+
                 .user-role {
                     display: inline-block;
                     font-size: 12px;
@@ -580,7 +548,9 @@ const currentAvatar = computed(() => {
 
         .aside-menu-scroll {
             flex: 1;
-            
+            overflow-y: auto;
+            overflow-x: hidden;
+
             .el-menu {
                 border-right: none;
                 --el-menu-bg-color: transparent;
@@ -605,12 +575,12 @@ const currentAvatar = computed(() => {
                 border-radius: 8px;
                 color: var(--app-sider-text);
                 transition: all 0.2s;
-                
+
                 .el-icon {
                     font-size: 18px;
                     margin-right: 12px;
                 }
-                
+
                 span {
                     font-size: 14px;
                     white-space: nowrap;
@@ -622,17 +592,18 @@ const currentAvatar = computed(() => {
 
                 &.danger {
                     color: #f56c6c;
+
                     &:hover {
                         background-color: rgba(245, 108, 108, 0.1);
                     }
                 }
-                
+
                 &.collapse-btn {
                     justify-content: center;
                     margin-top: 4px;
                     border-top: 1px solid var(--app-header-border);
                     padding-top: 14px;
-                    
+
                     .el-icon {
                         margin-right: 0;
                     }
@@ -647,13 +618,13 @@ const currentAvatar = computed(() => {
         border-radius: 8px;
         height: 44px;
         line-height: 44px;
-        
+
         &.is-active {
             background-color: var(--app-sider-active-bg);
             font-weight: 600;
         }
     }
-    
+
     :deep(.el-sub-menu__title) {
         margin: 4px 10px;
         border-radius: 8px;
@@ -678,7 +649,7 @@ const currentAvatar = computed(() => {
         flex-direction: column;
         min-width: 0;
         background: var(--app-main-bg);
-        
+
         .mobile-header {
             height: 50px;
             background: var(--app-header-bg);
@@ -686,13 +657,13 @@ const currentAvatar = computed(() => {
             display: flex;
             align-items: center;
             padding: 0 16px;
-            
+
             .menu-trigger {
                 font-size: 24px;
                 color: var(--app-header-icon);
                 margin-right: 16px;
             }
-            
+
             .mobile-title {
                 font-size: 18px;
                 font-weight: 600;
@@ -704,9 +675,20 @@ const currentAvatar = computed(() => {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-            
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+
+            &.no-padding {
+                padding: 0;
+            }
+
             @media (max-width: 768px) {
                 padding: 12px;
+
+                &.no-padding {
+                    padding: 0;
+                }
             }
         }
     }
@@ -718,52 +700,52 @@ const currentAvatar = computed(() => {
         padding: 0;
         background-color: var(--app-sider-bg);
     }
-    
+
     .mobile-drawer-content {
         height: 100%;
         display: flex;
         flex-direction: column;
-        
+
         .el-aside__logo {
             height: 60px;
             background: url('@/assets/logo.png') no-repeat center / 100px auto;
             margin-top: 10px;
         }
-        
+
         .user-info-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            
+
             .username {
                 margin-top: 10px;
                 font-weight: 600;
                 color: var(--app-sider-text);
             }
         }
-        
+
         .el-menu {
             flex: 1;
             border: none;
             --el-menu-bg-color: transparent;
         }
-        
+
         .aside-footer {
             padding: 16px;
             border-top: 1px solid var(--app-header-border);
-            
+
             .footer-item {
                 display: flex;
                 align-items: center;
                 padding: 12px;
                 color: var(--app-sider-text);
-                
+
                 .el-icon {
                     font-size: 20px;
                     margin-right: 12px;
                 }
-                
+
                 &.danger {
                     color: #f56c6c;
                 }

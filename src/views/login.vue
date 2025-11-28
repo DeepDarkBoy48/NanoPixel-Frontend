@@ -151,9 +151,11 @@ const goSmashEnglish = () => {
               <div class="tip-info">
                 <span class="tip-badge">测试账号</span>
                 <div class="tip-credentials">
-                  <span class="credential"><span class="credential-label">账号</span><span class="credential-value">徐晨阳2025</span></span>
+                  <span class="credential"><span class="credential-label">账号</span><span
+                      class="credential-value">徐晨阳2025</span></span>
                   <span class="credential-divider">|</span>
-                  <span class="credential"><span class="credential-label">密码</span><span class="credential-value">123456</span></span>
+                  <span class="credential"><span class="credential-label">密码</span><span
+                      class="credential-value">123456</span></span>
                 </div>
               </div>
               <el-button class="quick-login-btn" size="large" @click="oneClickLogin">一键登录</el-button>
@@ -172,7 +174,9 @@ const goSmashEnglish = () => {
             <!-- Smash English Sticker -->
             <div class="smash-english-sticker" @click="goSmashEnglish">
               <div class="sticker-content">
-                <el-icon class="sticker-icon"><MagicStick /></el-icon>
+                <el-icon class="sticker-icon">
+                  <MagicStick />
+                </el-icon>
                 <span>Smash English</span>
               </div>
               <div class="sticker-shine"></div>
@@ -218,7 +222,7 @@ const goSmashEnglish = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
+  background:
     radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(255, 0, 128, 0.12) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 50%, rgba(0, 150, 255, 0.08) 0%, transparent 60%);
@@ -264,10 +268,13 @@ const goSmashEnglish = () => {
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.6;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 0.9;
@@ -292,15 +299,13 @@ const goSmashEnglish = () => {
   position: relative;
   z-index: 1;
   width: 480px;
-  background: linear-gradient(
-    145deg,
-    rgba(30, 30, 60, 0.85) 0%,
-    rgba(20, 20, 50, 0.9) 50%,
-    rgba(40, 20, 60, 0.85) 100%
-  );
+  background: linear-gradient(145deg,
+      rgba(30, 30, 60, 0.85) 0%,
+      rgba(20, 20, 50, 0.9) 50%,
+      rgba(40, 20, 60, 0.85) 100%);
   padding: 48px 40px;
   border-radius: 28px;
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
@@ -322,7 +327,7 @@ const goSmashEnglish = () => {
   }
 
   &:hover {
-    box-shadow: 
+    box-shadow:
       0 35px 60px -15px rgba(0, 0, 0, 0.6),
       0 0 0 1px rgba(255, 255, 255, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.15),
@@ -336,6 +341,7 @@ const goSmashEnglish = () => {
     opacity: 0;
     transform: translateY(30px) scale(0.95);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -363,12 +369,16 @@ const goSmashEnglish = () => {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
+
   25% {
     transform: translateY(-8px) rotate(1deg);
   }
+
   75% {
     transform: translateY(-4px) rotate(-1deg);
   }
@@ -389,9 +399,12 @@ const goSmashEnglish = () => {
 }
 
 @keyframes title-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     filter: drop-shadow(0 0 20px rgba(196, 181, 253, 0.3));
   }
+
   50% {
     filter: drop-shadow(0 0 30px rgba(196, 181, 253, 0.5));
   }
@@ -508,7 +521,7 @@ const goSmashEnglish = () => {
 :deep(.el-input__wrapper) {
   background: rgba(0, 0, 0, 0.35) !important;
   border-radius: 14px !important;
-  box-shadow: 
+  box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.3),
     0 1px 0 rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -524,7 +537,7 @@ const goSmashEnglish = () => {
 :deep(.el-input__wrapper.is-focus) {
   background: rgba(0, 0, 0, 0.45) !important;
   border-color: rgba(147, 51, 234, 0.7) !important;
-  box-shadow: 
+  box-shadow:
     inset 0 2px 4px rgba(0, 0, 0, 0.3),
     0 0 0 4px rgba(147, 51, 234, 0.15),
     0 0 20px rgba(147, 51, 234, 0.2) !important;
@@ -581,7 +594,7 @@ const goSmashEnglish = () => {
   letter-spacing: 0.1em;
   border-radius: 14px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 10px 25px rgba(139, 92, 246, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   position: relative;
@@ -601,7 +614,7 @@ const goSmashEnglish = () => {
   &:hover {
     background: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #c026d3 100%);
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 
+    box-shadow:
       0 15px 35px rgba(139, 92, 246, 0.45),
       inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
