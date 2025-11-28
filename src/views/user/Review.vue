@@ -22,13 +22,8 @@
                         </div>
                     </div>
                     <div class="review-actions">
-                        <el-button
-                            size="small"
-                            type="danger"
-                            link
-                            :loading="deletingId === item.id"
-                            @click="confirmDelete(item)"
-                        >
+                        <el-button size="small" type="danger" link :loading="deletingId === item.id"
+                            @click="confirmDelete(item)">
                             删除
                         </el-button>
                     </div>

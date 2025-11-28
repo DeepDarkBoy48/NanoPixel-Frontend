@@ -127,7 +127,7 @@
                             <h3>评论区</h3>
                             <p>围绕该作品的讨论与反馈</p>
                         </div>
-                        <el-button size="small" type="primary" plain @click="toggleCommentForm">
+                        <el-button size="small" type="primary" @click="toggleCommentForm">
                             {{ showCommentForm ? '收起' : '新增评论' }}
                         </el-button>
                     </header>
@@ -1008,6 +1008,7 @@ watch(mediaId, (id) => {
 
 .comment-panel header .el-button {
     background: linear-gradient(135deg, var(--app-primary) 0%, color-mix(in srgb, var(--app-primary) 80%, #F4A261) 100%);
+    color: #fff;
     border: none;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(217, 116, 89, 0.3);
