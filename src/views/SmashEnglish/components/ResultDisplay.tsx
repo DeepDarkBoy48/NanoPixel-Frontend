@@ -1,8 +1,7 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AnalysisResult, AnalysisChunk, Correction } from '../types';
-import { Volume2, Copy, BookOpen, Loader2, Sparkles, AlertTriangle, CheckCircle2, GitMerge, Clock } from 'lucide-react';
-import { generateSpeechService } from '../services/geminiService';
+import { Copy, BookOpen, Sparkles, AlertTriangle, CheckCircle2, GitMerge, Clock } from 'lucide-react';
 
 interface ResultDisplayProps {
     result: AnalysisResult;
@@ -10,103 +9,6 @@ interface ResultDisplayProps {
 }
 
 export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, compact = false }) => {
-    const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-    const [isAudioLoading, setIsAudioLoading] = useState(false);
-
-    // Cache audio buffer for the current sentence
-    const audioCacheRef = useRef<AudioBuffer | null>(null);
-    // Keep track of the current generation promise to avoid race conditions or double-fetching
-    const audioPromiseRef = useRef<Promise<AudioBuffer> | null>(null);
-
-    const currentSentenceRef = useRef<string>(result.englishSentence);
-    const audioContextRef = useRef<AudioContext | null>(null);
-
-    // Initialize AudioContext lazily
-    const getAudioContext = () => {
-        if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
-            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-        }
-        return audioContextRef.current;
-    };
-
-    // Auto-prefetch audio when result changes
-    useEffect(() => {
-        // Clean up previous state
-        audioCacheRef.current = null;
-        audioPromiseRef.current = null;
-        currentSentenceRef.current = result.englishSentence;
-
-        const prefetchAudio = async () => {
-            try {
-                const promise = generateSpeechService(result.englishSentence);
-                audioPromiseRef.current = promise;
-
-                const buffer = await promise;
-
-                // Ensure the result hasn't changed while we were fetching
-                if (currentSentenceRef.current === result.englishSentence) {
-                    audioCacheRef.current = buffer;
-                }
-            } catch (err) {
-                console.error("Audio pre-fetch failed:", err);
-            }
-        };
-
-        prefetchAudio();
-
-    }, [result.englishSentence]);
-
-    const playAudio = async () => {
-        if (isAudioPlaying) return;
-
-        const context = getAudioContext();
-        if (context.state === 'suspended') {
-            await context.resume();
-        }
-
-        try {
-            let audioBuffer = audioCacheRef.current;
-
-            if (!audioBuffer) {
-                setIsAudioLoading(true);
-
-                // If pre-fetch is in progress, wait for it
-                if (audioPromiseRef.current) {
-                    try {
-                        audioBuffer = await audioPromiseRef.current;
-                    } catch (e) {
-                        // If pre-fetch failed, try again explicitly
-                        audioBuffer = await generateSpeechService(result.englishSentence);
-                    }
-                } else {
-                    // Fallback if no pre-fetch happened
-                    audioBuffer = await generateSpeechService(result.englishSentence);
-                }
-
-                // Update cache
-                audioCacheRef.current = audioBuffer;
-                setIsAudioLoading(false);
-            }
-
-            if (audioBuffer) {
-                setIsAudioPlaying(true);
-                const source = context.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(context.destination);
-                source.onended = () => setIsAudioPlaying(false);
-                source.start(0);
-            }
-
-        } catch (err) {
-            console.error("TTS Playback Error:", err);
-            setIsAudioLoading(false);
-            setIsAudioPlaying(false);
-            // Clear promise so user can retry
-            audioPromiseRef.current = null;
-            alert("无法播放音频，请稍后再试。");
-        }
-    };
-
     const copyToClipboard = () => {
         navigator.clipboard.writeText(result.englishSentence);
     };
@@ -152,14 +54,6 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, compact = 
                         </div>
 
                         <div className="flex items-center gap-2 self-start md:self-center">
-                            <button
-                                onClick={playAudio}
-                                disabled={isAudioLoading}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full font-medium transition-all text-xs ${isAudioPlaying ? 'bg-pink-100 text-pink-600 ring-2 ring-pink-200' : 'bg-slate-100 text-slate-600 hover:bg-pink-50 hover:text-pink-600'}`}
-                            >
-                                {isAudioLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Volume2 className={`w-3 h-3 ${isAudioPlaying ? 'animate-pulse' : ''}`} />}
-                                <span>{isAudioLoading ? '加载...' : '朗读'}</span>
-                            </button>
                             {!compact && (
                                 <button onClick={copyToClipboard} className="p-2.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-all" title="复制">
                                     <Copy className="w-4 h-4" />

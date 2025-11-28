@@ -1,8 +1,8 @@
 
-import React, { useState, useRef } from 'react';
-import { Search, Volume2, Book, Loader2, AlertCircle, ChevronRight, BarChart3, Sparkles, Link2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Book, Loader2, AlertCircle, ChevronRight, BarChart3, Sparkles, Link2 } from 'lucide-react';
 import { DictionaryResult, ModelLevel } from '../types';
-import { lookupWordService, generateSpeechService } from '../services/geminiService';
+import { lookupWordService } from '../services/geminiService';
 
 interface DictionaryPageProps {
     initialResult: DictionaryResult | null;
@@ -13,10 +13,6 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
     const [query, setQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-
-    const audioContextRef = useRef<AudioContext | null>(null);
-    const audioCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,36 +28,6 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
             setError(err.message || "查询失败，请稍后再试。");
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const playAudio = async (text: string) => {
-        if (isAudioPlaying) return;
-        setIsAudioPlaying(true);
-
-        try {
-            if (!audioContextRef.current) {
-                audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-            }
-            const ctx = audioContextRef.current;
-            if (ctx.state === 'suspended') await ctx.resume();
-
-            let buffer: AudioBuffer;
-            if (audioCacheRef.current.has(text)) {
-                buffer = audioCacheRef.current.get(text)!;
-            } else {
-                buffer = await generateSpeechService(text);
-                audioCacheRef.current.set(text, buffer);
-            }
-
-            const source = ctx.createBufferSource();
-            source.buffer = buffer;
-            source.connect(ctx.destination);
-            source.onended = () => setIsAudioPlaying(false);
-            source.start(0);
-        } catch (e) {
-            console.error(e);
-            setIsAudioPlaying(false);
         }
     };
 
@@ -117,20 +83,13 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
             {result && !isLoading && (
                 <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
                     {/* Header */}
-                    <div className="bg-slate-50/50 border-b border-slate-100 px-6 py-8 md:px-10 md:py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="bg-slate-50/50 border-b border-slate-100 px-6 py-8 md:px-10 md:py-10">
                         <div>
                             <h2 className="text-5xl font-bold text-slate-900 font-serif tracking-tight leading-none mb-3">{result.word}</h2>
                             <div className="text-xl text-slate-500 font-sans flex items-center gap-2 font-medium">
                                 <span>{result.phonetic}</span>
                             </div>
                         </div>
-                        <button
-                            onClick={() => playAudio(result.word)}
-                            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-sm ${isAudioPlaying ? 'bg-pink-100 text-pink-600 ring-4 ring-pink-50' : 'bg-white border border-slate-200 text-slate-700 hover:text-pink-600 hover:border-pink-300 hover:shadow-md'}`}
-                            title="播放发音"
-                        >
-                            {isAudioPlaying ? <Loader2 className="w-6 h-6 animate-spin" /> : <Volume2 className="w-7 h-7" />}
-                        </button>
                     </div>
 
                     {/* Entries */}
