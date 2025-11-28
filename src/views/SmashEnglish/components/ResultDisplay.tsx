@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { AnalysisResult, AnalysisChunk, Correction } from '../types';
-import { Copy, BookOpen, Sparkles, AlertTriangle, CheckCircle2, GitMerge, Clock } from 'lucide-react';
+import { Volume2, Copy, BookOpen, Sparkles, AlertTriangle, CheckCircle2, GitMerge, Clock } from 'lucide-react';
 
 interface ResultDisplayProps {
     result: AnalysisResult;
@@ -9,8 +9,55 @@ interface ResultDisplayProps {
 }
 
 export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, compact = false }) => {
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
     const copyToClipboard = () => {
         navigator.clipboard.writeText(result.englishSentence);
+    };
+
+    const speakText = () => {
+        // 检查浏览器是否支持 Web Speech API
+        if (!('speechSynthesis' in window)) {
+            alert('您的浏览器不支持语音合成功能');
+            return;
+        }
+
+        // 如果正在播放，停止当前播放
+        if (isSpeaking) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+            return;
+        }
+
+        // 创建新的语音合成实例
+        const utterance = new SpeechSynthesisUtterance(result.englishSentence);
+
+        // 配置语音参数
+        utterance.lang = 'en-US'; // 英语
+        utterance.rate = 0.9; // 语速 (0.1 - 10)
+        utterance.pitch = 1; // 音调 (0 - 2)
+        utterance.volume = 1; // 音量 (0 - 1)
+
+        // 尝试选择英语语音（如果可用）
+        const voices = window.speechSynthesis.getVoices();
+        const englishVoice = voices.find(voice =>
+            voice.lang.startsWith('en') && voice.name.includes('English')
+        );
+        if (englishVoice) {
+            utterance.voice = englishVoice;
+        }
+
+        // 事件监听
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => {
+            setIsSpeaking(false);
+            console.error('语音播放出错');
+        };
+
+        utteranceRef.current = utterance;
+        window.speechSynthesis.speak(utterance);
     };
 
     return (
@@ -54,6 +101,14 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, compact = 
                         </div>
 
                         <div className="flex items-center gap-2 self-start md:self-center">
+                            <button
+                                onClick={speakText}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full font-medium transition-all text-xs ${isSpeaking ? 'bg-pink-100 text-pink-600 ring-2 ring-pink-200' : 'bg-slate-100 text-slate-600 hover:bg-pink-50 hover:text-pink-600'}`}
+                                title="朗读"
+                            >
+                                <Volume2 className={`w-3 h-3 ${isSpeaking ? 'animate-pulse' : ''}`} />
+                                <span>{isSpeaking ? '朗读中...' : '朗读'}</span>
+                            </button>
                             {!compact && (
                                 <button onClick={copyToClipboard} className="p-2.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-all" title="复制">
                                     <Copy className="w-4 h-4" />

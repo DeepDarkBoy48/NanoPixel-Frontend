@@ -27,8 +27,8 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onNavigate }) => {
             <button
               onClick={() => onNavigate('analyzer')}
               className={`px-3 md:px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab === 'analyzer'
-                  ? 'bg-white text-pink-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-pink-600 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
                 }`}
             >
               <Sparkles className="w-4 h-4 hidden sm:block" />
@@ -37,8 +37,8 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onNavigate }) => {
             <button
               onClick={() => onNavigate('dictionary')}
               className={`px-3 md:px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab === 'dictionary'
-                  ? 'bg-white text-pink-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-pink-600 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
                 }`}
             >
               <Book className="w-4 h-4 hidden sm:block" />
@@ -47,8 +47,8 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onNavigate }) => {
             <button
               onClick={() => onNavigate('writing')}
               className={`px-3 md:px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab === 'writing'
-                  ? 'bg-white text-pink-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-pink-600 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
                 }`}
             >
               <PenTool className="w-4 h-4 hidden sm:block" />

@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Search, Book, Loader2, AlertCircle, ChevronRight, BarChart3, Sparkles, Link2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Search, Volume2, Book, Loader2, AlertCircle, ChevronRight, BarChart3, Sparkles, Link2 } from 'lucide-react';
 import { DictionaryResult, ModelLevel } from '../types';
 import { lookupWordService } from '../services/geminiService';
 
@@ -13,6 +13,8 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
     const [query, setQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,6 +31,50 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const speakText = (text: string) => {
+        // 检查浏览器是否支持 Web Speech API
+        if (!('speechSynthesis' in window)) {
+            alert('您的浏览器不支持语音合成功能');
+            return;
+        }
+
+        // 如果正在播放，停止当前播放
+        if (isSpeaking) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+            return;
+        }
+
+        // 创建新的语音合成实例
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // 配置语音参数
+        utterance.lang = 'en-US'; // 英语
+        utterance.rate = 0.9; // 语速 (0.1 - 10)
+        utterance.pitch = 1; // 音调 (0 - 2)
+        utterance.volume = 1; // 音量 (0 - 1)
+
+        // 尝试选择英语语音（如果可用）
+        const voices = window.speechSynthesis.getVoices();
+        const englishVoice = voices.find(voice =>
+            voice.lang.startsWith('en') && voice.name.includes('English')
+        );
+        if (englishVoice) {
+            utterance.voice = englishVoice;
+        }
+
+        // 事件监听
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => {
+            setIsSpeaking(false);
+            console.error('语音播放出错');
+        };
+
+        utteranceRef.current = utterance;
+        window.speechSynthesis.speak(utterance);
     };
 
     const result = initialResult;
@@ -83,13 +129,20 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
             {result && !isLoading && (
                 <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
                     {/* Header */}
-                    <div className="bg-slate-50/50 border-b border-slate-100 px-6 py-8 md:px-10 md:py-10">
+                    <div className="bg-slate-50/50 border-b border-slate-100 px-6 py-8 md:px-10 md:py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
                             <h2 className="text-5xl font-bold text-slate-900 font-serif tracking-tight leading-none mb-3">{result.word}</h2>
                             <div className="text-xl text-slate-500 font-sans flex items-center gap-2 font-medium">
                                 <span>{result.phonetic}</span>
                             </div>
                         </div>
+                        <button
+                            onClick={() => speakText(result.word)}
+                            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-sm ${isSpeaking ? 'bg-pink-100 text-pink-600 ring-4 ring-pink-50' : 'bg-white border border-slate-200 text-slate-700 hover:text-pink-600 hover:border-pink-300 hover:shadow-md'}`}
+                            title="播放发音"
+                        >
+                            {isSpeaking ? <Loader2 className="w-6 h-6 animate-spin" /> : <Volume2 className="w-7 h-7" />}
+                        </button>
                     </div>
 
                     {/* Entries */}
