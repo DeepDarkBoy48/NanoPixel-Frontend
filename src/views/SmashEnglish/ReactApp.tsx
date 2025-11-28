@@ -46,7 +46,7 @@ const App: React.FC = () => {
   const [writingResult, setWritingResult] = useState<WritingResult | null>(null);
 
   const handleAnalyze = async (sentence: string) => {
-    if (!sentence.trim()) return;
+    if (!sentence.trim() || isAnalyzerLoading) return;
 
     setIsAnalyzerLoading(true);
     setAnalyzerError(null);

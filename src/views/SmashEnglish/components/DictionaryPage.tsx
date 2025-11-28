@@ -18,7 +18,7 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!query.trim()) return;
+        if (!query.trim() || isLoading) return;
 
         setIsLoading(true);
         setError(null);

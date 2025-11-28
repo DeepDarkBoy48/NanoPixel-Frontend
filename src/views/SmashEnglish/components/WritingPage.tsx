@@ -46,7 +46,7 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
     }, [result]);
 
     const handleAnalyze = async () => {
-        if (!inputText.trim()) return;
+        if (!inputText.trim() || isLoading) return;
 
         setIsLoading(true);
         setError(null);
@@ -65,6 +65,7 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
 
     const handleSyntaxAnalyze = async (sentence: string) => {
         if (sentence === activeSentence && syntaxResult) return; // Already loaded
+        if (isSyntaxLoading) return; // Prevent duplicate requests
 
         setActiveSentence(sentence);
 

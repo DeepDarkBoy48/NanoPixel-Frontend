@@ -20,7 +20,7 @@ export const InputArea: React.FC<InputAreaProps> = ({ onAnalyze, isLoading, init
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (text.trim()) {
+    if (text.trim() && !isLoading) {
       onAnalyze(text);
     }
   };
@@ -69,8 +69,14 @@ export const InputArea: React.FC<InputAreaProps> = ({ onAnalyze, isLoading, init
         {PRESETS.slice(0, 3).map((preset, idx) => (
             <button 
                 key={idx}
-                onClick={() => { setText(preset); onAnalyze(preset); }}
-                className="text-xs bg-slate-100 hover:bg-white border border-transparent hover:border-pink-200 text-slate-600 hover:text-pink-600 px-3 py-1.5 rounded-full transition-all cursor-pointer truncate max-w-[200px]"
+                onClick={() => { 
+                  if (!isLoading) {
+                    setText(preset); 
+                    onAnalyze(preset); 
+                  }
+                }}
+                disabled={isLoading}
+                className="text-xs bg-slate-100 hover:bg-white border border-transparent hover:border-pink-200 text-slate-600 hover:text-pink-600 px-3 py-1.5 rounded-full transition-all cursor-pointer truncate max-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {preset}
             </button>
