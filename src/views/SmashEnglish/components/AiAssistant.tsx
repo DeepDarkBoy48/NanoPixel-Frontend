@@ -97,12 +97,12 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ currentContext, contex
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
-        .suggestion-chip { flex-shrink: 0; bg-white; border; border-slate-200; text-slate-600; hover:bg-slate-100; px-3; py-1.5; rounded-full; text-xs; font-medium; transition-colors; shadow-sm; }
-        .suggestion-chip { @apply flex-shrink-0 bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-3 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #475569; }
+        .suggestion-chip { @apply flex-shrink-0 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 px-3 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm; }
       `}</style>
 
       {isOpen && (
-        <div className="w-full h-full md:w-[400px] md:h-[75vh] md:max-h-[800px] md:mb-4 bg-white md:rounded-3xl shadow-2xl shadow-slate-900/20 border border-slate-200 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300">
+        <div className="w-full h-full md:w-[400px] md:h-[75vh] md:max-h-[800px] md:mb-4 bg-white dark:bg-slate-900 md:rounded-3xl shadow-2xl shadow-slate-900/20 dark:shadow-slate-950/50 border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 transition-colors">
           {/* Header */}
           <div className="bg-gradient-to-r from-pink-600 to-rose-500 p-4 flex justify-between items-center text-white shadow-md z-10 shrink-0 safe-top">
             <div className="flex items-center gap-2.5">
@@ -120,10 +120,10 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ currentContext, contex
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-3 py-4 bg-slate-50 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-3 py-4 bg-slate-50 dark:bg-slate-800/50 space-y-6 custom-scrollbar transition-colors">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[90%] md:max-w-[98%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-pink-600 text-white rounded-br-sm' : 'bg-white border border-slate-200 text-slate-700 rounded-bl-sm markdown-body'
+                <div className={`max-w-[90%] md:max-w-[98%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-pink-600 text-white rounded-br-sm' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-bl-sm markdown-body'
                   }`}>
                   {msg.role === 'assistant' ? <ReactMarkdown>{msg.content}</ReactMarkdown> : msg.content}
                 </div>
@@ -131,9 +131,9 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ currentContext, contex
             ))}
             {isThinking && (
               <div className="flex justify-start">
-                <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex items-center gap-2 transition-colors">
                   <Loader2 className="w-4 h-4 animate-spin text-pink-500" />
-                  <span className="text-sm text-slate-400">正在思考...</span>
+                  <span className="text-sm text-slate-400 dark:text-slate-500">正在思考...</span>
                 </div>
               </div>
             )}
@@ -142,20 +142,20 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ currentContext, contex
 
           {/* Suggestions */}
           {!isThinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
-            <div className="px-4 py-2 bg-slate-50 flex gap-2 overflow-x-auto no-scrollbar shrink-0 border-t border-slate-50">
+            <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/50 flex gap-2 overflow-x-auto no-scrollbar shrink-0 border-t border-slate-50 dark:border-slate-700/50 transition-colors">
               {renderSuggestions()}
             </div>
           )}
 
           {/* Input */}
-          <form onSubmit={onSubmit} className="p-3 bg-white border-t border-slate-100 shrink-0 safe-bottom">
+          <form onSubmit={onSubmit} className="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-700 shrink-0 safe-bottom transition-colors">
             <div className="relative flex items-center">
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="输入你的问题..."
-                className="w-full pl-5 pr-12 py-3 rounded-full bg-slate-100 text-slate-700 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:bg-white transition-all text-sm"
+                className="w-full pl-5 pr-12 py-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-200 dark:focus:ring-pink-800 focus:bg-white dark:focus:bg-slate-700 transition-all text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
               <button type="submit" disabled={!inputValue.trim() || isThinking} className="absolute right-1.5 p-2 bg-pink-600 hover:bg-pink-700 rounded-full text-white disabled:opacity-50 transition-all">
                 <Send className="w-4 h-4" />
@@ -168,7 +168,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ currentContext, contex
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`group p-4 rounded-full shadow-xl transition-all duration-300 flex items-center gap-2 relative overflow-hidden ${isOpen ? 'hidden md:flex bg-slate-800 text-white rotate-90 scale-90' : 'flex bg-gradient-to-tr from-pink-600 to-rose-500 text-white hover:scale-105 hover:-translate-y-1'}`}
+        className={`group p-4 rounded-full shadow-xl transition-all duration-300 flex items-center gap-2 relative overflow-hidden ${isOpen ? 'hidden md:flex bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 rotate-90 scale-90' : 'flex bg-gradient-to-tr from-pink-600 to-rose-500 text-white hover:scale-105 hover:-translate-y-1'}`}
       >
         <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
         {isOpen ? <X className="w-6 h-6" /> : <><Sparkles className="w-6 h-6 animate-pulse" /><span className="font-bold text-base pr-1 hidden md:inline">问问 AI</span></>}

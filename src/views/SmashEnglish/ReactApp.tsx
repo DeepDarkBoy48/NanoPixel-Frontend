@@ -88,7 +88,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-50 text-slate-800 font-sans">
+    <div className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans transition-colors">
       <Header
         activeTab={activeTab}
         onNavigate={setActiveTab}
@@ -100,14 +100,14 @@ const App: React.FC = () => {
           <>
             {/* Hero Section */}
             <div className="text-center space-y-4 mb-4">
-              <div className="inline-flex items-center justify-center p-2 bg-pink-50 rounded-full text-pink-600 mb-2">
+              <div className="inline-flex items-center justify-center p-2 bg-pink-50 dark:bg-pink-950/50 rounded-full text-pink-600 dark:text-pink-400 mb-2">
                 <Sparkles className="w-5 h-5 mr-2" />
                 <span className="text-sm font-medium">AI 驱动的英语语法分析</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 font-serif">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-50 font-serif">
                 英语句子成分可视化
               </h1>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
                 输入任何英语句子，立刻解析其主谓宾定状补结构。
                 <br className="hidden md:block" />适合英语学习者、教师及语言爱好者。
               </p>
@@ -123,12 +123,12 @@ const App: React.FC = () => {
               {isAnalyzerLoading && (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-pink-500"></div>
-                  <p className="text-slate-500 animate-pulse">正在分析句子结构...</p>
+                  <p className="text-slate-500 dark:text-slate-400 animate-pulse">正在分析句子结构...</p>
                 </div>
               )}
 
               {analyzerError && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 text-red-700 max-w-2xl mx-auto">
+                <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3 text-red-700 dark:text-red-400 max-w-2xl mx-auto">
                   <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                   <div>
                     <h3 className="font-medium">分析出错</h3>
@@ -145,7 +145,7 @@ const App: React.FC = () => {
 
               {!analyzerResult && !isAnalyzerLoading && !analyzerError && (
                 <div className="text-center py-12 opacity-40 flex flex-col items-center">
-                  <BookOpen className="w-16 h-16 mb-4 text-slate-300" />
+                  <BookOpen className="w-16 h-16 mb-4 text-slate-300 dark:text-slate-600" />
                   <p>暂无分析结果，请在上方输入句子。</p>
                 </div>
               )}
