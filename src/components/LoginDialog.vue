@@ -1,5 +1,5 @@
 <script setup>
-import { User, Lock } from "@element-plus/icons-vue";
+import { User, Lock, Close } from "@element-plus/icons-vue";
 import { ref, watch } from "vue";
 import { ElMessage } from 'element-plus'
 import { useTokenStore } from "@/store/token";
@@ -109,6 +109,13 @@ defineExpose({ open })
   <el-dialog v-model="dialogVisible" :show-close="true" :close-on-click-modal="true" :close-on-press-escape="true"
     class="login-dialog" width="auto" align-center>
     <div class="login-container">
+      <!-- 关闭按钮 -->
+      <button class="close-btn" @click="dialogVisible = false" aria-label="关闭">
+        <el-icon>
+          <Close />
+        </el-icon>
+      </button>
+
       <div class="site-info">
         <img src="@/assets/logo.png" alt="Nano Pixel Logo" class="site-logo" />
         <h1 class="site-title">Nano Pixel</h1>
@@ -175,6 +182,60 @@ defineExpose({ open })
 </template>
 
 <style lang="scss" scoped>
+/* 关闭按钮样式 */
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+
+  .el-icon {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: rgba(249, 115, 22, 0.15);
+    color: var(--amber-600);
+    transform: rotate(90deg);
+  }
+
+  &:active {
+    transform: rotate(90deg) scale(0.9);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .close-btn {
+    background: rgba(255, 255, 255, 0.08);
+
+    &:hover {
+      background: rgba(251, 191, 36, 0.2);
+      color: var(--amber-400);
+    }
+  }
+}
+
+.dark .close-btn,
+[data-theme="dark"] .close-btn {
+  background: rgba(255, 255, 255, 0.08);
+
+  &:hover {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--amber-400);
+  }
+}
+
 /* 琥珀色主题变量 - 支持明暗模式 */
 .login-container {
   --amber-50: #fffbeb;
