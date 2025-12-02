@@ -7,9 +7,10 @@ const baseURL = "/api";
 const instance = axios.create({ baseURL });
 import { ElMessage } from "element-plus";
 
-import router from "@/router/router.js";//这里直接导入router，是因为request.js不是vue组件，不能使用setup语法糖
 //导入token状态
 import { useTokenStore } from "@/store/token.js";
+//导入登录弹窗状态
+import { useLoginDialogStore } from "@/store/loginDialog.js";
 //添加请求拦截器
 instance.interceptors.request.use(
   (config) => {
@@ -59,7 +60,9 @@ instance.interceptors.response.use(
       ElMessage.error("登录状态已过期，请重新登录");
       const tokenStore = useTokenStore();
       tokenStore.removeToken();
-      router.push('/login');
+      // 弹出登录框而非跳转登录页
+      const loginDialogStore = useLoginDialogStore();
+      loginDialogStore.show();
     } else {
       ElMessage.error("服务异常");
     }

@@ -17,16 +17,24 @@ import {
     Picture,
     MagicStick,
     ArrowRight,
+    Lock,
 } from '@element-plus/icons-vue'
 
 import { userInfoService } from '@/api/user.js'
 import useUserInfoStore from '@/store/userInfo.js'
 import { useTokenStore } from '@/store/token.js'
+import { useLoginDialogStore } from '@/store/loginDialog.js'
+import LoginDialog from '@/components/LoginDialog.vue'
+
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
+const loginDialogStore = useLoginDialogStore();
 const isCollapse = ref(false)
 const isMobile = ref(false)
 const drawerVisible = ref(false)
+
+// 是否已登录
+const isLoggedIn = computed(() => !!tokenStore.token)
 
 // 展开的子菜单
 const expandedMenus = ref(['/ai', '/ai2'])
@@ -64,14 +72,30 @@ watch(isMobile, (newVal) => {
     }
 })
 
-//调用函数,获取用户详细信息
+// 调用函数，获取用户详细信息（仅在已登录时调用）
 const getUserInfo = async () => {
-    //调用接口
-    let result = await userInfoService();
-    //数据存储到pinia中
-    userInfoStore.setInfo(result.data);
+    if (!tokenStore.token) return;
+    try {
+        let result = await userInfoService();
+        userInfoStore.setInfo(result.data);
+    } catch (err) {
+        console.error("获取用户信息失败", err);
+    }
 }
-getUserInfo();
+// 初始化时，如果已登录则获取用户信息
+if (tokenStore.token) {
+    getUserInfo();
+}
+
+// 登录成功回调
+const onLoginSuccess = () => {
+    getUserInfo();
+}
+
+// 打开登录弹窗
+const openLoginDialog = () => {
+    loginDialogStore.show();
+}
 
 import { useRouter, useRoute } from 'vue-router'
 const router = useRouter();
@@ -115,7 +139,8 @@ const handleCommand = (command) => {
             .then(async () => {
                 tokenStore.removeToken()
                 userInfoStore.removeInfo()
-                router.push('/login')
+                // 退出后跳转到 SmashEnglish（公开页面）
+                router.push('/ai/smashEnglish')
                 ElMessage({
                     type: 'success',
                     message: '退出登录成功',
@@ -177,8 +202,23 @@ const isActive = (path) => activeMenu.value === path
 // 检查子菜单是否有激活项
 const hasActiveChild = (paths) => paths.some(p => activeMenu.value.startsWith(p))
 
-// 导航到路由
+// 不需要登录即可访问的路由
+const publicRoutes = ['/ai/smashEnglish', '/ai/library', '/ai/library/:mediaId']
+
+// 导航到路由（非公开路由需要登录）
 const navigateTo = (path) => {
+    // 检查是否是公开路由
+    const isPublicRoute = publicRoutes.some(r => path.startsWith(r))
+
+    // 如果不是公开路由且未登录，弹出登录框
+    if (!isPublicRoute && !tokenStore.token) {
+        loginDialogStore.show()
+        if (isMobile.value) {
+            drawerVisible.value = false
+        }
+        return
+    }
+
     router.push(path)
     if (isMobile.value) {
         drawerVisible.value = false
@@ -192,6 +232,13 @@ const menuItems = computed(() => [
         index: '/ai/smashEnglish',
         icon: EditPen,
         label: 'AI 英语语法分析',
+        hot: true
+    },
+    {
+        type: 'item',
+        index: '/ai/library',
+        icon: Promotion,
+        label: '灵感广场',
         hot: true
     },
     {
@@ -211,7 +258,6 @@ const menuItems = computed(() => [
         label: 'AI绘图',
         children: [
             { index: '/ai/magicImageEdit', icon: Crop, label: '魔法绘图', hot: true },
-            { index: '/ai/library', icon: Promotion, label: '灵感广场' },
             { index: '/ai/magicImageEdit/history', icon: Picture, label: '绘图历史' },
             { index: '/ai/prompt', icon: EditPen, label: '绘图提示词' }
         ]
@@ -244,14 +290,15 @@ const menuItems = computed(() => [
             <div class="flex flex-col items-center py-5 px-2.5 border-b border-[var(--app-sider-border)] mb-2.5 transition-all duration-300 user-info-glow"
                 :class="isCollapse ? 'px-2' : 'px-4'">
                 <div class="transition-all duration-300 ease-out" :class="isCollapse ? 'scale-75' : 'scale-100'">
-                    <img :src="currentAvatar" :alt="userInfoStore.info.nickname"
+                    <img :src="isLoggedIn ? currentAvatar : 'https://api.dicebear.com/9.x/identicon/svg?seed=guest'"
+                        :alt="isLoggedIn ? userInfoStore.info.nickname : '游客'"
                         class="rounded-full object-cover ring-2 ring-[var(--app-sider-primary)]/25 shadow-md transition-all duration-300"
                         :class="isCollapse ? 'w-8 h-8' : 'w-12 h-12'" />
                 </div>
                 <div class="overflow-hidden transition-all duration-300 ease-out"
                     :class="isCollapse ? 'max-h-0 opacity-0 mt-0' : 'max-h-16 opacity-100 mt-2.5'">
                     <span class="text-base font-semibold text-[var(--app-sider-text)] whitespace-nowrap">
-                        {{ userInfoStore.info.nickname || '用户' }}
+                        {{ isLoggedIn ? (userInfoStore.info.nickname || '用户') : '游客' }}
                     </span>
                 </div>
             </div>
@@ -373,8 +420,19 @@ const menuItems = computed(() => [
                     <span v-if="!isCollapse" class="text-sm">主题模式</span>
                 </div>
 
-                <!-- 退出登录 -->
-                <div @click="handleCommand('logout')" :class="[
+                <!-- 登录按钮（未登录时显示） -->
+                <div v-if="!isLoggedIn" @click="openLoginDialog" :class="[
+                    'group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ease-out text-[var(--app-sider-primary)] hover:bg-[var(--app-sider-hover-bg)]',
+                    isCollapse ? 'justify-center' : ''
+                ]" title="登录">
+                    <el-icon class="text-lg transition-transform duration-200 group-hover:scale-110">
+                        <Lock />
+                    </el-icon>
+                    <span v-if="!isCollapse" class="text-sm font-medium">登录</span>
+                </div>
+
+                <!-- 退出登录（已登录时显示） -->
+                <div v-else @click="handleCommand('logout')" :class="[
                     'group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ease-out text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20',
                     isCollapse ? 'justify-center' : ''
                 ]" title="退出登录">
@@ -411,10 +469,11 @@ const menuItems = computed(() => [
                 <!-- 移动端用户信息 -->
                 <div
                     class="flex flex-col items-center py-6 px-4 border-b border-[var(--app-sider-border)] user-info-glow">
-                    <img :src="currentAvatar" :alt="userInfoStore.info.nickname"
+                    <img :src="isLoggedIn ? currentAvatar : 'https://api.dicebear.com/9.x/identicon/svg?seed=guest'"
+                        :alt="isLoggedIn ? userInfoStore.info.nickname : '游客'"
                         class="w-14 h-14 rounded-full object-cover ring-2 ring-[var(--app-sider-primary)]/25 shadow-md" />
                     <span class="mt-3 text-base font-semibold text-[var(--app-sider-text)]">
-                        {{ userInfoStore.info.nickname || '用户' }}
+                        {{ isLoggedIn ? (userInfoStore.info.nickname || '用户') : '游客' }}
                     </span>
                 </div>
 
@@ -493,7 +552,16 @@ const menuItems = computed(() => [
                         </el-icon>
                         <span>主题模式</span>
                     </div>
-                    <div @click="handleCommand('logout')"
+                    <!-- 登录按钮（未登录时显示） -->
+                    <div v-if="!isLoggedIn" @click="openLoginDialog"
+                        class="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer text-[var(--app-sider-primary)] hover:bg-[var(--app-sider-hover-bg)] transition-all duration-200 active:scale-[0.98]">
+                        <el-icon class="text-xl">
+                            <Lock />
+                        </el-icon>
+                        <span class="font-medium">登录</span>
+                    </div>
+                    <!-- 退出登录（已登录时显示） -->
+                    <div v-else @click="handleCommand('logout')"
                         class="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all duration-200 active:scale-[0.98]">
                         <el-icon class="text-xl">
                             <SwitchButton />
@@ -524,6 +592,9 @@ const menuItems = computed(() => [
             </main>
         </div>
     </div>
+
+    <!-- 登录弹窗 -->
+    <LoginDialog v-model="loginDialogStore.visible" @login-success="onLoginSuccess" />
 </template>
 
 <style scoped>

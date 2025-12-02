@@ -1,6 +1,5 @@
 //导入vue-router
 import { createRouter, createWebHistory } from "vue-router"; //导入组件
-import LoginVue from "@/views/login.vue";
 import LayoutVue from "@/views/layout.vue"; //定义路由关系
 import ArticleCategoryVue from "@/views/article/ArticleCategory.vue";
 import ArticleManageVue from "@/views/article/ArticleManage.vue";
@@ -23,8 +22,8 @@ import SmashEnglishVue from "@/views/SmashEnglish/index.vue";
 // - 根路径使用 Layout 作为统一布局容器，所有业务页面作为其子路由渲染在 <router-view/>
 // - AI 模块使用固定前缀 /ai/，根据不同子前缀（magicImageEdit、library）在头部展示不同模块导航（见 layout.vue）
 // - 如需新增模块，请添加路由并在 layout.vue 中注册对应的模块导航组件
+// - 登录功能已改为弹窗形式，无需独立路由
 const routes = [
-  { path: "/login", component: LoginVue },
   {
     path: "/",
     component: LayoutVue,
@@ -69,6 +68,7 @@ const routes = [
   },
   { path: "/blog", component: BlogVue },
   { path: "/smashEnglish", component: SmashEnglishVue },
+
 ];
 
 //创建路由器

@@ -4,9 +4,97 @@ import { Search, Volume2, Book, Loader2, AlertCircle, ChevronRight, BarChart3, S
 import { DictionaryResult, ModelLevel } from '../types';
 import { lookupWordService } from '../services/geminiService';
 
+// 预设的默认单词数据
+const DEFAULT_WORD_DATA: DictionaryResult = {
+    word: "take",
+    phonetic: "/teɪk/",
+    entries: [
+        {
+            partOfSpeech: "verb",
+            cocaFrequency: "Top 100",
+            definitions: [
+                {
+                    meaning: "to carry or move something or someone from one place to another",
+                    explanation: "将某物或某人从一个地方带到另一个地方",
+                    example: "Remember to take your umbrella with you, as it might rain later.",
+                    exampleTranslation: "记得带上你的伞，稍后可能会下雨。"
+                },
+                {
+                    meaning: "to get or obtain something",
+                    explanation: "得到或获取某物",
+                    example: "You need to take responsibility for your actions.",
+                    exampleTranslation: "你需要为自己的行为负责。"
+                },
+                {
+                    meaning: "to remove something or someone from a place",
+                    explanation: "将某物或某人从一个地方移走",
+                    example: "Please take your feet off the table.",
+                    exampleTranslation: "请把你的脚从桌子上拿开。"
+                },
+                {
+                    meaning: "to accept or agree to something",
+                    explanation: "接受或同意某事",
+                    example: "The company decided to take a chance on the innovative startup.",
+                    exampleTranslation: "公司决定给这家创新型初创企业一个机会。"
+                }
+            ]
+        },
+        {
+            partOfSpeech: "noun",
+            cocaFrequency: "Rank 2382",
+            definitions: [
+                {
+                    meaning: "the amount of money taken by a business from selling goods or services",
+                    explanation: "企业通过销售商品或服务所获得的收入",
+                    example: "The weekend's take was significantly higher than expected.",
+                    exampleTranslation: "周末的收入远高于预期。"
+                },
+                {
+                    meaning: "a scene or part of a film or television show that is recorded at one time",
+                    explanation: "电影或电视节目中一次性录制的一个场景或部分",
+                    example: "That was the fifth take of the same scene, but we finally got it right.",
+                    exampleTranslation: "那是同一个场景的第五次拍摄，但我们终于拍对了。"
+                }
+            ]
+        }
+    ],
+    collocations: [
+        {
+            phrase: "take into account",
+            meaning: "to consider something when making a decision or judgment",
+            example: "When planning your budget, remember to take into account unexpected expenses.",
+            exampleTranslation: "在制定预算时，请记住将意外开支考虑在内。"
+        },
+        {
+            phrase: "take part in",
+            meaning: "to participate in an activity or event",
+            example: "Many students decided to take part in the volunteer program.",
+            exampleTranslation: "许多学生决定参加这个志愿项目。"
+        },
+        {
+            phrase: "take advantage of",
+            meaning: "to make good use of the opportunities that you have",
+            example: "You should take advantage of the free workshops offered by the university.",
+            exampleTranslation: "你应该好好利用大学提供的免费研讨会。"
+        },
+        {
+            phrase: "take up",
+            meaning: "to begin a new hobby, sport, or activity",
+            example: "She decided to take up yoga to improve her flexibility.",
+            exampleTranslation: "她决定开始练习瑜伽以提高她的柔韧性。"
+        },
+        {
+            phrase: "take off",
+            meaning: "to leave the ground (for an aircraft); to suddenly become successful",
+            example: "The plane is scheduled to take off in thirty minutes. / Her new business really took off last year.",
+            exampleTranslation: "飞机预定在三十分钟后起飞。/ 她的新业务去年发展非常迅速。"
+        }
+    ]
+};
+
 interface DictionaryPageProps {
-    initialResult: DictionaryResult | null;
-    onResultChange: (result: DictionaryResult | null) => void;
+    initialResult?: DictionaryResult | null;
+    onResultChange?: (result: DictionaryResult | null) => void;
 }
 
 export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, onResultChange }) => {
@@ -14,6 +102,7 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [localResult, setLocalResult] = useState<DictionaryResult | null>(initialResult ?? DEFAULT_WORD_DATA);
     const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
     const handleSearch = async (e: React.FormEvent) => {
@@ -25,7 +114,8 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
 
         try {
             const data = await lookupWordService(query);
-            onResultChange(data);
+            setLocalResult(data);
+            onResultChange?.(data);
         } catch (err: any) {
             setError(err.message || "查询失败，请稍后再试。");
         } finally {
@@ -77,7 +167,7 @@ export const DictionaryPage: React.FC<DictionaryPageProps> = ({ initialResult, o
         window.speechSynthesis.speak(utterance);
     };
 
-    const result = initialResult;
+    const result = localResult;
 
     return (
         <div className="w-full max-w-4xl mx-auto animate-fade-in pb-12">

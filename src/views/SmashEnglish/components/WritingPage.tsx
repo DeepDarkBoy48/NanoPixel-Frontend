@@ -14,6 +14,75 @@ const MODES: { value: WritingMode; label: string; shortLabel: string }[] = [
     { value: 'fix', label: '基础纠错', shortLabel: '纠错' },
 ];
 
+// 预设的 Demo 数据 - 基础纠错演示
+const DEMO_WRITING_RESULT: WritingResult = {
+    mode: "fix",
+    generalFeedback: "The text shows several grammatical errors, including subject-verb agreement, verb tense, article usage, and prepositions. Sentence structure can also be improved for clarity. Pay attention to basic sentence construction and common grammatical patterns.",
+    segments: [
+        { type: "change", text: "Nowadays", original: "Nowdays", reason: "拼写错误。", category: "grammar" },
+        { type: "unchanged", text: ", the debate about government should " },
+        { type: "change", text: "provide", original: "giving", reason: "动词形式不正确，应使用动词原形。", category: "grammar" },
+        { type: "unchanged", text: " free health" },
+        { type: "change", text: "care", original: " healthy care", reason: "healthy (健康的) 是形容词，health (健康) 是名词，此处应使用名词作复合词。", category: "vocabulary" },
+        { type: "unchanged", text: " for everyone or individuals should pay " },
+        { type: "change", text: "the", original: "", reason: "此处需要定冠词。", category: "grammar" },
+        { type: "unchanged", text: " cost by " },
+        { type: "change", text: "themselves", original: "self", reason: "反身代词应与主语保持一致，individuals应使用themselves。", category: "grammar" },
+        { type: "unchanged", text: " has gained heavy attention. Both sides of " },
+        { type: "change", text: "the", original: "", reason: "此处需要定冠词。", category: "grammar" },
+        { type: "unchanged", text: " argument " },
+        { type: "change", text: "present", original: "presenting", reason: "句子缺少谓语动词，应使用动词原形。", category: "grammar" },
+        { type: "unchanged", text: " compelling viewpoint, and " },
+        { type: "change", text: "it", original: "", reason: "it作为形式主语，指代后面的不定式。", category: "grammar" },
+        { type: "unchanged", text: " is crucial to examin" },
+        { type: "change", text: "e", original: "ing", reason: "在 to 后，动词应使用原形。", category: "grammar" },
+        { type: "unchanged", text: " them critically before " },
+        { type: "change", text: "arriving at", original: "arrive a", reason: "arriving at 是一个常用搭配，表示「达成」或「得出」某个结论。", category: "grammar" },
+        { type: "unchanged", text: " a conclusion." },
+        { type: "unchanged", text: "\n\n" },
+        { type: "unchanged", text: "On one hand, those who agree" },
+        { type: "change", text: " with", original: "s", reason: "agree with是固定搭配，且who指代those，谓语动词应使用原形。", category: "collocation" },
+        { type: "unchanged", text: " free health" },
+        { type: "change", text: "care", original: " healthy care", reason: "healthy (健康的) 是形容词，health (健康) 是名词，此处应使用名词作复合词。", category: "vocabulary" },
+        { type: "unchanged", text: " argue that it is a foundation" },
+        { type: "change", text: "al", original: "", reason: "此处需要形容词，foundational（基础的）更合适。", category: "grammar" },
+        { type: "unchanged", text: " right that should be access" },
+        { type: "change", text: "ible", original: "", reason: "此处应使用形容词accessible（可获得的），而非名词access。", category: "grammar" },
+        { type: "unchanged", text: " to all citizens no matter their socio-economic status. They believ" },
+        { type: "change", text: "e", original: "ing", reason: "句子缺少谓语动词，应使用动词原形。", category: "grammar" },
+        { type: "unchanged", text: " that health" },
+        { type: "change", text: "care", original: " healthy care", reason: "healthy (健康的) 是形容词，health (健康) 是名词，此处应使用名词作复合词。", category: "vocabulary" },
+        { type: "unchanged", text: " is a critical service that ensure" },
+        { type: "change", text: "s", original: "", reason: "主语service是单数，谓语动词应加s。", category: "grammar" },
+        { type: "unchanged", text: " the well-being of individuals and society. " },
+        { type: "change", text: "If the", original: "Because", reason: "原句逻辑不通顺，Because引起的是原因状语从句，与主句结构不匹配。此处应改为条件句。", category: "grammar" },
+        { type: "unchanged", text: " government provide" },
+        { type: "change", text: "s", original: "", reason: "主语government是单数，谓语动词应加s。", category: "grammar" },
+        { type: "unchanged", text: " free health care, " },
+        { type: "change", text: "it", original: "so", reason: "使用it作主语，so在此处为多余。", category: "grammar" },
+        { type: "unchanged", text: " can ensure that no one " },
+        { type: "change", text: "is", original: "", reason: "被动语态缺少be动词。", category: "grammar" },
+        { type: "unchanged", text: " denied medical treat" },
+        { type: "change", text: "ment", original: "", reason: "treatment（治疗）是名词，treat是动词。", category: "vocabulary" },
+        { type: "unchanged", text: " because " },
+        { type: "change", text: "of", original: "", reason: "because后接从句，because of后接名词短语。", category: "grammar" },
+        { type: "unchanged", text: " no money. This can result " },
+        { type: "change", text: "in", original: "to", reason: "result in 是固定搭配，表示「导致」。", category: "collocation" },
+        { type: "unchanged", text: " a healthier population, reduce" },
+        { type: "change", text: "d", original: "", reason: "此处应使用形容词形式，作定语修饰absent。", category: "grammar" },
+        { type: "unchanged", text: " work absent" },
+        { type: "change", text: "eeism", original: "", reason: "absenteeism（缺勤）是名词，absent是形容词。", category: "vocabulary" },
+        { type: "unchanged", text: ", and rais" },
+        { type: "change", text: "ed", original: "ing", reason: "与前面reduced work absenteeism并列，应使用过去分词作形容词。", category: "grammar" },
+        { type: "unchanged", text: " productivity." }
+    ]
+};
+
+// 对应 Demo 数据的原始文本
+const DEMO_ORIGINAL_TEXT = `Nowdays, the debate about government should giving free healthy care for everyone or individuals should pay cost by self has gained heavy attention. Both sides of argument presenting compelling viewpoint, and is crucial to examining them critically before arrive a conclusion.
+
+On one hand, those who agrees free healthy care argue that it is a foundation right that should be access to all citizens no matter their socio-economic status. They believing that healthy care is a critical service that ensure the well-being of individuals and society. Because government provide free health care, so can ensure that no one denied medical treat because no money. This can result to a healthier population, reduce work absent, and raising productivity.`;
+
 const PAGE_MODES: { value: PageMode; label: string; icon: React.FC<{ className?: string }>; description: string }[] = [
     { value: 'writing', label: '写作纠错', icon: PenTool, description: '智能纠正语法错误' },
     { value: 'reading', label: '文章精读', icon: BookOpen, description: '深度分析句法结构' },
@@ -22,17 +91,18 @@ const PAGE_MODES: { value: PageMode; label: string; icon: React.FC<{ className?:
 type ViewMode = 'diff' | 'syntax';
 
 export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResultChange }) => {
-    const [inputText, setInputText] = useState("");
+    // 直接使用 Demo 数据作为初始状态
+    const [inputText, setInputText] = useState(DEMO_ORIGINAL_TEXT);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [mode, setMode] = useState<WritingMode>('fix');
-    const [result, setResult] = useState<WritingResult | null>(initialResult);
-    
+    const [result, setResult] = useState<WritingResult | null>(initialResult ?? DEMO_WRITING_RESULT);
+
     // Page Mode State (写作纠错 / 文章精读)
     const [pageMode, setPageMode] = useState<PageMode>('writing');
     const [isPageModeDropdownOpen, setIsPageModeDropdownOpen] = useState(false);
     const pageModeDropdownRef = useRef<HTMLDivElement>(null);
-    
+
     // Reading Mode State (文章精读专用)
     const [readingModeActive, setReadingModeActive] = useState(false);
     const [readingText, setReadingText] = useState("");
@@ -49,6 +119,13 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
     const [syntaxResult, setSyntaxResult] = useState<AnalysisResult | null>(null);
     const [isSyntaxLoading, setIsSyntaxLoading] = useState(false);
     const [syntaxCache, setSyntaxCache] = useState<Record<string, AnalysisResult>>({});
+
+    // 页面加载时通知父组件初始 Demo 数据
+    useEffect(() => {
+        if (!initialResult) {
+            onResultChange(DEMO_WRITING_RESULT);
+        }
+    }, []);
 
     useEffect(() => {
         // Reset sub-states when result changes
@@ -88,6 +165,15 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
         }
     };
 
+    // Demo 演示 - 使用预设数据进行提前渲染
+    const handleDemo = () => {
+        setInputText(DEMO_ORIGINAL_TEXT);
+        setResult(DEMO_WRITING_RESULT);
+        onResultChange(DEMO_WRITING_RESULT);
+        setError(null);
+        setShowOriginal(false);
+    };
+
     const handleSyntaxAnalyze = async (sentence: string) => {
         if (sentence === activeSentence && syntaxResult) return; // Already loaded
         if (isSyntaxLoading) return; // Prevent duplicate requests
@@ -124,6 +210,7 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
     };
 
     const handleReset = () => {
+        setInputText("");  // 清空输入框的 Demo 文本
         setResult(null);
         onResultChange(null);
         setActiveSegmentIndex(null);
@@ -188,8 +275,8 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
                             flex items-center gap-2 pl-4 pr-3 py-2.5
                             rounded-xl text-sm font-bold
                             border shadow-sm transition-all
-                            ${pageMode === 'writing' 
-                                ? 'bg-green-50 text-green-900 border-green-100 hover:bg-green-100' 
+                            ${pageMode === 'writing'
+                                ? 'bg-green-50 text-green-900 border-green-100 hover:bg-green-100'
                                 : 'bg-amber-50 text-amber-900 border-amber-100 hover:bg-amber-100'
                             }
                         `}
@@ -215,7 +302,7 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
                                         onClick={() => handlePageModeChange(m.value)}
                                         className={`
                                             w-full flex items-center gap-3 px-4 py-3 text-left text-sm transition-colors
-                                            ${isActive 
+                                            ${isActive
                                                 ? (m.value === 'writing' ? 'bg-green-50 text-green-900' : 'bg-amber-50 text-amber-900')
                                                 : 'hover:bg-slate-50 text-slate-700'
                                             }
@@ -260,7 +347,16 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
                                 className="w-full h-full p-6 rounded-2xl border border-slate-200 bg-white text-slate-700 text-lg leading-relaxed resize-none focus:ring-4 focus:ring-pink-50 focus:border-pink-300 outline-none shadow-sm placeholder:text-slate-300 font-serif whitespace-pre-wrap"
                                 disabled={isLoading}
                             />
-                            <div className="absolute bottom-4 right-4">
+                            <div className="absolute bottom-4 right-4 flex items-center gap-3">
+                                {/* Demo 演示按钮 */}
+                                <button
+                                    onClick={handleDemo}
+                                    disabled={isLoading}
+                                    className="px-4 py-3 rounded-xl font-medium shadow-md transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+                                >
+                                    <Lightbulb className="w-5 h-5 text-amber-500" />
+                                    <span>Demo 演示</span>
+                                </button>
                                 <button
                                     onClick={handleAnalyze}
                                     disabled={!inputText.trim() || isLoading}
@@ -335,11 +431,14 @@ export const WritingPage: React.FC<WritingPageProps> = ({ initialResult, onResul
                                 >
                                     <Copy className="w-3.5 h-3.5" /> 复制全文
                                 </button>
+                                {/* 大的醒目按钮：开始我的纠错 */}
                                 <button
                                     onClick={handleReset}
-                                    className="text-xs flex items-center gap-1 text-slate-500 hover:text-slate-700 px-2 py-1 transition-colors"
+                                    className="px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 hover:shadow-xl hover:scale-105 active:scale-100"
                                 >
-                                    <X className="w-4 h-4" /> 重写
+                                    <PenTool className="w-5 h-5" />
+                                    <span>开始我的纠错</span>
+                                    <ArrowRight className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
@@ -645,7 +744,7 @@ const SyntaxModeTextRenderer: React.FC<{
     const sentences = Array.from(segmenter.segment(fullText)) as { segment: string }[];
 
     // Theme color classes
-    const themeClasses = themeColor === 'amber' 
+    const themeClasses = themeColor === 'amber'
         ? {
             active: 'bg-amber-100 text-amber-900 ring-2 ring-amber-200 shadow-sm font-medium',
             hover: 'hover:bg-amber-50 hover:text-amber-700 text-slate-600'
