@@ -238,12 +238,12 @@ const connectWs = () => {
     isInitializing.value = true
 
     // 本地开发环境，直接连接后端
-    // const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
+    const wsUrl = `ws://localhost:8081/chat/${userInfo.info.id}`;
 
     // 生产环境，部署时取消下面的注释，并注释掉上面的本地开发配置
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host = window.location.host;
-    const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
+    // const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    // const host = window.location.host;
+    // const wsUrl = `${protocol}://${host}/chat/${userInfo.info.id}`;
 
     ws = new WebSocket(wsUrl);
 
@@ -1119,6 +1119,72 @@ const clearChatMemory = async () => {
             }
         }
 
+        // 标题样式
+        :deep(h1),
+        :deep(h2),
+        :deep(h3),
+        :deep(h4),
+        :deep(h5),
+        :deep(h6) {
+            margin: 16px 0 8px 0;
+            font-weight: 700;
+            line-height: 1.4;
+            color: inherit;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+
+        :deep(h1) {
+            font-size: 1.6em;
+            border-bottom: 2px solid currentColor;
+            padding-bottom: 6px;
+            opacity: 0.95;
+        }
+
+        :deep(h2) {
+            font-size: 1.4em;
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 4px;
+            opacity: 0.9;
+        }
+
+        :deep(h3) {
+            font-size: 1.25em;
+        }
+
+        :deep(h4) {
+            font-size: 1.1em;
+        }
+
+        :deep(h5) {
+            font-size: 1em;
+        }
+
+        :deep(h6) {
+            font-size: 0.9em;
+            opacity: 0.85;
+        }
+
+        // 链接样式
+        :deep(a) {
+            color: #3b82f6;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+
+            &:hover {
+                color: #60a5fa;
+                text-decoration-color: #60a5fa;
+            }
+
+            &:visited {
+                color: #8b5cf6;
+            }
+        }
+
         // 表格样式：在消息气泡内更好地显示 Markdown 表格
         :deep(table) {
             width: 100%;
@@ -1396,6 +1462,21 @@ const clearChatMemory = async () => {
         border-radius: 20px 20px 0 0;
         pointer-events: none;
     }
+
+    // 自己消息气泡内链接样式（深色背景时用浅色）
+    .content :deep(a) {
+        color: #bfdbfe;
+        text-decoration-color: rgba(191, 219, 254, 0.6);
+
+        &:hover {
+            color: #ffffff;
+            text-decoration-color: #ffffff;
+        }
+
+        &:visited {
+            color: #c4b5fd;
+        }
+    }
 }
 
 @keyframes selfBorderGlow {
@@ -1429,6 +1510,21 @@ const clearChatMemory = async () => {
         opacity: 0.6;
         pointer-events: none;
     }
+
+    // AI气泡内链接样式（浅色背景时）
+    .content :deep(a) {
+        color: #1d4ed8;
+        text-decoration-color: rgba(29, 78, 216, 0.5);
+
+        &:hover {
+            color: #1e40af;
+            text-decoration-color: #1e40af;
+        }
+
+        &:visited {
+            color: #6d28d9;
+        }
+    }
 }
 
 .bubble.system {
@@ -1436,6 +1532,21 @@ const clearChatMemory = async () => {
     border: 1px solid var(--system-border);
     color: var(--system-text);
     box-shadow: var(--system-glow);
+
+    // 系统消息气泡内链接样式
+    .content :deep(a) {
+        color: #7c2d12;
+        text-decoration-color: rgba(124, 45, 18, 0.5);
+
+        &:hover {
+            color: #9a3412;
+            text-decoration-color: #9a3412;
+        }
+
+        &:visited {
+            color: #6b21a8;
+        }
+    }
 }
 
 // 其他用户消息样式
@@ -1444,6 +1555,21 @@ const clearChatMemory = async () => {
     border: 1px solid var(--other-border);
     color: var(--other-text);
     box-shadow: var(--other-glow);
+
+    // 其他用户消息气泡内链接样式
+    .content :deep(a) {
+        color: #1d4ed8;
+        text-decoration-color: rgba(29, 78, 216, 0.5);
+
+        &:hover {
+            color: #1e40af;
+            text-decoration-color: #1e40af;
+        }
+
+        &:visited {
+            color: #6d28d9;
+        }
+    }
 }
 
 // 聊天加载动画
@@ -2225,6 +2351,51 @@ const clearChatMemory = async () => {
 
     .bubble .content :deep(tr:nth-child(odd) td) {
         background: var(--chat-table-zebra);
+    }
+
+    // 黑暗模式下链接颜色优化
+    .bubble .content :deep(a) {
+        color: #60a5fa;
+        text-decoration-color: rgba(96, 165, 250, 0.5);
+
+        &:hover {
+            color: #93c5fd;
+            text-decoration-color: #93c5fd;
+        }
+
+        &:visited {
+            color: #a78bfa;
+        }
+    }
+
+    // AI气泡在黑暗模式下的链接（深色文字背景）
+    .bubble.ai .content :deep(a) {
+        color: #1e40af;
+        text-decoration-color: rgba(30, 64, 175, 0.5);
+
+        &:hover {
+            color: #1e3a8a;
+            text-decoration-color: #1e3a8a;
+        }
+
+        &:visited {
+            color: #5b21b6;
+        }
+    }
+
+    // 黑暗模式下标题样式增强
+    .bubble .content :deep(h1),
+    .bubble .content :deep(h2),
+    .bubble .content :deep(h3),
+    .bubble .content :deep(h4),
+    .bubble .content :deep(h5),
+    .bubble .content :deep(h6) {
+        color: inherit;
+    }
+
+    .bubble .content :deep(h1),
+    .bubble .content :deep(h2) {
+        border-color: rgba(255, 255, 255, 0.3);
     }
 }
 </style>
