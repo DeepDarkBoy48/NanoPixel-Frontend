@@ -21,7 +21,7 @@ export const getUserLibraryService = (pageNum, pageSize) => {
 // 设置媒体发布/不发布
 export const setMediaPublicService = (mediaId, isPublic) => {
     // 接口使用 query 参数
-    return request.put("ai/media/public", null, { params: { mediaId, isPublic } });
+    return request.put("/ai/media/public/update", null, { params: { mediaId, isPublic } });
 };
 
 // 根据媒体ID获取原图URL
