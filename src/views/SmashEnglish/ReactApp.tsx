@@ -7,6 +7,7 @@ import { DictionaryPage } from './components/DictionaryPage';
 import { WritingPage } from './components/WritingPage';
 import { Footer } from './components/Footer';
 import { AiAssistant } from './components/AiAssistant';
+import { YoutubeStudyPage } from './components/YoutubeStudyPage';
 import { analyzeSentenceService } from './services/geminiService';
 import { AnalysisResult, DictionaryResult, WritingResult } from './types';
 import { Sparkles, BookOpen, AlertCircle } from 'lucide-react';
@@ -32,7 +33,7 @@ const DEMO_RESULT: AnalysisResult = {
 };
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'analyzer' | 'dictionary' | 'writing'>('analyzer');
+  const [activeTab, setActiveTab] = useState<'analyzer' | 'dictionary' | 'writing' | 'youtube'>('analyzer');
 
   // Analyzer State - 使用预加载的示例数据作为初始值
   const [isAnalyzerLoading, setIsAnalyzerLoading] = useState(false);
@@ -81,20 +82,20 @@ const App: React.FC = () => {
 
   // Dynamic container width based on active tab
   const getContainerMaxWidth = () => {
-    if (activeTab === 'writing') {
+    if (activeTab === 'writing' || activeTab === 'youtube') {
       return 'max-w-[98%] 2xl:max-w-[2400px]'; // Extra wide for split-view writing
     }
     return 'max-w-5xl'; // Standard readable width for Analyzer and Dictionary
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans transition-colors">
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans transition-colors overflow-hidden">
       <Header
         activeTab={activeTab}
         onNavigate={setActiveTab}
       />
 
-      <main className={`flex-grow container mx-auto px-4 py-8 ${getContainerMaxWidth()} flex flex-col gap-8 relative transition-all duration-300 ease-in-out`}>
+      <main className={`flex-grow container mx-auto px-4 py-8 overflow-y-auto ${getContainerMaxWidth()} flex flex-col gap-8 relative transition-all duration-300 ease-in-out`}>
 
         {activeTab === 'analyzer' && (
           <>
@@ -165,6 +166,10 @@ const App: React.FC = () => {
             initialResult={writingResult}
             onResultChange={setWritingResult}
           />
+        )}
+
+        {activeTab === 'youtube' && (
+          <YoutubeStudyPage />
         )}
       </main>
 

@@ -1,38 +1,20 @@
 
-import React, { useState, useEffect } from 'react';
-import { Sparkles, Book, PenTool, Moon, Sun } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Sparkles, Book, PenTool } from 'lucide-react';
 
 interface HeaderProps {
-  activeTab: 'analyzer' | 'dictionary' | 'writing';
-  onNavigate: (tab: 'analyzer' | 'dictionary' | 'writing') => void;
+  activeTab: 'analyzer' | 'dictionary' | 'writing' | 'youtube';
+  onNavigate: (tab: 'analyzer' | 'dictionary' | 'writing' | 'youtube') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, onNavigate }) => {
-  const [isDark, setIsDark] = useState(false);
-
-  // Sync with global theme on mount
+  // Force light mode
   useEffect(() => {
-    const checkDark = () => document.documentElement.classList.contains('dark');
-    setIsDark(checkDark());
-
-    // Watch for changes from global theme system
-    const observer = new MutationObserver(() => {
-      setIsDark(checkDark());
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
+    document.documentElement.classList.remove('dark');
+    localStorage.removeItem('app-theme'); 
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = isDark ? 'light' : 'dark';
-    localStorage.setItem('app-theme', newTheme);
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    setIsDark(!isDark);
-  };
+
 
   return (
     <header className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-10 transition-colors">
@@ -80,16 +62,19 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, onNavigate }) => {
               <PenTool className="w-4 h-4 hidden sm:block" />
               写作
             </button>
+            <button
+              onClick={() => onNavigate('youtube')}
+              className={`px-3 md:px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${activeTab === 'youtube'
+                ? 'bg-white dark:bg-slate-700 text-pink-600 dark:text-pink-400 shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
+            >
+              <Sparkles className="w-4 h-4 hidden sm:block" />
+              视频学习
+            </button>
           </nav>
 
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
-            title={isDark ? '切换到亮色模式' : '切换到暗色模式'}
-          >
-            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
+
         </div>
 
       </div>
